@@ -1,6 +1,6 @@
 {
   "ltv": {
-    "trained_at": "2026-09-06T16:22:10+00:00",
+    "trained_at": "2026-09-06T16:43:21+00:00",
     "target": "ltv_months",
     "training_policy": "customers only (purchased = 1); rows with missing ltv_months dropped (D-M2-1, D-M2-2)",
     "n_train": 3163,
@@ -163,13 +163,13 @@
     },
     "input_defaults": {
       "ad_budget": 3000.0,
-      "num_leads": 41.0,
+      "num_leads": 42.0,
       "leads_answered": 28.0,
       "leads_not_answered": 14.0,
       "followup_1": 22.0,
       "followup_2": 16.0,
       "followup_3": 13.0,
-      "followup_4": 12.0,
+      "followup_4": 11.0,
       "followup_5": 8.0,
       "not_closed": 5.0,
       "closed": 3.0,

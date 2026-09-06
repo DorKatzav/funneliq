@@ -62,8 +62,16 @@ window.FunnelIQ = (() => {
       throw new Error("session expired");
     }
     const body = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(body.detail ? JSON.stringify(body.detail) : `HTTP ${res.status}`);
+    if (!res.ok) throw new Error(describeError(body, res.status));
     return body;
+  }
+
+  /** FastAPI validation errors arrive as a list of {loc, msg}; show the messages, not the JSON. */
+  function describeError(body, status) {
+    const d = body && body.detail;
+    if (Array.isArray(d)) return d.map((e) => (e.msg || "").replace(/^Value error, /, "")).join("; ");
+    if (typeof d === "string") return d;
+    return `HTTP ${status}`;
   }
 
   const fmt = {

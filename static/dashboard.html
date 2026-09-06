@@ -72,7 +72,7 @@
     <div class="grid2">
       <div class="card">
         <h2>New customer</h2>
-        <p class="muted">Acquisition-time funnel data only. Defaults are the training-set medians; the follow-up counts must be non-increasing.</p>
+        <p class="muted">Acquisition-time funnel data only. Defaults are a typical real customer (nearest the medians); answered + not answered must equal leads, follow-ups must be non-increasing, closed + not closed must equal followup 5.</p>
         <form id="predict-form" class="formgrid"></form>
         <button class="primary" id="predict-btn" type="button" style="max-width:16rem">Predict</button>
         <div class="error" id="predict-error" role="alert"></div>
