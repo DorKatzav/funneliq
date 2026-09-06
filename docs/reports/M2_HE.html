@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  pre { font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; direction: ltr; text-align: left; unicode-bidi: isolate; background: #1b2733; color: #e8eef2; border-radius: 10px; padding: 1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0 1.25rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M2 · 2026-09-06</span>
+    <h1>M2: מה הדאטה אומר לפני שממדלים</h1>
+    <p class="lede">חבילה 1 של הברייף: חסרים, מתאמים לרווח, עקומת תקציב←לידים, והמרה לפי רמת תקציב. כל מספר כאן מחושב ב-<code>ml/eda.py</code> ונכתב אוטומטית ל-<code>docs/FINDINGS.md</code>; אותה פונקציה מזינה את לשונית Overview באתר החי מתוך השורות ב-Supabase.</p>
+    <span class="stamp">שער M2: עבר 6/6</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">33</div><div class="l">שורות חסרות (0.9%), רק בעמודות מטרה</div></div>
+    <div class="kpi"><div class="v">0.61</div><div class="l">אלסטיות לידים/תקציב (1.0 = פרופורציונלי)</div></div>
+    <div class="kpi"><div class="v">Mid</div><div class="l">ה-tier שממיר הכי טוב: 8.3%</div></div>
+    <div class="kpi"><div class="v">×4</div><div class="l">רווח ממוצע Mid לעומת High</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה: שלוש התשובות של הברייף</h3>
+    <ol>
+      <li><b>כמה שורות לא שלמות ומה עשינו?</b> 33 מתוך 3,500. החסרים נמצאים רק בשתי עמודות <b>מטרה</b> (ltv_months: 4, cumulative_profit: 29). מטרה לא ממלאים בניחוש; משמיטים את השורה רק במשימה שהיא המטרה שלה. בכל השאר השורות נשארות.</li>
+      <li><b>האם יותר תקציב קונה יותר לידים באופן פרופורציונלי?</b> לא. ב-₪500 מקבלים 25.7 לידים על כל ₪1,000; ב-₪20,000 רק 6.1. כל שקל נוסף קונה פחות מהקודם.</li>
+      <li><b>איזה tier ממיר הכי טוב, וזה מפתיע?</b> Mid (₪2,000–5,000): 8.3%, מול High 5.4% ו-Low 4.7%. כן מפתיע: לא הזול ולא היקר. ה-Mid גם מביא פי 4 רווח מ-High ולקוחות שנשארים פי 2.5 יותר זמן.</li>
+    </ol>
+  </div>
+
+  <h2>המרה, רווח וותק לפי רמת תקציב</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>tier</th><th>שורות</th><th>המרה (closed / leads)</th><th>רווח ממוצע</th><th>CAC ממוצע</th><th>LTV ממוצע (חודשים)</th><th>שיעור רכישה</th></tr></thead>
+    <tbody>
+      <tr><td>Low (≤ ₪1,500)</td><td class="num">780</td><td class="num">4.7%</td><td class="num">₪2,291</td><td class="num">₪766</td><td class="num">7.9</td><td class="num">73.2%</td></tr>
+      <tr class="win"><td>Mid (₪2,000–5,000)</td><td class="num">1,717</td><td class="num">8.3%</td><td class="num">₪21,792</td><td class="num">₪1,024</td><td class="num">33.6</td><td class="num">95.5%</td></tr>
+      <tr><td>High (> ₪5,000)</td><td class="num">1,003</td><td class="num">5.4%</td><td class="num">₪5,186</td><td class="num">₪2,430</td><td class="num">13.2</td><td class="num">94.9%</td></tr>
+    </tbody>
+  </table></div>
+  <p>הקפיצה ברווח בין ₪1,500 ל-₪2,000 (מ-₪3.3k ל-₪21.7k) והנפילה בין ₪5,000 ל-₪6,000 (מ-₪21.7k ל-₪5.2k) חדות מאוד; זה סימן שהדאטה בנוי עם אפקט ברמת tier, ורמז חזק לחבילה 6 (חלוקת ה-₪50,000).</p>
+
+  <h2>מה קשור לרווח</h2>
+  <div class="card">
+    <ul>
+      <li>הכי חזק: <code>ltv_months</code> (r = +0.85), <code>upsell</code> (+0.65), <code>referred</code> (+0.59). שלושתן <b>תוצאות</b>: הן ידועות רק אחרי שהקשר עם הלקוח התנהל. לכן אף אחת מהן לא תהיה פיצ'ר לחיזוי תוצאה אחרת.</li>
+      <li>בין פיצ'רי המשפך: <code>calls_to_closed</code> (r = −0.55). עסקאות שדרשו יותר שיחות לסגירה יוצאות פחות רווחיות.</li>
+      <li><code>ad_budget</code> (−0.21) ו-<code>customer_acquisition_cost</code> (−0.25) שליליים: להוציא יותר לא קונה יותר רווח לרשומה.</li>
+    </ul>
+  </div>
+
+  <h2>שתי החלטות שאושרו</h2>
+  <div class="decision">
+    <h3>D-M2-1 · על מי מאמנים</h3>
+    <p>337 הלא-רוכשים: רווח 0 ו-upsell 0 אצל כולם, אבל 98.8% מהם עם "ותק" חיובי ו-46% עם עסקאות סגורות. זה נראה כמו משך קשר בלי רכישה בתשלום. <b>ההחלטה:</b> מודלי הלקוח (LTV, upsell, super customer) מאומנים על purchased=1 בלבד; מודל הרווח (חבילה 6) שומר את כל השורות, כי קמפיין שלא הניב רכישה הוא תוצאה אמיתית של אפס רווח שהסימולטור חייב לראות.</p>
+  </div>
+  <div class="decision">
+    <h3>D-M2-2 · חסרים</h3>
+    <p>לא ממלאים עמודת מטרה. שורה שחסר בה ltv_months מושמטת רק באימון מודל ה-LTV; שורה שחסר בה cumulative_profit רק באימון מודל הרווח. במסד הנתונים הן NULL.</p>
+    <p><b>העיקרון שדור ניסח:</b> אסור שלמודל יהיה מידע עתידי; הוא נבנה רק על מה שכבר קרה. זה בדיוק מה ש-<code>assert_no_leakage</code> יאכוף כמבחן ב-M3.</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>GET /api/insights/overview</code> מושך את 3,500 השורות מ-Supabase <b>עם הטוקן של המשתמש</b> (1,000 בכל עמוד), מחשב את אותו <code>overview_stats</code> ששימש ל-FINDINGS.md, ושומר בזיכרון ל-10 דקות. לשונית Overview מציגה KPIs, עקומת תקציב←לידים (שני צירים), המרה לפי tier עם טבלה, מתאמים לרווח, וחסרים.</p>
+    <p><img src="img/m2_overview_live.jpg" alt="לשונית Overview באתר החי: KPIs 3,500 / 33 / 6.5% / Mid, עקומת תקציב מול לידים ולידים ל-₪1,000, ועמודות המרה לפי tier עם טבלה"></p>
+    <div class="artifacts"><span>ml/eda.py</span><span>docs/FINDINGS.md</span><span>app/routers/insights.py</span><span>static/dashboard.html</span><span>tests/test_eda.py</span><span>tests/test_insights.py</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (36 בדיקות, מהן 15 חדשות: מסגרת סינתטית עם תשובות ידועות + אינווריאנטים על הדאטה האמיתי + דפדוף ו-cache של הנתיב).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · EDA: 33 שורות חסרות, 3 tiers, verdict = diminishing.</li>
+      <li><span class="ok">עבר</span> · FINDINGS.md עונה על שלוש השאלות עם מספרים.</li>
+      <li><span class="ok">עבר</span> · D-M2-1 ו-D-M2-2 רשומות כמאושרות ב-PROJECT_LOG.</li>
+      <li><span class="ok">עבר</span> · <code>/api/insights/overview</code> החי מחזיר 200, 3,500 שורות, 3 tiers, 33 חסרות.</li>
+    </ol>
+    <p style="margin:0.6rem 0 0"><b>בדפדפן:</b> אחרי התחברות של דור, שלושת הגרפים מצוירים (Chart.js), ה-KPIs תואמים ל-FINDINGS.md.</p>
+  </div>
+
+  <div class="notice">
+    <h3>לקח קטן על git</h3>
+    <p>ה-PR של M2 נפתח מול ענף M1 (כי הוא צריך את <code>ml/data.py</code>). כש-M1 מוזג וענפו נמחק, GitHub סגר את ה-PR אוטומטית. הפתרון: rebase על main (קונפליקט אחד ביומן, נפתר) ו-PR חדש (#8). בעתיד: ענפים "מוערמים" מקבלים rebase מיד אחרי מיזוג הבסיס.</p>
+  </div>
+
+  <h2>הבא בתור: M3, רגרסיה ל-LTV</h2>
+  <div class="card">
+    <p><code>ml/features.py</code> עם קבוצות הפיצ'רים ומגן הדליפה כמבחן, <code>ml/evaluate.py</code>, שלושה רגרסורים (XGBoost, LightGBM, CatBoost) ב-5-fold על purchased=1, ניסוי ablation שמראה כמה R² "מנופח" נותן cumulative_profit, ואז <code>/api/predict/ltv</code> ולשונית Predict עם טופס לקוח חדש.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M2 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
