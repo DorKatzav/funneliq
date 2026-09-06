@@ -22,3 +22,6 @@ notebooks/
 .DS_Store
 .vscode/
 .idea/
+
+# CatBoost training scratch directory
+catboost_info/
