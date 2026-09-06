@@ -13,3 +13,12 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - `PLAN.md` (contracts + milestones + gates) and `PLAN_HE.html` written. Obsidian project pages created.
 - Environment check: conda `AI_dev` has pandas 3.0.3, scikit-learn 1.9.0, pytest, uvicorn, httpx, joblib, pydantic 2.13; missing xgboost, lightgbm, catboost, fastapi, supabase → install in M0. `gh` logged in as DorKatzav. No node/docker/railway CLI.
 - Next: M0 (skeleton deployed).
+
+## 2026-09-06 — M0: deployed skeleton — GATE PASSED (5/5)
+- Own git repo initialised; course repo ignores the folder. GitHub: https://github.com/DorKatzav/funneliq (public). PR #1 (skeleton) and PR #2 (gate fix) merged via CI.
+- Installed into AI_dev and pinned: fastapi 0.141.1, uvicorn 0.52.3, pydantic-settings 2.15.0, supabase 2.31.0, PyJWT 2.13.0, xgboost 3.2.0, lightgbm 4.7.0, catboost 1.2.10, ruff 0.16.6 (pandas 3.0.3 / scikit-learn 1.9.0 / numpy 2.4.6 already present).
+- Surprise: `brew list libomp` looked installed but the dylib was missing → xgboost/lightgbm import failed until `brew install libomp`. Documented in README.
+- Gate lesson: the secret-scan regex matched itself inside scripts/gate.py → the script is now excluded from its own scan (PR #2).
+- Railway: service from GitHub main, Nixpacks, healthcheck `/health`; domain https://funneliq-production-4b63.up.railway.app. First domain the user pasted (`funneliq-production.up.railway.app`) belonged to a *different* Railway user's app — domains are global; always copy from the Networking panel.
+- Live `/health` reports the exact main commit (4cf8e93) → push-to-redeploy proven. Manual restart in Railway → `/health` 200 again with uptime reset (115.9 s), same commit → restart survival proven.
+- Next: M1 (Supabase project, schema + RLS, loader, JWT auth, login page).

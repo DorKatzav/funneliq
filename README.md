@@ -8,7 +8,7 @@ simulates how to split a ₪50,000 monthly ad budget. Login-gated internal tool 
 with gradient boosting (XGBoost, LightGBM, CatBoost), FastAPI, Supabase (Postgres + Auth
 + Row Level Security) and Railway.
 
-> Status: **M0 — deployed skeleton.** Live URL: _coming in this milestone_.
+> Status: **M0 — deployed skeleton.** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
 
 ## Architecture (short version)
 
