@@ -7,3 +7,7 @@ select = ["E", "F", "I", "B", "UP"]
 [lint.flake8-bugbear]
 # FastAPI idiom: Depends()/Query() in defaults are declarations, not calls
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header"]
+
+[lint.per-file-ignores]
+# prose strings for the generated FINDINGS.md
+"ml/eda.py" = ["E501"]

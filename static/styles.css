@@ -72,3 +72,6 @@ th { background: var(--wind-soft); color: var(--wind); position: sticky; top: 0;
 .badge { display: inline-block; padding: 0.1rem 0.55rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; }
 .badge.ok { background: var(--gate-soft); color: var(--gate); }
 .badge.warn { background: var(--tape-soft); color: var(--tape); }
+
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; margin: 0 0 1rem; }
+.grid2 .card { margin: 0; }

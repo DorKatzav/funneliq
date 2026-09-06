@@ -22,3 +22,17 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Railway: service from GitHub main, Nixpacks, healthcheck `/health`; domain https://funneliq-production-4b63.up.railway.app. First domain the user pasted (`funneliq-production.up.railway.app`) belonged to a *different* Railway user's app — domains are global; always copy from the Networking panel.
 - Live `/health` reports the exact main commit (4cf8e93) → push-to-redeploy proven. Manual restart in Railway → `/health` 200 again with uptime reset (115.9 s), same commit → restart survival proven.
 - Next: M1 (Supabase project, schema + RLS, loader, JWT auth, login page).
+
+## 2026-09-06 — M1 code complete (offline), waiting on Supabase manual steps
+- Branch `feat/m1-supabase-auth`, draft PR #4. 24 tests: data module, JWT verification (ES256 via JWKS + HS256, forged key rejected), records API (401 / paginated 200), static pages.
+- Design note: `app/db.py` binds the user's JWT to the postgrest client per request (`client.postgrest.auth(token)`), so RLS is enforced by Postgres, not by our code.
+- Blocked on: Supabase project + keys, SQL run, team user, Railway variables (user away from desk).
+
+## 2026-09-06 — M2 offline half started early (user approved working ahead while blocked)
+- Branch `feat/m2-eda-overview` based on the M1 branch (needs ml/data.py). Only the CSV is read; nothing touches M1 files.
+- `ml/eda.py::overview_stats` + `render_findings_md` → `docs/FINDINGS.md` fully generated (no hand-typed numbers). 12 EDA tests + 3 endpoint tests. `GET /api/insights/overview` pages through Supabase rows (1,000/page) with a 10-minute cache; dashboard Overview tab with Chart.js (budget→leads, tier conversion, correlations).
+- Findings: 33 incomplete rows (27 customers / 6 non-customers); leads per ₪1,000 fall 25.7 → 6.1 (log-log elasticity 0.61 → diminishing); Mid tier converts best (8.3% vs High 5.4%, Low 4.7%) and carries ~4× the profit of High (₪21.8k vs ₪5.2k) with LTV 33.6 vs 13.2 months; strongest funnel-feature correlate of profit is calls_to_closed (r = −0.55); funnel identities hold on 100% of rows.
+- Non-purchasers (337): profit is 0 for all, upsell 0 for all, yet 98.8% have ltv_months > 0 and 46% have closed > 0.
+- **Proposed, pending user approval:**
+  - D-M2-1: customer models (P2 LTV, P3 upsell, P4 super) train on purchased = 1 only; the P6 profit model keeps all rows (zero-profit campaigns are real outcomes for the simulator).
+  - D-M2-2: never impute a target; drop rows missing `ltv_months` only for the LTV model and rows missing `cumulative_profit` only for the profit model; keep everything elsewhere; NULL in the database.

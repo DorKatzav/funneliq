@@ -6,6 +6,7 @@
 <title>FunnelIQ — Dashboard</title>
 <link rel="stylesheet" href="/static/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="/static/app.js"></script>
 </head>
 <body>
@@ -26,14 +27,45 @@
   <section class="panel" id="panel-overview">
     <div class="kpis">
       <div class="kpi"><div class="v" id="kpi-total">…</div><div class="l">records in Supabase</div></div>
+      <div class="kpi"><div class="v" id="kpi-incomplete">…</div><div class="l">incomplete rows</div></div>
+      <div class="kpi"><div class="v" id="kpi-conv">…</div><div class="l">overall conversion (closed / leads)</div></div>
+      <div class="kpi"><div class="v" id="kpi-tier">…</div><div class="l">best-converting budget tier</div></div>
       <div class="kpi"><div class="v" id="kpi-rls"><span class="badge ok">RLS on</span></div><div class="l">rows read with your token</div></div>
     </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>Does more budget buy proportionally more leads?</h2>
+        <p class="muted" id="dim-text">…</p>
+        <canvas id="chart-budget" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h2>Conversion by budget tier</h2>
+        <p class="muted">Low ≤ ₪1,500 · Mid ₪2,000–5,000 · High > ₪5,000</p>
+        <canvas id="chart-tier" height="220"></canvas>
+        <div class="tablewrap"><table id="tier-table"><thead><tr><th>tier</th><th>n</th><th>conversion</th><th>mean profit</th><th>mean CAC</th><th>mean LTV</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>Correlation with cumulative profit</h2>
+        <p class="muted">Pearson r. Outcome columns (LTV, upsell, referred) dominate — they are never used as features.</p>
+        <canvas id="chart-corr" height="320"></canvas>
+      </div>
+      <div class="card">
+        <h2>Missing values</h2>
+        <ul id="missing-list" class="muted"></ul>
+        <h2>Funnel consistency</h2>
+        <ul id="consistency-list" class="muted"></ul>
+      </div>
+    </div>
+
     <div class="card">
       <h2>Historical records</h2>
       <p class="muted">First rows of <code>funnel_records</code>, fetched through the API with your session token.</p>
       <div class="tablewrap"><table id="records"><thead></thead><tbody></tbody></table></div>
     </div>
-    <div class="card"><h2>Insights</h2><p class="muted">Correlations, budget→leads curve and conversion by tier arrive in the next milestone (P1).</p></div>
   </section>
 
   <section class="panel" id="panel-predict" hidden>
@@ -78,6 +110,53 @@
     } catch (e) {
       document.getElementById("kpi-total").textContent = "error";
       document.getElementById("kpi-rls").innerHTML = `<span class="badge warn">${e.message}</span>`;
+    }
+
+    // overview insights (P1)
+    try {
+      const s = await FunnelIQ.api("/api/insights/overview");
+      const f = FunnelIQ.fmt;
+      document.getElementById("kpi-incomplete").textContent = f.int(s.counts.incomplete_rows);
+      document.getElementById("kpi-conv").textContent = f.pct(s.counts.overall_conversion);
+      document.getElementById("kpi-tier").textContent = s.best_tier;
+      const d = s.diminishing_returns;
+      document.getElementById("dim-text").textContent =
+        `${d.verdict === "diminishing" ? "Diminishing returns" : "Roughly proportional"}: leads per ₪1,000 go from ` +
+        `${d.leads_per_1000_at_min_budget} at the smallest budget to ${d.leads_per_1000_at_max_budget} at the largest ` +
+        `(elasticity ${d.log_log_elasticity}; 1.0 would be proportional).`;
+
+      const wind = "#0f5c6e", tape = "#c9560c", gate = "#2f7d46", line = "#c9d2cd";
+      new Chart(document.getElementById("chart-budget"), {
+        type: "line",
+        data: {
+          labels: s.budget_vs_leads.map((b) => b.ad_budget),
+          datasets: [
+            { label: "mean leads", data: s.budget_vs_leads.map((b) => b.mean_leads), borderColor: wind, backgroundColor: wind, yAxisID: "y", tension: 0.25 },
+            { label: "leads per ₪1,000", data: s.budget_vs_leads.map((b) => b.leads_per_1000), borderColor: tape, backgroundColor: tape, yAxisID: "y2", tension: 0.25 },
+          ],
+        },
+        options: { scales: { x: { title: { display: true, text: "ad budget (₪)" } }, y: { title: { display: true, text: "leads" }, grid: { color: line } }, y2: { position: "right", title: { display: true, text: "leads per ₪1,000" }, grid: { drawOnChartArea: false } } } },
+      });
+      new Chart(document.getElementById("chart-tier"), {
+        type: "bar",
+        data: { labels: s.conversion_by_tier.map((t) => t.tier), datasets: [{ label: "conversion", data: s.conversion_by_tier.map((t) => 100 * t.conversion), backgroundColor: [line, gate, wind] }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { title: { display: true, text: "closed / leads (%)" }, beginAtZero: true } } },
+      });
+      document.querySelector("#tier-table tbody").innerHTML = s.conversion_by_tier.map((t) =>
+        `<tr><td>${t.tier}</td><td>${f.int(t.n)}</td><td>${f.pct(t.conversion)}</td><td>${f.money(t.mean_profit)}</td><td>${f.money(t.mean_cac)}</td><td>${t.mean_ltv_months} mo</td></tr>`).join("");
+      const corr = s.correlations_with_profit;
+      new Chart(document.getElementById("chart-corr"), {
+        type: "bar",
+        data: { labels: corr.map((c) => c.column), datasets: [{ label: "Pearson r", data: corr.map((c) => c.r), backgroundColor: corr.map((c) => (c.r >= 0 ? wind : tape)) }] },
+        options: { indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: { min: -1, max: 1 } } },
+      });
+      document.getElementById("missing-list").innerHTML =
+        Object.entries(s.counts.missing_per_column).map(([k, v]) => `<li><code>${k}</code>: ${v} rows</li>`).join("") +
+        `<li>${s.counts.incomplete_rows} incomplete rows in total; targets are never imputed (see FINDINGS.md).</li>`;
+      document.getElementById("consistency-list").innerHTML =
+        Object.entries(s.funnel_consistency).map(([k, v]) => `<li>${k}: <b>${f.pct(v)}</b></li>`).join("");
+    } catch (e) {
+      document.getElementById("dim-text").textContent = "insights unavailable: " + e.message;
     }
   })();
 </script>
