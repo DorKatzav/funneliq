@@ -14,9 +14,10 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import insights, records
+from app.routers import insights, predict, records
+from ml.registry import ModelRegistry
 
-APP_VERSION = "0.3.0"
+APP_VERSION = "0.4.0"
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 _started_at = time.time()
 
@@ -24,6 +25,7 @@ _started_at = time.time()
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="FunnelIQ", version=APP_VERSION, docs_url="/api/docs", redoc_url=None)
+    app.state.registry = ModelRegistry.load(settings.models_dir)
 
     @app.get("/health", tags=["ops"])
     def health() -> dict:
@@ -34,7 +36,7 @@ def create_app() -> FastAPI:
             "commit": (settings.railway_git_commit_sha or "dev")[:12],
             "env": settings.app_env,
             "supabase_configured": bool(settings.supabase_url and settings.supabase_anon_key),
-            "models_loaded": [],
+            "models_loaded": app.state.registry.loaded,
             "uptime_s": round(time.time() - _started_at, 1),
         }
 
@@ -53,6 +55,7 @@ def create_app() -> FastAPI:
 
     app.include_router(records.router)
     app.include_router(insights.router)
+    app.include_router(predict.router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     return app
 
