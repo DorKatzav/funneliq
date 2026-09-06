@@ -50,3 +50,10 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - D-M2-1: customer models (P2 LTV, P3 upsell, P4 super) train on purchased = 1; P6 profit model keeps all rows.
 - D-M2-2: targets are never imputed; drop rows missing the target only for that task; NULL in the database.
 - Standing rule reinforced: FUNNEL features only (acquisition-time), enforced by ml/features.py::assert_no_leakage in M3.
+
+## 2026-09-06 — M2: P1 exploration, cleaning, Overview panel — GATE PASSED (6/6)
+- PR #8 merged (re-opened from #5 after the M1 base branch was deleted). Live v0.3.0.
+- Live `/api/insights/overview` computes from 3,500 Supabase rows with the user's token (paged 1,000/page, cached 10 min). Dashboard Overview verified signed-in: KPIs 3,500 / 33 / 6.5% / Mid; three charts rendered; tier table.
+- Numbers that drive the next milestones: elasticity of leads vs budget 0.608 (diminishing); Mid tier converts 8.3% with mean profit ₪21,792 and LTV 33.6 months vs High 5.4% / ₪5,186 / 13.2 and Low 4.7% / ₪2,291 / 7.9; calls_to_closed r = −0.546 with profit.
+- Feature-policy note for M3: `ltv_months` (r = 0.846), `upsell` (0.652) and `referred` (0.585) dominate the profit correlation — all outcomes; none is ever a feature for another outcome.
+- Next: M3 — P2 LTV regression (features.py + leakage guard, evaluate.py, three regressors, ablation, /api/predict/ltv, Predict tab).

@@ -8,7 +8,7 @@ simulates how to split a ₪50,000 monthly ad budget. Login-gated internal tool 
 with gradient boosting (XGBoost, LightGBM, CatBoost), FastAPI, Supabase (Postgres + Auth
 + Row Level Security) and Railway.
 
-> Status: **M1 — data in Supabase behind RLS, real login.** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
+> Status: **M2 — P1 exploration live on the Overview tab.** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
 
 ## Architecture (short version)
 
@@ -34,7 +34,8 @@ cp .env.example .env                  # fill in your Supabase values
 uvicorn app.main:app --reload         # http://127.0.0.1:8000  (docs at /api/docs)
 pytest -q && ruff check .
 python scripts/load_data.py           # CSV → Supabase (needs SUPABASE_SERVICE_KEY locally)
-python scripts/gate.py --m 1          # milestone gate (offline + live checks)
+python -m ml.eda --write docs/FINDINGS.md   # regenerate the P1 findings note
+python scripts/gate.py --m 2          # milestone gate (offline + live checks)
 ```
 
 macOS note: `lightgbm` needs `brew install libomp`.
