@@ -212,7 +212,7 @@ Rules used (in `ml/followups.py`): cut only if < 15% of closed deals needed > 3 
 | lightgbm | 6,594 ± 1,713 | 0.654 |
 | catboost ★ served | 6,515 ± 1,680 | 0.662 |
 
-Target std ₪11,228. The simulator feeds the served model a *typical* campaign per budget level (median of every funnel feature at that level, `models/profiles.json`) and multiplies by the number of campaigns; the empirical column is the observed mean profit at that level × campaigns.
+Target std ₪11,228. For each budget level the simulator uses the served model's expected profit per campaign — its predictions averaged over the real campaigns at that level, stored in `models/profiles.json` next to the median funnel profile — and multiplies by the number of campaigns; the empirical column is the observed mean profit at that level × campaigns.
 
 ### The model's curve: profit per campaign by budget level
 

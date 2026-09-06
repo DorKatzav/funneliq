@@ -231,9 +231,10 @@ def render_report_md(ranking: dict, profit_metrics: dict) -> str:
         lines.append(f"| {name}{star} | {m['rmse_mean']:,.0f} ± {m['rmse_std']:,.0f} | {m['r2_mean']:.3f} |")
     lines += [
         "",
-        f"Target std ₪{profit_metrics['target_stats']['std']:,.0f}. The simulator feeds the served model a *typical* campaign "
-        "per budget level (median of every funnel feature at that level, `models/profiles.json`) and multiplies by the "
-        "number of campaigns; the empirical column is the observed mean profit at that level × campaigns.",
+        f"Target std ₪{profit_metrics['target_stats']['std']:,.0f}. For each budget level the simulator uses the served "
+        "model's expected profit per campaign — its predictions averaged over the real campaigns at that level, stored "
+        "in `models/profiles.json` next to the median funnel profile — and multiplies by the number of campaigns; the "
+        "empirical column is the observed mean profit at that level × campaigns.",
         "",
         "### The model's curve: profit per campaign by budget level",
         "",
