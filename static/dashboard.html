@@ -69,8 +69,33 @@
   </section>
 
   <section class="panel" id="panel-predict" hidden>
-    <div class="card"><h2>Predict</h2><p class="muted">Customer lifetime, upsell probability and super-customer score — coming in M3–M5.</p></div>
+    <div class="grid2">
+      <div class="card">
+        <h2>New customer</h2>
+        <p class="muted">Acquisition-time funnel data only. Defaults are the training-set medians; the follow-up counts must be non-increasing.</p>
+        <form id="predict-form" class="formgrid"></form>
+        <button class="primary" id="predict-btn" type="button" style="max-width:16rem">Predict</button>
+        <div class="error" id="predict-error" role="alert"></div>
+      </div>
+      <div class="card">
+        <h2>Expected lifetime</h2>
+        <div class="result" id="ltv-result">
+          <div class="big" id="ltv-months">—</div>
+          <div class="muted" id="ltv-sub">months (fill the form and press Predict)</div>
+        </div>
+        <table id="ltv-by-model" class="compact"><thead><tr><th>model</th><th>months</th></tr></thead><tbody></tbody></table>
+        <p class="muted" id="ltv-note"></p>
+        <h2 style="margin-top:1.25rem">What drives this prediction</h2>
+        <canvas id="chart-ltv-imp" height="200"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Your recent predictions</h2>
+      <p class="muted">Read back from <code>prediction_log</code> in Supabase — Row Level Security returns only your own rows.</p>
+      <div class="tablewrap"><table id="pred-log"><thead><tr><th>when</th><th>model</th><th>calls to close</th><th>budget</th><th>CAC</th><th>result</th></tr></thead><tbody></tbody></table></div>
+    </div>
   </section>
+
   <section class="panel" id="panel-followups" hidden>
     <div class="card"><h2>Follow-ups</h2><p class="muted">Dropout per follow-up stage and the recommendation — coming in M6.</p></div>
   </section>
@@ -78,7 +103,17 @@
     <div class="card"><h2>Budget simulator</h2><p class="muted">Allocate ₪50,000 across campaign sizes — coming in M7.</p></div>
   </section>
   <section class="panel" id="panel-findings" hidden>
-    <div class="card"><h2>Findings</h2><p class="muted">Model metrics and business recommendations — filled in as milestones complete.</p></div>
+    <div class="card">
+      <h2>P2 · Customer lifetime (LTV) — model comparison</h2>
+      <p class="muted" id="ltv-policy"></p>
+      <div class="tablewrap"><table id="ltv-cv"><thead><tr><th>model</th><th>RMSE (months)</th><th>R²</th><th>note</th></tr></thead><tbody></tbody></table></div>
+      <p class="muted" id="ltv-ablation"></p>
+    </div>
+    <div class="card">
+      <h2>Feature importances (all three models)</h2>
+      <canvas id="chart-ltv-imp-all" height="260"></canvas>
+    </div>
+    <div class="card"><h2>Business recommendations</h2><p class="muted">Collected in <code>docs/REPORT.md</code>; the lever for customer longevity is documented under P2.</p></div>
   </section>
 </main>
 
@@ -157,6 +192,80 @@
         Object.entries(s.funnel_consistency).map(([k, v]) => `<li>${k}: <b>${f.pct(v)}</b></li>`).join("");
     } catch (e) {
       document.getElementById("dim-text").textContent = "insights unavailable: " + e.message;
+    }
+
+    // ---------------- Predict + Findings (P2) ----------------
+    const FIELDS = ["ad_budget","num_leads","leads_answered","leads_not_answered","followup_1","followup_2","followup_3",
+                    "followup_4","followup_5","not_closed","closed","calls_to_closed","calls_to_not_closed","customer_acquisition_cost"];
+    const wind = "#0f5c6e", tape = "#c9560c";
+    let models = null;
+    try {
+      models = await FunnelIQ.api("/api/models");
+    } catch (e) {
+      document.getElementById("ltv-policy").textContent = "models unavailable: " + e.message;
+    }
+    const ltv = models && models.metrics.ltv;
+    const form = document.getElementById("predict-form");
+    form.innerHTML = FIELDS.map((f) => {
+      const d = ltv && ltv.input_defaults ? Math.round(ltv.input_defaults[f]) : 0;
+      return `<label>${f.replaceAll("_", " ")}<input name="${f}" type="number" min="0" step="1" value="${d}"></label>`;
+    }).join("");
+
+    function fmtLog(r) {
+      const i = r.input || {}, o = r.output || {};
+      const when = new Date(r.created_at).toLocaleString("en-GB");
+      const result = o.months != null ? `${o.months} months` : JSON.stringify(o);
+      return `<tr><td>${when}</td><td>${r.model}</td><td>${i.calls_to_closed ?? "—"}</td><td>${FunnelIQ.fmt.money(i.ad_budget)}</td><td>${FunnelIQ.fmt.money(i.customer_acquisition_cost)}</td><td>${result}</td></tr>`;
+    }
+    async function loadLog() {
+      try {
+        const log = await FunnelIQ.api("/api/predictions?limit=10");
+        document.querySelector("#pred-log tbody").innerHTML = log.rows.map(fmtLog).join("") || "<tr><td colspan=6 class=muted>none yet</td></tr>";
+      } catch (e) { /* table stays empty */ }
+    }
+    loadLog();
+
+    document.getElementById("predict-btn").addEventListener("click", async () => {
+      const err = document.getElementById("predict-error"); err.textContent = "";
+      const payload = {};
+      FIELDS.forEach((f) => { payload[f] = Number(form.elements[f].value); });
+      try {
+        const r = await FunnelIQ.api("/api/predict/ltv", { method: "POST", body: JSON.stringify(payload) });
+        document.getElementById("ltv-months").textContent = r.months;
+        document.getElementById("ltv-sub").textContent = `months expected · served by ${r.served} · typical error ±${(r.rmse_months || 0).toFixed(1)} months`;
+        document.querySelector("#ltv-by-model tbody").innerHTML =
+          Object.entries(r.by_model).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
+        document.getElementById("ltv-note").textContent =
+          "Reads as: a customer acquired like this — same budget, same calls to close, same cost — stays this long on average.";
+        loadLog();
+      } catch (e) { err.textContent = e.message; }
+    });
+
+    if (ltv) {
+      const served = ltv.served;
+      const imp = ltv.importances[served === "ensemble" ? "catboost" : served];
+      const top = Object.entries(imp).slice(0, 8);
+      new Chart(document.getElementById("chart-ltv-imp"), {
+        type: "bar",
+        data: { labels: top.map(([k]) => k), datasets: [{ label: `importance (${served === "ensemble" ? "catboost" : served})`, data: top.map(([, v]) => v), backgroundColor: wind }] },
+        options: { indexAxis: "y", plugins: { legend: { display: false } }, scales: { x: { min: 0, max: 1 } } },
+      });
+      // Findings
+      document.getElementById("ltv-policy").textContent =
+        `Trained on ${ltv.n_train.toLocaleString()} customers · ${ltv.training_policy} · features: ${ltv.features.length} (funnel only) · trained ${ltv.trained_at}`;
+      document.querySelector("#ltv-cv tbody").innerHTML = Object.entries(ltv.cv).map(([name, m]) =>
+        `<tr${name === served ? ' class="win"' : ""}><td>${name}${name === served ? " ★ served" : ""}</td><td>${m.rmse_mean.toFixed(2)} ± ${m.rmse_std.toFixed(2)}</td><td>${m.r2_mean.toFixed(3)}</td><td>${name === "ensemble" ? "mean of the three" : ""}</td></tr>`).join("");
+      const ab = ltv.ablation_with_profit;
+      document.getElementById("ltv-ablation").textContent =
+        `Leakage ablation (never served): adding cumulative_profit lifts CatBoost R² from ${ab.catboost_funnel_only_same_rows.r2_mean.toFixed(3)} to ${ab.catboost.r2_mean.toFixed(3)} — because profit accrues over the lifetime it is predicting. That is why it is excluded.`;
+      const names = Object.keys(ltv.importances);
+      const feats = Object.keys(ltv.importances[names[0]]).slice(0, 8);
+      const colors = { xgboost: wind, lightgbm: "#2f7d46", catboost: tape };
+      new Chart(document.getElementById("chart-ltv-imp-all"), {
+        type: "bar",
+        data: { labels: feats, datasets: names.map((n) => ({ label: n, data: feats.map((f) => ltv.importances[n][f] || 0), backgroundColor: colors[n] })) },
+        options: { scales: { y: { min: 0, max: 1, title: { display: true, text: "share of importance" } } } },
+      });
     }
   })();
 </script>

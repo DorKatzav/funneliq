@@ -230,6 +230,60 @@ def check_live_overview() -> None:
     assert body["counts"]["incomplete_rows"] == 33
 
 
+# ---------------------------------------------------------------- M3 checks
+def _metrics() -> dict:
+    path = ROOT / "models" / "metrics.json"
+    assert path.exists(), "models/metrics.json missing — run python -m ml.train_ltv"
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def check_leakage_test_passes() -> None:
+    res = _run([PY, "-m", "pytest", "-q", "tests/test_features.py", "-k", "leakage"])
+    assert res.returncode == 0, res.stdout.strip().splitlines()[-1]
+
+
+def check_ltv_metrics_complete() -> None:
+    ltv = _metrics().get("ltv")
+    assert ltv, "metrics.json has no 'ltv' section"
+    for name in ("xgboost", "lightgbm", "catboost"):
+        cv = ltv["cv"][name]
+        assert 0 < cv["rmse_mean"] and -1 <= cv["r2_mean"] <= 1, cv
+        assert (ROOT / "models" / f"ltv_{name}.joblib").exists(), f"ltv_{name}.joblib missing"
+        assert ltv["importances"][name], f"no importances for {name}"
+    assert "cumulative_profit" not in ltv["features"], "leaked feature in served model"
+
+
+def check_ablation_documents_leak() -> None:
+    ltv = _metrics()["ltv"]
+    ab = ltv["ablation_with_profit"]
+    assert ab["catboost"]["r2_mean"] > ab["catboost_funnel_only_same_rows"]["r2_mean"], ab
+
+
+def check_report_p2() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    for needle in ("## P2", "cumulative_profit", "calls_to_closed", "two sentences"):
+        assert needle in text, f"REPORT.md §P2 lacks '{needle}'"
+
+
+def check_live_predict_ltv() -> None:
+    import httpx
+
+    token = _gate_user_token()
+    customer = {
+        "ad_budget": 3000, "num_leads": 40, "leads_answered": 26, "leads_not_answered": 14,
+        "followup_1": 21, "followup_2": 16, "followup_3": 13, "followup_4": 11, "followup_5": 8,
+        "not_closed": 4, "closed": 4, "calls_to_closed": 2, "calls_to_not_closed": 3,
+        "customer_acquisition_cost": 750,
+    }
+    headers = {"Authorization": f"Bearer {token}"}
+    res = httpx.post(f"{_live_url()}/api/predict/ltv", json=customer, headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert 1 <= body["months"] <= 60, body
+    log = httpx.get(f"{_live_url()}/api/predictions?limit=1", headers=headers, timeout=30).json()
+    assert log["rows"] and log["rows"][0]["model"] == "ltv", log
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -255,6 +309,15 @@ GATES: dict[int, list[Check]] = {
         ("FINDINGS.md answers the three P1 questions", check_findings_written),
         ("D-M2-1 / D-M2-2 approved in PROJECT_LOG", check_decisions_logged),
         ("live /api/insights/overview -> 200 with 3 tiers (Supabase rows)", check_live_overview),
+    ],
+    3: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("leakage guard test passes", check_leakage_test_passes),
+        ("metrics.json: 3 LTV models with CV, importances, artifacts", check_ltv_metrics_complete),
+        ("ablation with profit scores higher (documents the leak)", check_ablation_documents_leak),
+        ("REPORT.md §P2 answers the brief", check_report_p2),
+        ("live POST /api/predict/ltv -> 200 + logged in prediction_log", check_live_predict_ltv),
     ],
 }
 

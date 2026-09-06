@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — איך חוזים ותק לקוח ממידע על המשפך</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 108%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.1rem; line-height: 1.75; text-align: start; }
+  main { max-width: 56rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.2; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); margin-block-end: 1.5rem; font-size: 1.15rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.65rem; margin: 2.5rem 0 0.9rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.4rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .question { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.25rem; font-size: 1.12rem; }
+  .answer { border-inline-start: 5px solid var(--gate); background: var(--gate-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.25rem; }
+  .answer h3, .question h3 { margin: 0 0 0.4rem; font-size: 1.15rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem 1.1rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.8rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.98rem; }
+  th, td { border: 1px solid var(--line); padding: 0.5rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  .bar { display: inline-block; height: 0.8rem; background: var(--wind); border-radius: 3px; vertical-align: middle; margin-inline-end: 0.4rem; }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+  .col h4 { margin: 0 0 0.4rem; font-family: var(--display); font-weight: 400; font-size: 1.15rem; }
+  .col.yes h4 { color: var(--gate); } .col.no h4 { color: var(--tape); }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · הסבר · M3 · 2026-09-06</span>
+    <h1>איך אפשר לחזות כמה זמן לקוח יישאר, מנתונים על המשפך השיווקי?</h1>
+    <p class="lede">שאלה טובה שראוי לענות עליה במספרים ולא בסיסמאות. התשובה הקצרה: הנתונים <b>כן</b> מתארים את הלקוח, רק לא בדרך שמצפים לה. הם מתארים איך הלקוח הזה <i>נרכש</i>, וזה מתברר כסימן חזק מאוד לאיך הוא יתנהג אחר כך.</p>
+  </header>
+
+  <div class="question">
+    <h3>השאלה שלך</h3>
+    <p>"על פי המידע הזה, איך נוכל לחזות משהו שקשור בכלל ללקוח? כמה זמן הוא יהיה איתנו? זה מידע שקשור למודל הפרסום שלנו וכו', ולא אליו ישירות."</p>
+  </div>
+
+  <h2>1. מה באמת יש בכל שורה</h2>
+  <div class="card">
+    <p>הברייף אומר: "שורה אחת לכל רשומת לקוח/קמפיין". כלומר כל שורה היא <b>לקוח אחד יחד עם ההקשר שבו הוא הגיע</b>. חלק מהעמודות מתארות את הקמפיין (תקציב, כמה לידים נוצרו, כמה ענו), אבל חלק מתארות את <b>המסע של הלקוח הספציפי הזה</b> מול צוות המכירות:</p>
+    <ul>
+      <li><code>calls_to_closed</code>: כמה שיחות היו צריכות כדי לסגור את העסקה עם הלקוח הזה. זה התנהגות שלו: כמה מהר השתכנע, כמה התלבט.</li>
+      <li><code>customer_acquisition_cost</code>: כמה עלה להשיג דווקא אותו.</li>
+      <li>רמת התקציב (<code>budget_tier</code>): מאיזה סוג קמפיין הוא הגיע, כלומר מאיזה קהל.</li>
+    </ul>
+    <p>אין לנו גיל, תעשייה או היסטוריית רכישות. אבל יש לנו את <b>אופן הרכישה</b>, וזה מידע על הלקוח בדיוק כמו שהדרך שבה מישהו נכנס לחנות אומרת משהו עליו.</p>
+  </div>
+
+  <h2>2. מה המודל למד בפועל (מדוד, לא משוער)</h2>
+  <div class="kpis">
+    <div class="kpi"><div class="v">0.95</div><div class="l">R² בקרוס-ולידציה, פיצ'רי משפך בלבד</div></div>
+    <div class="kpi"><div class="v">±2.8</div><div class="l">חודשים, טעות ממוצעת (RMSE)</div></div>
+    <div class="kpi"><div class="v">12.0</div><div class="l">חודשים, פיזור הוותק בפועל (std)</div></div>
+    <div class="kpi"><div class="v">−0.95</div><div class="l">מתאם ותק ↔ שיחות עד סגירה</div></div>
+  </div>
+  <p>שלושת המודלים (XGBoost, LightGBM, CatBoost) מסכימים: 83%–92% מכוח החיזוי יושב בפיצ'ר אחד, <code>calls_to_closed</code>. ואם מסתכלים על הדאטה ישירות, רואים למה:</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>שיחות עד סגירה</th><th>לקוחות</th><th>ותק ממוצע (חודשים)</th><th>פיזור בתוך הקבוצה</th></tr></thead>
+    <tbody>
+      <tr><td>1–2</td><td class="num">1,073</td><td class="num"><span class="bar" style="width:9rem"></span>36.4</td><td class="num">±3.0</td></tr>
+      <tr><td>3</td><td class="num">571</td><td class="num"><span class="bar" style="width:7rem"></span>28.2</td><td class="num">±3.1</td></tr>
+      <tr><td>4</td><td class="num">343</td><td class="num"><span class="bar" style="width:4.4rem"></span>17.8</td><td class="num">±2.7</td></tr>
+      <tr><td>5</td><td class="num">654</td><td class="num"><span class="bar" style="width:3rem"></span>12.0</td><td class="num">±2.8</td></tr>
+      <tr><td>6 ומעלה</td><td class="num">522</td><td class="num"><span class="bar" style="width:1.7rem"></span>6.7</td><td class="num">±1.9</td></tr>
+    </tbody>
+  </table></div>
+  <p>לקוח שנסגר בשיחה או שתיים נשאר בממוצע שלוש שנים. לקוח שדרש שש שיחות נשאר חצי שנה. בתוך כל מדרגה הפיזור הוא ±3 חודשים בלבד. זו לא סטטיסטיקה של קמפיין; זו סטטיסטיקה של <b>איזה סוג לקוח נסגר בקלות ואיזה בקושי</b>.</p>
+
+  <div class="answer">
+    <h3>אז מה המודל עונה בפועל?</h3>
+    <p>לא "כמה זמן יישאר הלקוח הזה, כי אנחנו מכירים אותו אישית", אלא: <b>"לקוח שנרכש ככה, בקמפיין כזה, אחרי כל כך הרבה שיחות ובעלות כזו, נשאר בדרך כלל X חודשים, פלוס-מינוס 3."</b> זו בדיוק השאלה של המייסד: ברגע שעסקה נסגרת, מנהל המכירות יודע כמה שיחות היא לקחה, ומאותו רגע אפשר לומר לו לאיזה ותק לצפות, בלי לחכות שנה כדי לגלות.</p>
+  </div>
+
+  <h2>3. ומה עם רמת התקציב? היא לא הסיפור האמיתי</h2>
+  <div class="card">
+    <p>ב-M2 ראינו שלקוחות מקמפיינים בינוניים (₪2,000–5,000) נשארים 33.5 חודשים, מול 13.2 בגבוהים ו-8.9 בנמוכים. נראה כמו אפקט של הפרסום. אבל כשמחלקים גם לפי שיחות:</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>שיחות עד סגירה</th><th>Low</th><th>Mid</th><th>High</th></tr></thead>
+      <tbody>
+        <tr><td>1–2</td><td class="num">—</td><td class="num">36.4</td><td class="num">—</td></tr>
+        <tr><td>3</td><td class="num">26.0</td><td class="num">28.4</td><td class="num">23.5</td></tr>
+        <tr><td>4</td><td class="num">18.0</td><td class="num">22.5</td><td class="num">17.6</td></tr>
+        <tr><td>5</td><td class="num">13.7</td><td class="num">—</td><td class="num">11.7</td></tr>
+        <tr><td>6–7</td><td class="num">7.0</td><td class="num">—</td><td class="num">5.8</td></tr>
+      </tbody>
+    </table></div>
+    <p>הקמפיינים הבינוניים "מנצחים" בעיקר כי הם מביאים לקוחות שנסגרים ב-1–4 שיחות; הנמוכים והגבוהים מביאים לקוחות שדורשים 3–9. באותה כמות שיחות, ההבדל בין ה-tiers קטן (2–5 חודשים). כלומר: <b>התקציב קובע איזה קהל מגיע; קלות הסגירה היא מה שמנבא כמה זמן הוא יישאר.</b> זו תובנה עסקית בפני עצמה, והיא תופיע ב-REPORT.</p>
+  </div>
+
+  <h2>4. מה המודל יודע ומה הוא לא יודע</h2>
+  <div class="card two">
+    <div class="col yes">
+      <h4>מה הוא כן עושה</h4>
+      <ul>
+        <li>נותן צפי ותק לכל לקוח חדש ברגע הסגירה, ממידע שקיים באותו רגע.</li>
+        <li>מסביר את עצמו: כמעט כל המשקל על שיחות-עד-סגירה, ואחריו התקציב.</li>
+        <li>מודד את הטעות שלו ביושר: ±2.8 חודשים בקרוס-ולידציה, לא על נתוני האימון.</li>
+        <li>מסרב להשתמש ברווח המצטבר: ה-ablation מראה שהוא היה "משפר" ל-R² 0.975, בדיוק כי הוא מידע מהעתיד.</li>
+      </ul>
+    </div>
+    <div class="col no">
+      <h4>מה הוא לא עושה</h4>
+      <ul>
+        <li>לא מכיר את הלקוח כאדם: אין גיל, ענף, גודל חברה, שימוש במוצר.</li>
+        <li>לא מסביר <i>למה</i> לקוח קשה-לסגירה עוזב מהר; הוא רק יודע שזה קורה בעקביות בנתונים האלה.</li>
+        <li>לא יעבוד על לקוח שעוד לא נסגר (אין לו עדיין <code>calls_to_closed</code>). לזה צריך מודל אחר עם פיצ'רים מוקדמים יותר.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>5. הסתייגות שחשוב לומר בקול</h2>
+  <div class="card">
+    <p>R² של 0.95 עם מדרגות כל כך נקיות הוא תוצאה <b>חריגה</b>. בדאטה אמיתי של סוכנות הקשר בין שיחות-לסגירה לוותק קיים (זה דפוס מוכר: לקוח שהתלבט הרבה נוטה לנטוש), אבל הוא רועש הרבה יותר, וה-R² היה כנראה 0.3–0.6. הדאטה כאן נבנה לתרגול, וכנראה נוצר עם כלל כמעט דטרמיניסטי. זה לא פוסל את המודל; זה אומר שהערך שלו כפורטפוליו הוא <b>בשיטה</b>: הפרדת פיצ'רים מתוצאות, קרוס-ולידציה, ablation שמוכיח דליפה, והסבר של מה המודל באמת למד. את השיטה הזו אפשר להעביר לכל דאטה.</p>
+  </div>
+
+  <footer>FunnelIQ · הסבר M3 · המספרים מ-<code>models/metrics.json</code> ומחישוב ישיר על <code>data/funnel_marketing_data.csv</code> (לקוחות בלבד, purchased = 1, n = 3,163).</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,187 @@
+{
+  "ltv": {
+    "trained_at": "2026-09-06T16:22:10+00:00",
+    "target": "ltv_months",
+    "training_policy": "customers only (purchased = 1); rows with missing ltv_months dropped (D-M2-1, D-M2-2)",
+    "n_train": 3163,
+    "features": [
+      "ad_budget",
+      "num_leads",
+      "leads_answered",
+      "leads_not_answered",
+      "followup_1",
+      "followup_2",
+      "followup_3",
+      "followup_4",
+      "followup_5",
+      "not_closed",
+      "closed",
+      "calls_to_closed",
+      "calls_to_not_closed",
+      "customer_acquisition_cost",
+      "answer_rate",
+      "conversion_rate",
+      "cost_per_lead",
+      "budget_tier"
+    ],
+    "served": "catboost",
+    "cv": {
+      "xgboost": {
+        "rmse_mean": 2.8444,
+        "rmse_std": 0.1672,
+        "r2_mean": 0.9439,
+        "r2_std": 0.0056,
+        "n_splits": 5,
+        "n_rows": 3163
+      },
+      "lightgbm": {
+        "rmse_mean": 2.8591,
+        "rmse_std": 0.1618,
+        "r2_mean": 0.9434,
+        "r2_std": 0.0053,
+        "n_splits": 5,
+        "n_rows": 3163
+      },
+      "catboost": {
+        "rmse_mean": 2.7975,
+        "rmse_std": 0.1639,
+        "r2_mean": 0.9458,
+        "r2_std": 0.0055,
+        "n_splits": 5,
+        "n_rows": 3163
+      },
+      "ensemble": {
+        "rmse_mean": 2.8117,
+        "rmse_std": 0.1653,
+        "r2_mean": 0.9452,
+        "r2_std": 0.0055,
+        "n_splits": 5,
+        "n_rows": 3163
+      }
+    },
+    "importances": {
+      "xgboost": {
+        "calls_to_closed": 0.85789,
+        "ad_budget": 0.09311,
+        "budget_tier": 0.01622,
+        "followup_5": 0.00313,
+        "cost_per_lead": 0.00263,
+        "followup_2": 0.00247,
+        "followup_3": 0.00243,
+        "num_leads": 0.00241,
+        "customer_acquisition_cost": 0.00234,
+        "leads_not_answered": 0.00226,
+        "leads_answered": 0.00223,
+        "answer_rate": 0.00206,
+        "not_closed": 0.002,
+        "followup_1": 0.00197,
+        "conversion_rate": 0.00181,
+        "closed": 0.0018,
+        "followup_4": 0.00174,
+        "calls_to_not_closed": 0.00148
+      },
+      "lightgbm": {
+        "calls_to_closed": 0.82761,
+        "ad_budget": 0.13575,
+        "customer_acquisition_cost": 0.00983,
+        "answer_rate": 0.00491,
+        "cost_per_lead": 0.00305,
+        "conversion_rate": 0.00293,
+        "followup_3": 0.00198,
+        "num_leads": 0.00191,
+        "followup_4": 0.00173,
+        "leads_not_answered": 0.00172,
+        "followup_1": 0.00172,
+        "leads_answered": 0.00167,
+        "followup_2": 0.00116,
+        "followup_5": 0.0011,
+        "calls_to_not_closed": 0.00101,
+        "not_closed": 0.00097,
+        "budget_tier": 0.00067,
+        "closed": 0.00029
+      },
+      "catboost": {
+        "calls_to_closed": 0.91862,
+        "ad_budget": 0.01735,
+        "answer_rate": 0.00949,
+        "leads_not_answered": 0.00637,
+        "budget_tier": 0.00599,
+        "cost_per_lead": 0.00582,
+        "conversion_rate": 0.00496,
+        "num_leads": 0.00466,
+        "followup_2": 0.00411,
+        "followup_3": 0.00373,
+        "followup_5": 0.00348,
+        "followup_4": 0.00325,
+        "followup_1": 0.00291,
+        "customer_acquisition_cost": 0.00275,
+        "leads_answered": 0.00252,
+        "not_closed": 0.00177,
+        "calls_to_not_closed": 0.00141,
+        "closed": 0.00083
+      }
+    },
+    "ablation_with_profit": {
+      "features": [
+        "ad_budget",
+        "num_leads",
+        "leads_answered",
+        "leads_not_answered",
+        "followup_1",
+        "followup_2",
+        "followup_3",
+        "followup_4",
+        "followup_5",
+        "not_closed",
+        "closed",
+        "calls_to_closed",
+        "calls_to_not_closed",
+        "customer_acquisition_cost",
+        "answer_rate",
+        "conversion_rate",
+        "cost_per_lead",
+        "budget_tier",
+        "cumulative_profit"
+      ],
+      "n_rows": 3136,
+      "catboost": {
+        "rmse_mean": 1.9088,
+        "rmse_std": 0.092,
+        "r2_mean": 0.9748,
+        "r2_std": 0.0022,
+        "n_splits": 5,
+        "n_rows": 3136
+      },
+      "catboost_funnel_only_same_rows": {
+        "rmse_mean": 2.7948,
+        "rmse_std": 0.2102,
+        "r2_mean": 0.9458,
+        "r2_std": 0.008,
+        "n_splits": 5,
+        "n_rows": 3136
+      }
+    },
+    "input_defaults": {
+      "ad_budget": 3000.0,
+      "num_leads": 41.0,
+      "leads_answered": 28.0,
+      "leads_not_answered": 14.0,
+      "followup_1": 22.0,
+      "followup_2": 16.0,
+      "followup_3": 13.0,
+      "followup_4": 12.0,
+      "followup_5": 8.0,
+      "not_closed": 5.0,
+      "closed": 3.0,
+      "calls_to_closed": 3.0,
+      "calls_to_not_closed": 4.0,
+      "customer_acquisition_cost": 1000.0
+    },
+    "target_stats": {
+      "mean": 22.96,
+      "std": 12.04,
+      "min": 1.0,
+      "max": 56.0
+    }
+  }
+}

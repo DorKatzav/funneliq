@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str | None = None
 
     app_env: str = "dev"
-    models_dir: Path = Path("models")
+    models_dir: Path = Path(__file__).resolve().parent.parent / "models"
     # Railway injects the deployed commit; used by /health to prove which build is live.
     railway_git_commit_sha: str | None = None
 

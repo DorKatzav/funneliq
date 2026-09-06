@@ -75,3 +75,11 @@ th { background: var(--wind-soft); color: var(--wind); position: sticky; top: 0;
 
 .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1rem; margin: 0 0 1rem; }
 .grid2 .card { margin: 0; }
+
+.formgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: 0.6rem 0.9rem; margin: 0 0 1rem; }
+.formgrid label { font-weight: 600; font-size: 0.85rem; margin: 0; }
+.formgrid input { margin-top: 0.2rem; }
+.result { text-align: center; padding: 0.5rem 0 1rem; }
+.result .big { font-size: 3rem; font-weight: 700; color: var(--wind); line-height: 1.1; }
+table.compact td, table.compact th { padding: 0.3rem 0.6rem; }
+tr.win td { background: var(--gate-soft); font-weight: 600; }
