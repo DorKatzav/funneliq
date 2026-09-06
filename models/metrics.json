@@ -583,5 +583,268 @@
         "actual": 1466
       }
     }
+  },
+  "super": {
+    "trained_at": "2026-09-06T17:46:46+00:00",
+    "target": "referred",
+    "training_policy": "customers only (purchased = 1); budget_tier as a native CatBoost categorical",
+    "n_train": 3163,
+    "features": [
+      "ad_budget",
+      "num_leads",
+      "leads_answered",
+      "leads_not_answered",
+      "followup_1",
+      "followup_2",
+      "followup_3",
+      "followup_4",
+      "followup_5",
+      "not_closed",
+      "closed",
+      "calls_to_closed",
+      "calls_to_not_closed",
+      "customer_acquisition_cost",
+      "answer_rate",
+      "conversion_rate",
+      "cost_per_lead",
+      "budget_tier"
+    ],
+    "cat_features": [
+      "budget_tier"
+    ],
+    "baseline": {
+      "majority_class": 0,
+      "accuracy": 0.5729,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5
+    },
+    "search": [
+      {
+        "learning_rate": 0.03,
+        "depth": 4,
+        "iterations": 300,
+        "roc_auc": 0.7834,
+        "f1": 0.7365
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 4,
+        "iterations": 600,
+        "roc_auc": 0.7822,
+        "f1": 0.7349
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 4,
+        "iterations": 1000,
+        "roc_auc": 0.7799,
+        "f1": 0.7282
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 6,
+        "iterations": 300,
+        "roc_auc": 0.783,
+        "f1": 0.7371
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 6,
+        "iterations": 600,
+        "roc_auc": 0.7819,
+        "f1": 0.7294
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 6,
+        "iterations": 1000,
+        "roc_auc": 0.7799,
+        "f1": 0.7168
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 8,
+        "iterations": 300,
+        "roc_auc": 0.7867,
+        "f1": 0.7326
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 8,
+        "iterations": 600,
+        "roc_auc": 0.7828,
+        "f1": 0.7227
+      },
+      {
+        "learning_rate": 0.03,
+        "depth": 8,
+        "iterations": 1000,
+        "roc_auc": 0.777,
+        "f1": 0.7097
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 4,
+        "iterations": 300,
+        "roc_auc": 0.7803,
+        "f1": 0.7267
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 4,
+        "iterations": 600,
+        "roc_auc": 0.7786,
+        "f1": 0.7063
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 4,
+        "iterations": 1000,
+        "roc_auc": 0.7695,
+        "f1": 0.6889
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 6,
+        "iterations": 300,
+        "roc_auc": 0.7759,
+        "f1": 0.7077
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 6,
+        "iterations": 600,
+        "roc_auc": 0.7693,
+        "f1": 0.6876
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 6,
+        "iterations": 1000,
+        "roc_auc": 0.7636,
+        "f1": 0.6761
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 8,
+        "iterations": 300,
+        "roc_auc": 0.775,
+        "f1": 0.703
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 8,
+        "iterations": 600,
+        "roc_auc": 0.7679,
+        "f1": 0.6876
+      },
+      {
+        "learning_rate": 0.1,
+        "depth": 8,
+        "iterations": 1000,
+        "roc_auc": 0.7633,
+        "f1": 0.6762
+      }
+    ],
+    "search_splits": 3,
+    "best_params": {
+      "learning_rate": 0.03,
+      "depth": 8,
+      "iterations": 300
+    },
+    "cv": {
+      "n_splits": 5,
+      "n_rows": 3163,
+      "accuracy": 0.7512,
+      "accuracy_std": 0.0227,
+      "precision": 0.6764,
+      "precision_std": 0.0252,
+      "recall": 0.8016,
+      "recall_std": 0.0269,
+      "f1": 0.7335,
+      "f1_std": 0.0234,
+      "roc_auc": 0.7836,
+      "roc_auc_std": 0.0248
+    },
+    "importances": {
+      "calls_to_closed": 0.29632,
+      "calls_to_not_closed": 0.08661,
+      "budget_tier": 0.08003,
+      "answer_rate": 0.07176,
+      "conversion_rate": 0.06186,
+      "cost_per_lead": 0.05078,
+      "customer_acquisition_cost": 0.04689,
+      "leads_answered": 0.03726,
+      "leads_not_answered": 0.03359,
+      "not_closed": 0.03275,
+      "num_leads": 0.03243,
+      "closed": 0.03062,
+      "followup_2": 0.02755,
+      "followup_5": 0.02715,
+      "followup_1": 0.02299,
+      "followup_3": 0.02199,
+      "ad_budget": 0.02002,
+      "followup_4": 0.01939
+    },
+    "score_bands": [
+      {
+        "min": 0,
+        "max": 39,
+        "band": "Low"
+      },
+      {
+        "min": 40,
+        "max": 69,
+        "band": "Medium"
+      },
+      {
+        "min": 70,
+        "max": 100,
+        "band": "High"
+      }
+    ],
+    "score_stats_train": {
+      "mean": 43.07,
+      "std": 28.43,
+      "min": 3,
+      "max": 90,
+      "band_counts": {
+        "Low": 1447,
+        "Medium": 940,
+        "High": 776
+      }
+    },
+    "profile": {
+      "definition": "referred = Yes AND upsell = 1 AND ltv_months >= 34 (75th percentile of customers)",
+      "ltv_cutoff_months": 34.0,
+      "n_customers": 3163,
+      "n_super": 529,
+      "share_of_customers": 0.1672,
+      "share_of_total_profit": 0.3361,
+      "avg_profit_super": 28234.6,
+      "avg_profit_others": 11188.6,
+      "avg_cac_super": 990.7,
+      "avg_cac_others": 1527.2,
+      "avg_ltv_super": 37.18,
+      "avg_ltv_others": 20.1,
+      "tier_distribution": {
+        "Low": 1,
+        "Mid": 528
+      },
+      "calls_to_closed_distribution": {
+        "1": 45,
+        "2": 468,
+        "3": 15,
+        "5": 1
+      },
+      "early_signal": {
+        "share_mid_tier": 0.9981,
+        "share_closed_in_2_calls": 0.9698,
+        "rest_share_mid_tier": 0.4222,
+        "rest_share_closed_in_2_calls": 0.2126
+      }
+    }
   }
 }

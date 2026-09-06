@@ -87,3 +87,7 @@ tr.win td { background: var(--gate-soft); font-weight: 600; }
 .result.compact-result .big { font-size: 2.2rem; }
 label.tenure { display: block; margin: 0 0 1rem; font-weight: 600; font-size: 0.9rem; }
 label.tenure input { max-width: 22rem; }
+
+.scorebar { height: 0.7rem; background: var(--wind-soft); border-radius: 999px; overflow: hidden; margin: 0.25rem 0 0.5rem; }
+.scorefill { height: 100%; width: 0; background: var(--wind); transition: width 0.4s; }
+.scorefill.low { background: var(--line); } .scorefill.medium { background: var(--tape); } .scorefill.high { background: var(--gate); }

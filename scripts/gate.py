@@ -340,6 +340,69 @@ def check_live_predict_upsell() -> None:
     assert 0 <= body["probability"] <= 1 and body["rule_flag"] is not None, body
 
 
+# ---------------------------------------------------------------- M5 checks
+def check_super_search_complete() -> None:
+    sup = _metrics().get("super")
+    assert sup, "metrics.json has no 'super' section"
+    assert len(sup["search"]) == 18, f"search has {len(sup['search'])} rows, expected 18"
+    best = max(sup["search"], key=lambda r: r["roc_auc"])
+    argmax = {k: best[k] for k in ("learning_rate", "depth", "iterations")}
+    assert sup["best_params"] == argmax, "best_params != argmax"
+    assert (ROOT / "models" / "super.joblib").exists(), "super.joblib missing"
+    assert sup["cv"]["roc_auc"] > 0.55, sup["cv"]
+
+
+def check_super_scores_spread() -> None:
+    sys.path.insert(0, str(ROOT))
+    import numpy as np
+
+    from ml.data import clean, customers_only, load_raw
+    from ml.registry import MODELS_DIR, ModelRegistry
+
+    reg = ModelRegistry.load(MODELS_DIR)
+    df = clean(load_raw())
+    from ml.features import build_features
+
+    X = build_features(df, "super", categorical=True)
+    scores = np.rint(100 * reg.super_model.predict_proba(X)[:, 1])
+    assert scores.min() >= 0 and scores.max() <= 100, (scores.min(), scores.max())
+    assert scores.std() > 5, f"scores nearly constant (std {scores.std():.2f})"
+    assert len(scores) == 3500
+    _ = customers_only  # keep import explicit: scoring runs on all rows, training on customers
+
+
+def check_super_profile() -> None:
+    pr = _metrics()["super"]["profile"]
+    assert pr["n_super"] > 0 and 0 < pr["share_of_total_profit"] < 1, pr
+    assert pr["avg_cac_super"] is not None and pr["avg_cac_others"] is not None
+
+
+def check_report_p4() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    for needle in ("## P4", "share of total profit", "spot them earlier", "native categorical"):
+        assert needle in text, f"REPORT.md §P4 lacks '{needle}'"
+
+
+def check_live_super() -> None:
+    import httpx
+
+    token = _gate_user_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    customer = {
+        "ad_budget": 3000, "num_leads": 40, "leads_answered": 26, "leads_not_answered": 14,
+        "followup_1": 21, "followup_2": 16, "followup_3": 13, "followup_4": 11, "followup_5": 8,
+        "not_closed": 4, "closed": 4, "calls_to_closed": 2, "calls_to_not_closed": 3,
+        "customer_acquisition_cost": 750,
+    }
+    res = httpx.post(f"{_live_url()}/api/predict/super-score", json=customer, headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert 0 <= body["score"] <= 100 and body["band"] in ("Low", "Medium", "High"), body
+    prof = httpx.get(f"{_live_url()}/api/insights/super-customers", headers=headers, timeout=60)
+    assert prof.status_code == 200, f"HTTP {prof.status_code} {prof.text[:200]}"
+    assert 0 < prof.json()["share_of_total_profit"] < 1, prof.json()
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -383,6 +446,15 @@ GATES: dict[int, list[Check]] = {
         ("business rule tuned, scored, and compared by tier", check_business_rule_compared),
         ("REPORT.md §P3 answers the brief", check_report_p3),
         ("live POST /api/predict/upsell -> 200 with probability + rule verdict", check_live_predict_upsell),
+    ],
+    5: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("search table has 18 rows, best_params is the argmax, artifact exists", check_super_search_complete),
+        ("scores on all 3,500 rows within 0..100 and not constant", check_super_scores_spread),
+        ("super-customer profile: profit share and CAC reported", check_super_profile),
+        ("REPORT.md §P4 answers the brief", check_report_p4),
+        ("live POST /api/predict/super-score + GET /api/insights/super-customers", check_live_super),
     ],
 }
 

@@ -163,3 +163,32 @@ def test_upsell_endpoint(api):
     body = res.json()
     assert 0 <= body["probability"] <= 1 and isinstance(body["flag"], bool) and body["rule"]
     assert any(r["model"] == "upsell" for r in fake.inserted)
+
+
+# --- P4 super-customer score ---------------------------------------------------------------
+
+
+def test_registry_loads_super_model_and_search(registry):
+    assert "super" in registry.loaded
+    sup = registry.metrics["super"]
+    assert len(sup["search"]) == 18
+    best = max(sup["search"], key=lambda r: r["roc_auc"])
+    assert sup["best_params"] == {k: best[k] for k in ("learning_rate", "depth", "iterations")}
+    assert sup["profile"]["n_super"] > 0 and 0 < sup["profile"]["share_of_total_profit"] < 1
+
+
+def test_super_score_range_and_ordering(registry):
+    easy = registry.super_score(EASY_CLOSE)  # Mid tier, 2 calls -> the super-customer profile
+    hard = registry.super_score(HARD_CLOSE)  # High tier, 6 calls
+    for r in (easy, hard):
+        assert 0 <= r["score"] <= 100 and r["band"] in ("Low", "Medium", "High")
+        assert abs(r["score"] - 100 * r["probability"]) <= 0.5
+    assert easy["score"] > hard["score"] + 20
+
+
+def test_super_score_endpoint_and_profile_endpoint(api):
+    tc, fake = api
+    res = tc.post("/api/predict/super-score", json=EASY_CLOSE)
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert 0 <= body["score"] <= 100 and body["band"] and any(r["model"] == "super" for r in fake.inserted)

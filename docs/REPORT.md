@@ -117,3 +117,51 @@ customers by probability (the rule only says yes/no), it works on day one withou
 0.754, still far above the baseline), and it will keep working if the thresholds drift.
 **Recommendation:** use the rule as the default outreach list for existing customers, and the early model to
 pre-flag new customers at signing; revisit if the tiers or CAC structure change.
+
+## P4 — Who becomes a "super customer"? (CatBoost score on `referred`)
+
+**Setup.** Customers only (n = 3,163); referral rate 42.7% (majority baseline accuracy 57.3%, F1 0).
+CatBoost with `budget_tier` as a **native categorical** feature (no one-hot), the other 17 features numeric. Hyperparameter
+search over learning rate × depth × iterations = 18 configurations, scored by stratified 3-fold ROC-AUC; the chosen
+configuration was then re-scored with 5-fold CV and refit on all rows. The probability is served as a **0–100 score**
+with bands Low (<40), Medium (40–69), High (≥70).
+
+| learning rate | depth | iterations | ROC-AUC (3-fold) | F1 |
+| ---: | ---: | ---: | ---: | ---: |
+| 0.03 | 8 | 300 | 0.7867 | 0.7326 |
+| 0.03 | 4 | 300 | 0.7834 | 0.7365 |
+| 0.03 | 6 | 300 | 0.7830 | 0.7371 |
+| 0.03 | 8 | 600 | 0.7828 | 0.7227 |
+| 0.03 | 4 | 600 | 0.7822 | 0.7349 |
+
+Best: **learning rate 0.03, depth 8, 300 iterations**; worst was
+lr 0.1, depth 8, 1000 iterations (AUC 0.7633). The pattern across the whole table is
+consistent: more iterations and the higher learning rate *hurt* — with ~3,000 rows the model overfits quickly, and the
+search is mostly choosing how little to fit. Final 5-fold: **ROC-AUC 0.784**, F1 0.734, precision 0.676, recall 0.802.
+Importances: `calls_to_closed` 0.30, `calls_to_not_closed` 0.09, `budget_tier` 0.08, `answer_rate` 0.07, `conversion_rate` 0.06.
+
+### Profile of the super customers (referred = Yes, upsell = 1, tenure ≥ 34 months)
+
+| | super customers | everyone else |
+| --- | ---: | ---: |
+| count | 529 (16.7% of customers) | 2,634 |
+| **share of total profit** | **33.6%** | 66.4% |
+| average profit per customer | ₪28,235 | ₪11,189 |
+| **average acquisition cost** | **₪991** | ₪1,527 |
+| average tenure | 37.2 months | 20.1 months |
+| Mid-tier share | 99.8% | 42.2% |
+| closed in ≤ 2 calls | 97.0% | 21.3% |
+
+One customer in six brings a third of the profit, and costs **less** to acquire than the average customer, not more.
+
+### How could Northbound spot them earlier?
+
+They are visible on the day they sign. Virtually all super customers come from **Mid-budget campaigns (₪2,000–5,000)**
+and **close within two calls** — 100% and 97% respectively, against
+42% and 21% for everyone else. The score formalises this (and the
+API serves it), but the plain rule "Mid tier, closed in one or two calls, CAC around ₪1,000" already identifies the
+segment. **Recommendation:** at signing, route every Mid-tier customer closed in ≤ 2 calls into a referral programme
+and a retention track; they are the cheapest profit in the funnel.
+
+**Caveat.** Referral is noisier than lifetime (AUC 0.78, not 0.95): the score ranks well but individual
+mistakes are common, so use it to prioritise outreach, not to exclude anyone.
