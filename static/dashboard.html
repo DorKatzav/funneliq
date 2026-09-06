@@ -195,6 +195,8 @@
     tabs.forEach((btn) => btn.addEventListener("click", () => {
       tabs.forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
       document.querySelectorAll("section.panel").forEach((p) => { p.hidden = p.id !== `panel-${btn.dataset.tab}`; });
+      // charts created while their panel was hidden have a zero-size canvas — resize them now that it is visible
+      document.querySelectorAll(`#panel-${btn.dataset.tab} canvas`).forEach((c) => { const ch = Chart.getChart(c); if (ch) ch.resize(); });
     }));
 
     // records
