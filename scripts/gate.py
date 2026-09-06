@@ -83,7 +83,10 @@ def check_live_health() -> None:
 
 
 def check_no_secrets_in_git() -> None:
-    res = _run(["git", "grep", "-iE", "service_role|eyJ[A-Za-z0-9_-]{20,}", "--", ".", ":!*.md", ":!*.html"])
+    pattern = "service_role|eyJ[A-Za-z0-9_-]{20,}"
+    # exclude docs and this script (which contains the pattern itself)
+    paths = [".", ":!*.md", ":!*.html", ":!scripts/gate.py"]
+    res = _run(["git", "grep", "-iE", pattern, "--", *paths])
     assert res.returncode != 0, f"possible secret committed:\n{res.stdout}"
 
 
