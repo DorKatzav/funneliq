@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .verdict { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 1rem 1.25rem; margin-block: 1rem; font-size: 1.15rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  tr.odd td { background: var(--tape-soft); font-weight: 600; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M6 · 2026-09-06</span>
+    <h1>M6: האם אחרי השיחה השלישית מבזבזים זמן?</h1>
+    <p class="lede">חבילה 5 של הברייף, "פרדוקס המעקבים": מנהל המכירות טוען שאחרי שיחת המעקב השלישית הצוות מבזבז זמן. בדקנו את זה בנתונים: טבלת נשירה לכל שלב במשפך (כולל לפי רמת תקציב), התפלגות מספר השיחות בעסקאות שנסגרו ובעסקאות שאבדו, וכלל הכרעה מפורש שמחזיר כן/לא עם הסיבה. הכול חי בלשונית Follow-ups.</p>
+    <span class="stamp">שער M6: עבר 5/5</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">48%</div><div class="l">מהעסקאות שנסגרו דרשו יותר מ-3 שיחות</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">חציון שיחות עד סגירה (רבעונים 2–5)</div></div>
+    <div class="kpi"><div class="v">10.4%</div><div class="l">נשירה בין מעקב 3 למעקב 4, מול חציון 23.7% בשאר</div></div>
+    <div class="kpi"><div class="v"><span dir="ltr">₪24,777</span> מול <span dir="ltr">₪2,001</span></div><div class="l">רווח ממוצע: סגירה ב-1–2 שיחות מול 6 ומעלה</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>לא, הצוות לא מבזבז זמן אחרי השיחה השלישית: כמעט מחצית מהמכירות נסגרו רק בשיחה הרביעית ומעלה, ומי שהיה מפסיק אחרי שלוש היה מוותר עליהן. הפרדוקס האמיתי נמצא במקום אחר: דווקא בין המעקב השלישי לרביעי כמעט אף אחד לא נושר (10% לעומת כרבע בכל שלב אחר). מי שעדיין מדבר איתנו אחרי שלוש שיחות הוא ליד רציני. אבל יש מחיר: עסקאות שנסגרות מאוחר הן עסקאות קטנות. לקוח שנסגר בשיחה אחת או שתיים נשאר 36 חודשים ומכניס כ-₪25,000; לקוח שנסגר אחרי שש שיחות ויותר נשאר 7 חודשים ומכניס כ-₪2,000. לכן ההמלצה היא לא "להפסיק", אלא "לדעת למה מצפים".</p>
+  </div>
+
+  <h2>טבלת הנשירה (3,500 קמפיינים, נשירה = 1 − הבא/הנוכחי, על סכומים)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>שלב</th><th>לידים שנותרו (ממוצע לקמפיין)</th><th>נשירה</th><th>Low</th><th>Mid</th><th>High</th></tr></thead>
+    <tbody>
+      <tr><td>נענה ← מעקב 1</td><td class="num">21.9</td><td class="num">21.7%</td><td class="num">24.5%</td><td class="num">22.0%</td><td class="num">21.0%</td></tr>
+      <tr><td>מעקב 1 ← מעקב 2</td><td class="num">16.3</td><td class="num">25.7%</td><td class="num">26.9%</td><td class="num">25.7%</td><td class="num">25.4%</td></tr>
+      <tr><td>מעקב 2 ← מעקב 3</td><td class="num">13.2</td><td class="num">18.6%</td><td class="num">19.4%</td><td class="num">18.6%</td><td class="num">18.5%</td></tr>
+      <tr class="odd"><td>מעקב 3 ← מעקב 4 (השלב החריג)</td><td class="num">11.9</td><td class="num">10.4%</td><td class="num">10.9%</td><td class="num">10.4%</td><td class="num">10.3%</td></tr>
+      <tr><td>מעקב 4 ← מעקב 5</td><td class="num">8.4</td><td class="num">29.2%</td><td class="num">31.6%</td><td class="num">29.3%</td><td class="num">28.8%</td></tr>
+      <tr><td>מעקב 5 ← סגירה</td><td class="num">3.0</td><td class="num">64.1%</td><td class="num">66.7%</td><td class="num">57.2%</td><td class="num">70.1%</td></tr>
+    </tbody>
+  </table></div>
+  <p>הדפוס זהה בכל רמת תקציב, כלומר זו תכונה של תהליך המכירה ולא של גודל הקמפיין. הנשירה הגדולה קורית מוקדם (אחרי המעקב הראשון והשני) ובסגירה עצמה; המעבר מהמעקב השלישי לרביעי הוא הרגוע ביותר במשפך. שלב הסגירה (64%) מדווח אבל לא מועמד ל"חריג": הוא שיעור סגירה, לא נשירה ממעקב.</p>
+
+  <h2>כמה שיחות לוקחת מכירה?</h2>
+  <div class="card">
+    <p>עסקאות שנסגרו (3,163 לקוחות): חציון <b>3 שיחות</b>, רבעונים 2–5, ממוצע 3.70. <b>48% דרשו יותר מ-3 שיחות</b> ו-16.5% דרשו יותר מ-5. עסקאות שאבדו (3,451 קמפיינים עם לפחות עסקה אבודה אחת): חציון 4, ממוצע 3.99. מספר השיחות לבדו לא מבדיל בין מכירה להפסד.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>שיחות עד סגירה</th><th>לקוחות</th><th>נתח מהמכירות</th><th>ותק ממוצע (חודשים)</th><th>רווח ממוצע</th><th>שיעור upsell</th></tr></thead>
+      <tbody>
+        <tr class="win"><td class="num">1–2</td><td class="num">1,073</td><td class="num">33.9%</td><td class="num">36.4</td><td class="num">₪24,777</td><td class="num">69%</td></tr>
+        <tr><td class="num">3</td><td class="num">571</td><td class="num">18.1%</td><td class="num">28.2</td><td class="num">₪18,944</td><td class="num">70%</td></tr>
+        <tr><td class="num">4–5</td><td class="num">997</td><td class="num">31.5%</td><td class="num">14.0</td><td class="num">₪5,993</td><td class="num">28%</td></tr>
+        <tr><td class="num">6+</td><td class="num">522</td><td class="num">16.5%</td><td class="num">6.7</td><td class="num">₪2,001</td><td class="num">9%</td></tr>
+      </tbody>
+    </table></div>
+    <p>זה אותו סולם שראינו ב-M3 (שיחות-עד-סגירה מסבירות את הוותק) וב-M5 (97% מלקוחות-העל נסגרו בשתי שיחות). סגירה מאוחרת היא מכירה אמיתית, אבל קטנה.</p>
+  </div>
+
+  <h2>ההכרעה</h2>
+  <div class="verdict">
+    <b>לא, לא להפסיק אחרי השיחה השלישית.</b> 48% מהעסקאות שנסגרו דרשו יותר מ-3 שיחות (חציון 3, אחוזון 75 הוא 5); עצירה אחרי השלישית הייתה מוותרת עליהן. 16.5% דרשו יותר מ-5 שיחות, מתחת לרף 25% שהיה מצדיק להרחיב את חלון המעקב.
+  </div>
+  <div class="card">
+    <h3>הכללים, במפורש (ב-<code>ml/followups.py</code>)</h3>
+    <ul>
+      <li><b>cut_after_3</b> רק אם פחות מ-15% מהעסקאות שנסגרו דרשו יותר מ-3 שיחות (הרף מהתוכנית).</li>
+      <li><b>extend</b> רק אם 25% ומעלה דרשו יותר מחמשת המעקבים שנמדדים.</li>
+      <li>אחרת <b>keep</b>. השלב החריג הוא מעבר-המעקב שהנשירה שלו הכי רחוקה מחציון שאר המעברים.</li>
+    </ul>
+    <p>הספים והמספרים שהובילו להכרעה מוחזרים ב-API יחד עם ההמלצה, כך שכל שינוי בדאטה משנה את הפסק-דין בלי לגעת בקוד.</p>
+  </div>
+
+  <h2>המלצה למייסד</h2>
+  <div class="card">
+    <p>המנוף הוא לא <i>האם</i> להמשיך להתקשר אלא <i>למי ובאיזו ציפייה</i>. ליד שעדיין מדבר איתנו אחרי שלוש שיחות הוא ליד רציני ולא כדאי לוותר עליו; אבל מהשיחה הרביעית והלאה מדובר בדרך כלל בחשבון קטן (ותק של שנה ומטה, רווח של ₪6,000 ומטה). לתעדף את זמן הצוות לפי הציון (P4) ותחזית הוותק (P2) שכבר משתמשים באות הזה, ולא לפי כלל גס של "שלוש שיחות ודי".</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>GET /api/insights/followups</code> מחשב חי משורות Supabase (עם הטוקן של המשתמש, נשמר במטמון 10 דקות) את שלושת המבנים: טבלת הנשירה, התפלגות השיחות, וההמלצה. לשונית Follow-ups מציגה ארבעה KPI, כרטיס הכרעה, גרף לידים-שנותרו, עמודות נשירה לפי tier, היסטוגרמת שיחות (נסגר מול אבד) וטבלת "מה שווה סגירה מאוחרת".</p>
+    <p><img src="img/m6_followups_live.jpg" alt="לשונית Follow-ups באתר החי: הכרעה keep, 48% מהמכירות דרשו יותר מ-3 שיחות, השלב החריג הוא מעקב 3 למעקב 4, וגרפי הנשירה"></p>
+    <p><b>תיקון UI אגבי:</b> טבלאות קומפקטיות בכרטיסים ברוחב חצי (פרופיל P4 ב-Findings, טבלת הערך כאן) עוטפות טקסט במקום להיחתך; זו ההערה שנרשמה ל-M8 בדוח M5, ונסגרה כאן.</p>
+    <div class="artifacts"><span>ml/followups.py</span><span>tests/test_followups.py</span><span>app/routers/insights.py</span><span>static/dashboard.html</span><span>docs/REPORT.md §P5</span><span>scripts/gate.py</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (78 בדיקות; הבדיקה הסינתטית מהנדסת את המעבר מעקב 3 ← 4 כחריג ומוודאת שהוא מזוהה).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · על ה-CSV: 6 שלבים, פסק-דין, סיבה ושלב חריג.</li>
+      <li><span class="ok">עבר</span> · REPORT.md §P5 נוצר מהקוד (<code>python -m ml.followups --write-report</code>) ועונה על שלוש השאלות.</li>
+      <li><span class="ok">עבר</span> · חי: <code>GET /api/insights/followups</code> מחזיר 200 עם 6 שלבים והמלצה; הכרטיס מוצג עם סיבה.</li>
+    </ol>
+  </div>
+
+  <div class="notice">
+    <h3>הערה מתודולוגית</h3>
+    <p>הנשירה מחושבת על סכומים (סך הלידים בשלב הבא חלקי סך הלידים בשלב הנוכחי) ולא כממוצע של יחסים לכל קמפיין, כדי שקמפיינים קטנים עם מספרים קופצניים לא ישלטו בתמונה. השלב "מעקב 5 ← סגירה" מוצג אבל לא נכנס לתחרות על "השלב החריג", אחרת הוא היה זוכה תמיד: הוא סגירה, לא מעקב.</p>
+  </div>
+
+  <h2>הבא בתור: M7, סימולטור התקציב</h2>
+  <div class="card">
+    <p>חבילה 6: מודל רווח לקמפיין (שלושה רגרסורים על פיצ'רי המשפך), פרופיל טיפוסי לכל רמת תקציב, וסימולטור שמחלק ₪50,000 בין קמפיינים: אסטרטגיות מוכנות (2×20,000+10,000, 10×5,000, 25×2,000, 100×500, 5×10,000) מדורגות לפי רווח צפוי מול רווח אמפירי, ובונה חופשי שמאפשר לחיצה רק כשהסכום בדיוק 50,000.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M6 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>

@@ -8,7 +8,7 @@ simulates how to split a ₪50,000 monthly ad budget. Login-gated internal tool 
 with gradient boosting (XGBoost, LightGBM, CatBoost), FastAPI, Supabase (Postgres + Auth
 + Row Level Security) and Railway.
 
-> Status: **M5 — lifetime, upsell and super-customer score live; super customers profiled (17% of customers = 34% of profit).** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
+> Status: **M6 — predictions, super-customer score and the follow-up paradox live (verdict: keep calling; 48% of sales need > 3 calls).** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
 
 ## Architecture (short version)
 
@@ -38,7 +38,8 @@ python -m ml.eda --write docs/FINDINGS.md   # regenerate the P1 findings note
 python -m ml.train_ltv                # P2: train the LTV regressors -> models/
 python -m ml.train_upsell             # P3: train the upsell classifiers -> models/
 python -m ml.train_super              # P4: tune + train the super-customer scorer -> models/
-python scripts/gate.py --m 5          # milestone gate (offline + live checks)
+python -m ml.followups --write-report  # P5: regenerate REPORT.md §P5 from the data
+python scripts/gate.py --m 6          # milestone gate (offline + live checks)
 python scripts/smoke_live.py          # live end-to-end sanity sweep
 ```
 
