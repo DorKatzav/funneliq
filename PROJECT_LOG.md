@@ -67,3 +67,10 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Live incidents: (1) first M3 deploy crashed with 502 — the Railpack runtime image lacks OpenMP; fixed by `aptPackages: ["libgomp1"]` in railpack.json (PR #11). (2) Form defaults built from column medians violated the funnel identity (28 + 14 ≠ 41) → 422; fixed by using the real customer nearest the medians as defaults + plain-language validation messages (PR #12).
 - API: POST /api/predict/ltv (validated funnel shape, logged to prediction_log through the user's token), GET /api/models, GET /api/predictions. Dashboard: Predict + Findings tabs. REPORT.md §P2 written from metrics.json.
 - PRs #10, #11, #12 merged. Next: M4 — P3 upsell classification (early vs tenure variants, baseline, business rule).
+
+## 2026-09-06 — Live end-to-end sanity sweep after M3 (user-requested) — 32/32
+- Auth: no/garbage token, Basic scheme, the anon key and even the service key used as a bearer → all 401 (legacy HS256 keys are rejected because no HS256 secret is configured; hardening to also require role == "authenticated" scheduled for M4). RLS: anon cannot read prediction_log.
+- Validation: negative, inconsistent funnel (answered sum, increasing follow-ups, closed sum), missing field, string number, empty body, limit > 500 → 422; unknown extra field ignored.
+- Predictions: non-increasing in calls_to_closed (35.7 → 35.6 → 27.6 → 19.2 → 12.9 → 7.0 → 6.9 → 6.8 → 6.3), within ±1.4 months of the empirical group means, three models within 1 month of each other, live == local artifacts (diff 0.000), absurd inputs stay in range.
+- Observations to keep in mind (not bugs): an all-zero funnel still returns a plausible-looking 24.7 months, and atypical combinations (₪800 budget with 42 leads) extrapolate — a "distance from training data" warning in the form is a candidate improvement for M8.
+- prediction_log grew exactly by the number of calls; median latency 671 ms (Railway ↔ Supabase round trip incl. the log insert); overview and health consistent.
