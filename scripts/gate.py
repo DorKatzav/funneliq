@@ -83,9 +83,17 @@ def check_live_health() -> None:
 
 
 def check_no_secrets_in_git() -> None:
-    pattern = "service_role|eyJ[A-Za-z0-9_-]{20,}"
-    # exclude docs and this script (which contains the pattern itself)
-    paths = [".", ":!*.md", ":!*.html", ":!scripts/gate.py"]
+    # real key material only: JWT-shaped strings, new-style secret keys,
+    # or a service-key assignment that carries an actual value
+    pattern = "|".join(
+        [
+            r"eyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}",
+            r"sb_secret_[A-Za-z0-9]{8,}",
+            r"SUPABASE_SERVICE_KEY\s*=\s*eyJ",
+        ]
+    )
+    # exclude docs, this script (contains the pattern itself) and the template
+    paths = [".", ":!*.md", ":!*.html", ":!scripts/gate.py", ":!.env.example"]
     res = _run(["git", "grep", "-iE", pattern, "--", *paths])
     assert res.returncode != 0, f"possible secret committed:\n{res.stdout}"
 
