@@ -23,6 +23,20 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Live `/health` reports the exact main commit (4cf8e93) → push-to-redeploy proven. Manual restart in Railway → `/health` 200 again with uptime reset (115.9 s), same commit → restart survival proven.
 - Next: M1 (Supabase project, schema + RLS, loader, JWT auth, login page).
 
+## 2026-09-06 — M1 code complete (offline), waiting on Supabase manual steps
+- Branch `feat/m1-supabase-auth`, draft PR #4. 24 tests: data module, JWT verification (ES256 via JWKS + HS256, forged key rejected), records API (401 / paginated 200), static pages.
+- Design note: `app/db.py` binds the user's JWT to the postgrest client per request (`client.postgrest.auth(token)`), so RLS is enforced by Postgres, not by our code.
+- Blocked on: Supabase project + keys, SQL run, team user, Railway variables (user away from desk).
+
+## 2026-09-06 — M2 offline half started early (user approved working ahead while blocked)
+- Branch `feat/m2-eda-overview` based on the M1 branch (needs ml/data.py). Only the CSV is read; nothing touches M1 files.
+- `ml/eda.py::overview_stats` + `render_findings_md` → `docs/FINDINGS.md` fully generated (no hand-typed numbers). 12 EDA tests + 3 endpoint tests. `GET /api/insights/overview` pages through Supabase rows (1,000/page) with a 10-minute cache; dashboard Overview tab with Chart.js (budget→leads, tier conversion, correlations).
+- Findings: 33 incomplete rows (27 customers / 6 non-customers); leads per ₪1,000 fall 25.7 → 6.1 (log-log elasticity 0.61 → diminishing); Mid tier converts best (8.3% vs High 5.4%, Low 4.7%) and carries ~4× the profit of High (₪21.8k vs ₪5.2k) with LTV 33.6 vs 13.2 months; strongest funnel-feature correlate of profit is calls_to_closed (r = −0.55); funnel identities hold on 100% of rows.
+- Non-purchasers (337): profit is 0 for all, upsell 0 for all, yet 98.8% have ltv_months > 0 and 46% have closed > 0.
+- **Proposed, pending user approval:**
+  - D-M2-1: customer models (P2 LTV, P3 upsell, P4 super) train on purchased = 1 only; the P6 profit model keeps all rows (zero-profit campaigns are real outcomes for the simulator).
+  - D-M2-2: never impute a target; drop rows missing `ltv_months` only for the LTV model and rows missing `cumulative_profit` only for the profit model; keep everything elsewhere; NULL in the database.
+
 ## 2026-09-06 — M1: Supabase data, RLS, login — GATE PASSED (8/8)
 - Supabase project `pcztrnvcymvxwwmcbxbt` (ES256 JWKS → no JWT secret anywhere). Self sign-up disabled (verified via /auth/v1/settings). Team user created; credentials only in .env.
 - Loader ran twice → 3,500 rows both times. RLS proven: anon 0 rows, signed-in user 3,500 rows. Live API: 401 without token, 200 + total 3500 with token. Browser: redirect to login, sign-in, dashboard with email + table, sign-out clears session.
@@ -30,3 +44,9 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - RLS incident: policies.sql had not actually executed (SQL editor runs only the highlighted selection) → RLS on with no policies → 0 rows for everyone. Resolved with a single query that creates policies and returns counts (3500 | 3 | postgres).
 - Gate fix: secret scan now matches key material only (JWT shape, sb_secret_, SERVICE_KEY=eyJ...), after the word service_role in a SQL comment tripped it.
 - PRs: #4 (M1) merged, #6 (Railpack) merged. Next: approve D-M2-1 / D-M2-2, merge #5, verify Overview on the live URL.
+
+## 2026-09-06 — D-M2-1 / D-M2-2 APPROVED by the user
+- User's wording: the model must never have future information; it is built only on what has already happened.
+- D-M2-1: customer models (P2 LTV, P3 upsell, P4 super) train on purchased = 1; P6 profit model keeps all rows.
+- D-M2-2: targets are never imputed; drop rows missing the target only for that task; NULL in the database.
+- Standing rule reinforced: FUNNEL features only (acquisition-time), enforced by ml/features.py::assert_no_leakage in M3.
