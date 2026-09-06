@@ -38,6 +38,8 @@ python scripts/gate.py --m 0          # milestone gate
 
 macOS note: `lightgbm` needs `brew install libomp`.
 
+Railway note: the service builds with **Railpack**; the start command lives in `railpack.json` (and `railway.json`) so the platform never has to guess it.
+
 ## Repository map
 
 | Path | What |
