@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  pre { font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; direction: ltr; text-align: left; unicode-bidi: isolate; background: #1b2733; color: #e8eef2; border-radius: 10px; padding: 1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0 1.25rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.25rem; margin-block: 1.25rem 1.5rem; }
+  .flow .node { font-family: var(--mono); font-size: 0.8rem; font-weight: 600; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--wind); color: var(--wind); border-radius: 6px; padding: 0.3rem 0.6rem; background: var(--wind-soft); }
+  .flow .arrow { color: var(--tape); font-weight: 700; }
+  .flow .caption { width: 100%; font-size: 0.9rem; color: var(--ink-soft); margin-block-start: 0.25rem; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M1 · 2026-09-06</span>
+    <h1>M1: Supabase, RLS ולוגין אמיתי</h1>
+    <p class="lede">התחנה שבה שלושת העמודים מתחברים: הדאטה יושב ב-Postgres מאחורי Row Level Security, ה-API מאמת טוקן של Supabase ושואל את המסד <b>בתור המשתמש</b>, והדפדפן מקבל מסך התחברות אמיתי. זר שפותח את הכתובת רואה לוגין ותו לא.</p>
+    <span class="stamp">שער M1: עבר 8/8</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">8/8</div><div class="l">בדיקות השער</div></div>
+    <div class="kpi"><div class="v">3,500</div><div class="l">שורות ב-Postgres, טעינה אידמפוטנטית</div></div>
+    <div class="kpi"><div class="v">0 / 3,500</div><div class="l">שורות ל-anon / למשתמש מחובר</div></div>
+    <div class="kpi"><div class="v">24</div><div class="l">בדיקות pytest חדשות</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה: מה קרה בתחנה הזו</h3>
+    <p>העלינו את 3,500 השורות מה-CSV לטבלה ב-Supabase עם סקריפט שאפשר להריץ שוב ושוב בלי לייצר כפילויות. הדלקנו RLS: המסד עצמו מסרב לתת שורות למי שלא מחובר. כתבנו בשרת קוד שמאמת את הטוקן ש-Supabase נותן אחרי לוגין (חתימה ES256 מול המפתח הציבורי של הפרויקט), ואז שולח את אותו טוקן הלאה ל-Postgres, כך שהמדיניות נאכפת שם ולא אצלנו. בדפדפן יש דף לוגין עם supabase-js ומפתח ה-anon הציבורי בלבד. מפתח ה-service קיים רק במחשב של דור.</p>
+  </div>
+
+  <section class="flow" aria-label="זרימת האימות">
+    <span class="node">login.html (anon key)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">Supabase Auth → JWT (ES256)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">GET /api/records + Bearer</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">app/auth.py: verify (JWKS)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">app/db.py: postgrest.auth(token)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">Postgres + RLS</span>
+    <span class="caption">בלי טוקן: 401 מה-API, ו-0 שורות מהמסד גם אם פונים אליו ישירות עם מפתח ה-anon. עם טוקן תקף: 200 ו-3,500 שורות.</span>
+  </section>
+
+  <h2>מה נבנה</h2>
+  <div class="card">
+    <ul>
+      <li><b>ניקוי משותף</b>: <code>ml/data.py</code>: טעינה, המרת referred ל-boolean, budget_tier, row_id יציב, ייצוא JSON-safe. 8 בדיקות. אותו קוד ישמש את האימון ואת השירות.</li>
+      <li><b>סכמה ומדיניות</b>: <code>db/schema.sql</code> (טבלת <code>funnel_records</code> עם עמודת tier מחושבת, וטבלת <code>prediction_log</code> לרישום חיזויים) ו-<code>db/policies.sql</code> (RLS: קריאה ל-authenticated בלבד; ב-prediction_log כל משתמש רואה וכותב רק את השורות שלו).</li>
+      <li><b>טעינה</b>: <code>scripts/load_data.py</code>: upsert לפי id בקבוצות של 500 עם מפתח ה-service, מקומי בלבד. הרצה כפולה השאירה בדיוק 3,500 שורות.</li>
+      <li><b>אימות</b>: <code>app/auth.py</code>: אימות JWT מול JWKS (ES256/RS256) עם fallback ל-HS256 לפרויקטים ישנים; דורש aud=authenticated ו-exp. 8 בדיקות, כולל דחיית טוקן שנחתם במפתח זר.</li>
+      <li><b>לקוח לפי משתמש</b>: <code>app/db.py</code>: לקוח supabase חדש לכל בקשה עם הטוקן של המשתמש. ה-API מחזיק רק את מפתח ה-anon.</li>
+      <li><b>API</b>: <code>GET /api/records</code> עם דפדוף; 401 בלי טוקן, 422 על פרמטרים לא חוקיים.</li>
+      <li><b>דפדפן</b>: <code>login.html</code>, <code>dashboard.html</code> (לשוניות, sign-out, טבלת רשומות), <code>app.js</code> (עוזר fetch עם Bearer, ניתוב ללוגין כשאין session).</li>
+    </ul>
+    <div class="artifacts"><span>ml/data.py</span><span>db/schema.sql</span><span>db/policies.sql</span><span>scripts/load_data.py</span><span>app/auth.py</span><span>app/db.py</span><span>app/routers/records.py</span><span>static/login.html</span><span>static/dashboard.html</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (24 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · אין חומר מפתחות ב-git.</li>
+      <li><span class="ok">עבר</span> · <code>funnel_records</code> מכיל 3,500 שורות אחרי שתי הרצות של הטוען.</li>
+      <li><span class="ok">עבר</span> · RLS: פנייה ישירה למסד עם מפתח anon ובלי טוקן מחזירה 0 שורות.</li>
+      <li><span class="ok">עבר</span> · RLS: משתמש הצוות המחובר רואה 3,500 שורות.</li>
+      <li><span class="ok">עבר</span> · <code>/api/records</code> החי מחזיר 401 בלי טוקן.</li>
+      <li><span class="ok">עבר</span> · <code>/api/records</code> החי עם טוקן מחזיר 200 ו-total 3,500.</li>
+    </ol>
+    <p style="margin:0.6rem 0 0"><b>בדפדפן (ידני, מתועד):</b> כניסה ל-URL בלי session ← הפניה ללוגין · דור התחבר ← הדשבורד הציג את האימייל שלו, 3,500 רשומות ו-10 שורות ראשונות · Sign out ← חזרה ללוגין בלי הפניה חזרה (ה-session נמחק).</p>
+  </div>
+<pre>$ python scripts/gate.py --m 1
+[PASS] pytest green
+[PASS] ruff clean
+[PASS] no secrets in git
+[PASS] funnel_records has 3500 rows (loader idempotent)
+[PASS] RLS: anon without JWT sees 0 rows
+[PASS] RLS: signed-in user sees 3500 rows
+[PASS] live /api/records -> 401 without token
+[PASS] live /api/records -> 200 + total 3500 with token
+GATE M1: PASS 8/8</pre>
+
+  <h3>הדשבורד אחרי התחברות (URL חי)</h3>
+  <p><img src="img/m1_dashboard_signed_in.jpg" alt="דשבורד FunnelIQ אחרי התחברות: אימייל המשתמש בסרגל העליון, 3,500 רשומות, טבלת עשר השורות הראשונות"></p>
+
+  <h2>מה למדנו הפעם</h2>
+  <div class="notice">
+    <h3>1. Railway החליף builder מתחת לרגליים</h3>
+    <p>הפריסה השנייה נכשלה עם "No start command detected": Railway עבר מ-Nixpacks ל-Railpack, ש-לא מזהה אפליקציה שיושבת ב-<code>app/main.py</code>. הפריסה הישנה המשיכה לשרת (Railway שומר על האחרונה שעברה healthcheck), אז שום דבר לא נפל. תוקן ב-PR #6: <code>railpack.json</code> עם פקודת ההפעלה המפורשת, ו-<code>railway.json</code> מצהיר על Railpack.</p>
+    <h3>2. RLS בלי מדיניות = נעול לכולם</h3>
+    <p>אחרי הרצת הסכמה עם "Enable RLS", המשתמש המחובר קיבל 0 שורות בדיוק כמו anon. הסיבה: <code>policies.sql</code> לא באמת רץ (עורך ה-SQL מריץ רק טקסט מסומן אם יש סימון). הפתרון היה שאילתה אחת שיוצרת את המדיניות <b>ומחזירה</b> את הספירה באותה הרצה: <code>3500 | 3 | postgres</code>. לקח: לאמת תוצאה בתוך אותה פקודה, לא בפקודה נפרדת.</p>
+    <h3>3. סורק סודות שמחפש מילים תופס הערות</h3>
+    <p>המילה <code>service_role</code> בהערה ב-SQL הפילה את השער. הסריקה עברה לחפש חומר מפתחות בלבד: מחרוזות בצורת JWT, מפתחות <code>sb_secret_</code>, או השמה של מפתח service עם ערך אמיתי.</p>
+    <h3>4. שלושה דברים שהתגלו על הפרויקט הספציפי</h3>
+    <ul>
+      <li>הפרויקט חותם טוקנים ב-<b>ES256</b> עם JWKS ← לא נדרש שום secret בשרת. ה-fallback ל-HS256 נשאר בקוד לפרויקטים ישנים.</li>
+      <li>ההרשמה העצמית כובתה (אומת ישירות מול <code>/auth/v1/settings</code>: <code>disable_signup: true</code>).</li>
+      <li>מפתח ה-service לא הוגדר ב-Railway; ה-API החי מחזיק רק URL + anon key.</li>
+    </ul>
+  </div>
+
+  <h2>הבא בתור: M2</h2>
+  <div class="card">
+    <p>החצי הלא-מקוון של M2 כבר נבנה (בזמן ההמתנה ל-Supabase): מודול ה-EDA, <code>docs/FINDINGS.md</code> שנוצר ממספרים מחושבים, <code>/api/insights/overview</code> ולשונית Overview עם גרפים. נותר: לאשר את שתי ההחלטות <b>D-M2-1</b> (מודלי לקוח על purchased=1; מודל רווח על הכל) ו-<b>D-M2-2</b> (לא ממלאים מטרות), למזג, ולאמת את הפאנל על ה-URL החי.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M1 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
