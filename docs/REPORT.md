@@ -54,3 +54,66 @@ leads close fast, rather than paying more per customer in the High tier for shor
 **Caveat.** An R² of 0.95 with steps this clean is unusual; on real agency data the same relationship exists
 but is noisier. The method (feature policy, cross-validation, leakage ablation, explaining what the model
 learned) is what transfers.
+
+## P3 — Who is likely to buy more? (classification on `upsell`)
+
+**Setup.** Customers only (n = 3,163). Class balance 1,466 positive / 1,697 negative
+(46.4% positive) — close to balanced. Three classifiers, stratified 5-fold, seed 42, two feature variants:
+*early* (funnel only) and *tenure* (funnel + `ltv_months`).
+
+**Is class-imbalance handling warranted?** Barely. With a 46/54 split, `scale_pos_weight` = 1.16
+moved XGBoost's F1 from 0.741 to 0.749. It was kept because it cleared the
+pre-declared +0.005 bar, but the effect is marginal and the decision would not survive a different seed with confidence.
+
+| variant / model | accuracy | precision | recall | F1 | ROC-AUC |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| majority baseline (always "no") | 53.6% | — | 0 | 0 | 0.500 |
+| early / xgboost | 74.4% | 0.687 | 0.824 | 0.749 | 0.775 |
+| early / lightgbm | 73.1% | 0.678 | 0.799 | 0.734 | 0.772 |
+| early / catboost | 74.8% | 0.690 | 0.832 | 0.754 | 0.778 |
+| tenure / xgboost | 76.3% | 0.702 | 0.849 | 0.768 | 0.788 |
+| tenure / lightgbm | 74.9% | 0.693 | 0.825 | 0.753 | 0.786 |
+| tenure / catboost | 76.4% | 0.700 | 0.859 | 0.771 | 0.795 |
+| **business rule: LTV > 12 and CAC < 2000** | 77.9% | 0.713 | 0.876 | **0.786** | — |
+
+Served: **tenure / catboost** (best ROC-AUC). When a request carries no known tenure the API falls back to the
+early variant automatically and says so.
+
+### Is accuracy a sufficient metric? No.
+
+The majority baseline already scores 53.6% accuracy while flagging nobody (recall 0, F1 0). The models add about
+23 accuracy points, but the number that matters for an outreach list is
+precision/recall: the served model finds 86% of upsellers at 70% precision.
+ROC-AUC (0.795) is the threshold-free view.
+
+### One feature or a combination?
+
+A combination. Unlike lifetime, no single feature dominates: early-variant importances are `calls_to_closed` 0.23, `customer_acquisition_cost` 0.10, `conversion_rate` 0.10, `answer_rate` 0.09;
+with tenure allowed, `ltv_months` 0.32, `customer_acquisition_cost` 0.11, `conversion_rate` 0.08, `answer_rate` 0.07. Upsell follows the same calls-to-close staircase (74% upsell at 1 call, 6% at 7)
+and the Mid tier (69% vs ~21%), but acquisition cost and conversion rate add real signal.
+
+### Why the tenure variant is allowed to see `ltv_months`
+
+Upsell outreach targets *existing* customers: at the moment of deciding whom to call, the team knows how long
+each customer has been with them. That is information from the past, not the future. It is the only outcome
+column any model may use, listed explicitly in `ml/features.ALLOWED_OUTCOMES`, and the early variant exists
+for the moment of signing when tenure is still zero.
+
+### The business rule vs the model — where does each win?
+
+The brief's rule, tuned on the training folds like the models, lands at **LTV > 12 months and
+CAC < ₪2,000** and scores F1 0.786 — *slightly better* than the served model's out-of-fold F1
+(0.771). By tier (F1 / recall):
+
+| tier | n | upsell rate | model | rule |
+| --- | ---: | ---: | ---: | ---: |
+| Low | 571 | 21% | 0.685 / 0.623 | 0.708 / 0.656 |
+| Mid | 1640 | 69% | 0.814 / 0.966 | 0.827 / 0.990 |
+| High | 952 | 22% | 0.490 / 0.408 | 0.489 / 0.379 |
+
+The rule wins in Low and Mid and ties in High. The honest reading: with tenure known, two thresholds capture
+almost everything a gradient-boosting model finds in this data. The model's advantages are elsewhere — it ranks
+customers by probability (the rule only says yes/no), it works on day one without tenure (early variant, F1
+0.754, still far above the baseline), and it will keep working if the thresholds drift.
+**Recommendation:** use the rule as the default outreach list for existing customers, and the early model to
+pre-flag new customers at signing; revisit if the tiers or CAC structure change.

@@ -105,3 +105,16 @@ def test_unsupported_algorithm_is_rejected(hs_settings):
     token = jwt.encode(_claims(), SECRET, algorithm="HS512")
     with pytest.raises(ValueError, match="unsupported"):
         auth.verify_token(token, hs_settings)
+
+
+def test_service_role_token_is_rejected_even_if_signature_is_valid(hs_settings):
+    """A service_role JWT signed with the project secret must never act as a user."""
+    token = jwt.encode(_claims(role="service_role"), SECRET, algorithm="HS256")
+    with pytest.raises(ValueError, match="role"):
+        auth.verify_token(token, hs_settings)
+
+
+def test_anon_role_token_is_rejected(hs_settings):
+    token = jwt.encode(_claims(role="anon"), SECRET, algorithm="HS256")
+    with pytest.raises(ValueError, match="role"):
+        auth.verify_token(token, hs_settings)

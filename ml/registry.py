@@ -19,6 +19,7 @@ MODELS_DIR = Path(__file__).resolve().parent.parent / "models"
 METRICS_FILE = "metrics.json"
 
 LTV_MODELS = ("xgboost", "lightgbm", "catboost")
+UPSELL_VARIANTS = ("early", "tenure")
 
 
 def utc_now() -> str:
@@ -49,10 +50,17 @@ def customer_frame(customer: dict) -> pd.DataFrame:
 
 
 class ModelRegistry:
-    def __init__(self, models_dir: Path, metrics: dict, ltv_models: dict[str, object]):
+    def __init__(
+        self,
+        models_dir: Path,
+        metrics: dict,
+        ltv_models: dict[str, object],
+        upsell_models: dict[str, object] | None = None,
+    ):
         self.models_dir = models_dir
         self.metrics = metrics
         self.ltv_models = ltv_models
+        self.upsell_models = upsell_models or {}  # key: "<variant>_<name>"
 
     @classmethod
     def load(cls, models_dir: Path = MODELS_DIR) -> ModelRegistry:
@@ -63,11 +71,17 @@ class ModelRegistry:
             path = models_dir / f"ltv_{name}.joblib"
             if path.exists():
                 ltv_models[name] = joblib.load(path)
-        return cls(models_dir, metrics, ltv_models)
+        upsell_models: dict[str, object] = {}
+        for variant in UPSELL_VARIANTS:
+            for name in LTV_MODELS:
+                path = models_dir / f"upsell_{variant}_{name}.joblib"
+                if path.exists():
+                    upsell_models[f"{variant}_{name}"] = joblib.load(path)
+        return cls(models_dir, metrics, ltv_models, upsell_models)
 
     @property
     def loaded(self) -> list[str]:
-        return [f"ltv_{n}" for n in self.ltv_models]
+        return [f"ltv_{n}" for n in self.ltv_models] + [f"upsell_{k}" for k in self.upsell_models]
 
     # ------------------------------------------------------------------ P2
     def predict_ltv(self, customer: dict) -> dict:
@@ -82,3 +96,46 @@ class ModelRegistry:
         else:
             months = by_model[served]
         return {"months": round(months, 1), "by_model": by_model, "served": served}
+
+    # ------------------------------------------------------------------ P3
+    def upsell_config(self) -> dict:
+        m = self.metrics.get("upsell", {})
+        return {
+            "variant": m.get("variant_served", "early"),
+            "model": m.get("model_served", "catboost"),
+            "ltv_threshold": m.get("business_rule", {}).get("ltv_threshold"),
+            "cac_threshold": m.get("business_rule", {}).get("cac_threshold"),
+        }
+
+    def predict_upsell(self, customer: dict) -> dict:
+        """Probability of buying more. The served variant may need ltv_months (tenure); if it is
+        missing, fall back to the early variant and say so."""
+        if not self.upsell_models:
+            raise RuntimeError("upsell models are not loaded")
+        cfg = self.upsell_config()
+        variant, name = cfg["variant"], cfg["model"]
+        has_tenure = customer.get("ltv_months") is not None
+        if variant == "tenure" and not has_tenure:
+            variant = "early"
+        key = f"{variant}_{name}"
+        if key not in self.upsell_models:
+            key = next(iter(self.upsell_models))
+            variant, name = key.split("_", 1)
+        X = build_features(customer_frame(customer), f"upsell_{variant}")
+        proba = float(self.upsell_models[key].predict_proba(X)[0][1])
+        rule_flag = None
+        if has_tenure and cfg["ltv_threshold"] is not None:
+            rule_flag = bool(
+                customer["ltv_months"] > cfg["ltv_threshold"]
+                and customer["customer_acquisition_cost"] < cfg["cac_threshold"]
+            )
+        return {
+            "probability": round(proba, 4),
+            "flag": proba >= 0.5,
+            "rule_flag": rule_flag,
+            "variant": variant,
+            "model": name,
+            "rule": (
+                f"ltv_months > {cfg['ltv_threshold']} and customer_acquisition_cost < {cfg['cac_threshold']}"
+            ),
+        }

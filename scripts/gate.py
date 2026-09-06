@@ -284,6 +284,62 @@ def check_live_predict_ltv() -> None:
     assert log["rows"] and log["rows"][0]["model"] == "ltv", log
 
 
+# ---------------------------------------------------------------- M4 checks
+def check_upsell_metrics_complete() -> None:
+    up = _metrics().get("upsell")
+    assert up, "metrics.json has no 'upsell' section"
+    for v in ("early", "tenure"):
+        for name in ("xgboost", "lightgbm", "catboost"):
+            cv = up["cv"][v][name]
+            assert all(k in cv for k in ("accuracy", "precision", "recall", "f1", "roc_auc")), cv
+            artifact = ROOT / "models" / f"upsell_{v}_{name}.joblib"
+            assert artifact.exists(), f"{artifact.name} missing"
+    assert up["baseline"]["accuracy"] > 0.5 and "use_scale_pos_weight" in up["imbalance"]
+
+
+def check_upsell_beats_baseline() -> None:
+    up = _metrics()["upsell"]
+    m = up["cv"][up["variant_served"]][up["model_served"]]
+    assert m["roc_auc"] > 0.55, f"ROC-AUC {m['roc_auc']}"
+    assert m["f1"] > up["baseline"]["f1"], "F1 not above the majority baseline"
+
+
+def check_business_rule_compared() -> None:
+    br = _metrics()["upsell"]["business_rule"]
+    assert br["ltv_threshold"] > 0 and br["cac_threshold"] > 0 and br["cv"]["f1"] > 0
+    assert len(br["by_tier"]) == 3, br["by_tier"]
+
+
+def check_report_p3() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    needles = (
+        "## P3",
+        "Is accuracy a sufficient metric",
+        "business rule",
+        "tenure",
+        "One feature or a combination",
+    )
+    for needle in needles:
+        assert needle in text, f"REPORT.md §P3 lacks '{needle}'"
+
+
+def check_live_predict_upsell() -> None:
+    import httpx
+
+    token = _gate_user_token()
+    customer = {
+        "ad_budget": 3000, "num_leads": 40, "leads_answered": 26, "leads_not_answered": 14,
+        "followup_1": 21, "followup_2": 16, "followup_3": 13, "followup_4": 11, "followup_5": 8,
+        "not_closed": 4, "closed": 4, "calls_to_closed": 2, "calls_to_not_closed": 3,
+        "customer_acquisition_cost": 750, "ltv_months": 30,
+    }
+    headers = {"Authorization": f"Bearer {token}"}
+    res = httpx.post(f"{_live_url()}/api/predict/upsell", json=customer, headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert 0 <= body["probability"] <= 1 and body["rule_flag"] is not None, body
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -318,6 +374,15 @@ GATES: dict[int, list[Check]] = {
         ("ablation with profit scores higher (documents the leak)", check_ablation_documents_leak),
         ("REPORT.md §P2 answers the brief", check_report_p2),
         ("live POST /api/predict/ltv -> 200 + logged in prediction_log", check_live_predict_ltv),
+    ],
+    4: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("metrics.json: 2 variants x 3 classifiers, full metrics + artifacts", check_upsell_metrics_complete),
+        ("served model beats the majority baseline (F1) and ROC-AUC > 0.55", check_upsell_beats_baseline),
+        ("business rule tuned, scored, and compared by tier", check_business_rule_compared),
+        ("REPORT.md §P3 answers the brief", check_report_p3),
+        ("live POST /api/predict/upsell -> 200 with probability + rule verdict", check_live_predict_upsell),
     ],
 }
 

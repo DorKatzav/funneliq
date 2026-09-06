@@ -11,3 +11,6 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header"]
 [lint.per-file-ignores]
 # prose strings for the generated FINDINGS.md
 "ml/eda.py" = ["E501"]
+# trainers and the live smoke script print long human-readable lines
+"ml/train_*.py" = ["E501"]
+"scripts/smoke_live.py" = ["E501"]

@@ -28,7 +28,7 @@ def registry() -> ModelRegistry:
 
 
 def test_registry_loads_three_ltv_models_and_metrics(registry):
-    assert set(registry.loaded) == {"ltv_xgboost", "ltv_lightgbm", "ltv_catboost"}
+    assert {"ltv_xgboost", "ltv_lightgbm", "ltv_catboost"} <= set(registry.loaded)
     ltv = registry.metrics["ltv"]
     assert set(ltv["cv"]) >= {"xgboost", "lightgbm", "catboost", "ensemble"}
     assert ltv["served"] in ltv["cv"]
@@ -131,3 +131,35 @@ def test_models_and_predictions_endpoints(api):
 
 def test_health_lists_loaded_models(client):
     assert "ltv_catboost" in client.get("/health").json()["models_loaded"]
+
+
+# --- P3 upsell ---------------------------------------------------------------------------
+
+
+def test_registry_loads_upsell_models(registry):
+    assert any(k.startswith("upsell_") for k in registry.loaded)
+    up = registry.metrics["upsell"]
+    assert up["variant_served"] in ("early", "tenure") and up["baseline"]["accuracy"] > 0.5
+    assert up["business_rule"]["ltv_threshold"] > 0 and up["business_rule"]["cac_threshold"] > 0
+
+
+def test_predict_upsell_falls_back_to_early_without_tenure(registry):
+    res = registry.predict_upsell(EASY_CLOSE)
+    assert 0 <= res["probability"] <= 1 and res["variant"] == "early" and res["rule_flag"] is None
+
+
+def test_predict_upsell_uses_tenure_and_rule_when_ltv_given(registry):
+    long = registry.predict_upsell({**EASY_CLOSE, "ltv_months": 36})
+    short = registry.predict_upsell({**HARD_CLOSE, "ltv_months": 3})
+    assert long["variant"] == registry.metrics["upsell"]["variant_served"]
+    assert long["rule_flag"] is True and short["rule_flag"] is False
+    assert long["probability"] > short["probability"]
+
+
+def test_upsell_endpoint(api):
+    tc, fake = api
+    res = tc.post("/api/predict/upsell", json={**EASY_CLOSE, "ltv_months": 30})
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert 0 <= body["probability"] <= 1 and isinstance(body["flag"], bool) and body["rule"]
+    assert any(r["model"] == "upsell" for r in fake.inserted)

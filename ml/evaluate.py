@@ -100,3 +100,27 @@ def importances(model, feature_names: list[str]) -> dict[str, float]:
     norm = raw / total if total > 0 else np.full_like(raw, 1.0 / len(raw))
     pairs = sorted(zip(feature_names, norm, strict=True), key=lambda kv: kv[1], reverse=True)
     return {name: round(float(v), 5) for name, v in pairs}
+
+
+def oof_proba(model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5, seed: int = 42) -> np.ndarray:
+    """Out-of-fold positive-class probabilities (stratified) — for fair model-vs-rule comparisons."""
+    skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    out = np.zeros(len(X), dtype=float)
+    for train_idx, test_idx in skf.split(X, y):
+        est = clone(model)
+        est.fit(X.iloc[train_idx], y.iloc[train_idx])
+        out[test_idx] = est.predict_proba(X.iloc[test_idx])[:, 1]
+    return out
+
+
+def classification_scores(y_true, y_pred, proba=None) -> dict:
+    """Accuracy / precision / recall / F1 (and ROC-AUC when probabilities are given) for one split."""
+    out = {
+        "accuracy": round(float(accuracy_score(y_true, y_pred)), 4),
+        "precision": round(float(precision_score(y_true, y_pred, zero_division=0)), 4),
+        "recall": round(float(recall_score(y_true, y_pred, zero_division=0)), 4),
+        "f1": round(float(f1_score(y_true, y_pred, zero_division=0)), 4),
+    }
+    if proba is not None and len(set(np.asarray(y_true).tolist())) > 1:
+        out["roc_auc"] = round(float(roc_auc_score(y_true, proba)), 4)
+    return out
