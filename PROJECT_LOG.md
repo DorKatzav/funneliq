@@ -57,3 +57,13 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Numbers that drive the next milestones: elasticity of leads vs budget 0.608 (diminishing); Mid tier converts 8.3% with mean profit ₪21,792 and LTV 33.6 months vs High 5.4% / ₪5,186 / 13.2 and Low 4.7% / ₪2,291 / 7.9; calls_to_closed r = −0.546 with profit.
 - Feature-policy note for M3: `ltv_months` (r = 0.846), `upsell` (0.652) and `referred` (0.585) dominate the profit correlation — all outcomes; none is ever a feature for another outcome.
 - Next: M3 — P2 LTV regression (features.py + leakage guard, evaluate.py, three regressors, ablation, /api/predict/ltv, Predict tab).
+
+## 2026-09-06 — M3: P2 customer-lifetime regression — GATE PASSED (7/7)
+- Feature policy (`ml/features.py`): FUNNEL_RAW (14) + ENGINEERED (4); OUTCOMES never features; the only allowance is ltv_months for the upsell-tenure variant (M4). `assert_no_leakage` is a tested guard.
+- Training (customers only, n = 3,163; 4 rows without ltv dropped): XGBoost R² 0.944 / RMSE 2.84, LightGBM 0.943 / 2.86, CatBoost 0.946 / 2.80 (served), ensemble 0.945 / 2.81. Target std 12.0 months.
+- Ablation: adding cumulative_profit lifts CatBoost R² 0.946 → 0.975 on the same rows — the leak, documented and excluded.
+- What the models learned: calls_to_closed = 83–92% of gain importance in all three (LightGBM switched to gain importance so the three are comparable). Lifetime is a staircase on calls-to-close (36 / 28 / 18 / 12 / ~7 months for 1–2 / 3 / 4 / 5 / 6+ calls, ±3 within steps; r = −0.95). Budget tier acts mostly through it.
+- User asked how funnel data can predict anything about the customer; answered in docs/notes/LTV_EXPLAINER_HE.html (calls_to_closed and CAC are the customer's own acquisition journey) with an explicit caveat that R² 0.95 is a property of this practice dataset.
+- Live incidents: (1) first M3 deploy crashed with 502 — the Railpack runtime image lacks OpenMP; fixed by `aptPackages: ["libgomp1"]` in railpack.json (PR #11). (2) Form defaults built from column medians violated the funnel identity (28 + 14 ≠ 41) → 422; fixed by using the real customer nearest the medians as defaults + plain-language validation messages (PR #12).
+- API: POST /api/predict/ltv (validated funnel shape, logged to prediction_log through the user's token), GET /api/models, GET /api/predictions. Dashboard: Predict + Findings tabs. REPORT.md §P2 written from metrics.json.
+- PRs #10, #11, #12 merged. Next: M4 — P3 upsell classification (early vs tenure variants, baseline, business rule).

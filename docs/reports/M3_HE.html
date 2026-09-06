@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  pre { font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; direction: ltr; text-align: left; unicode-bidi: isolate; background: #1b2733; color: #e8eef2; border-radius: 10px; padding: 1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0 1.25rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M3 · 2026-09-06</span>
+    <h1>M3: כמה זמן לקוח חדש יישאר?</h1>
+    <p class="lede">חבילה 2 של הברייף: שלושה מודלי gradient boosting שחוזים את <code>ltv_months</code> ממה שידוע ברגע הרכישה בלבד, מושווים ב-5-fold cross-validation, עם ניסוי ablation שמוכיח למה <code>cumulative_profit</code> אסור, וחיזוי חי מאחורי טופס באתר.</p>
+    <span class="stamp">שער M3: עבר 7/7</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">0.946</div><div class="l">R² של המודל המוגש (CatBoost), CV</div></div>
+    <div class="kpi"><div class="v">±2.8</div><div class="l">חודשים, טעות טיפוסית (RMSE); הפיזור בפועל 12.0</div></div>
+    <div class="kpi"><div class="v">0.975</div><div class="l">R² אם מרשים לרווח לדלוף (לא מוגש)</div></div>
+    <div class="kpi"><div class="v">92%</div><div class="l">מהחשיבות: שיחות עד סגירה</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>המודל מקבל את הנתונים שיש לצוות ביום שהעסקה נסגרת (תקציב הקמפיין, כמה לידים, כמה מעקבים, כמה שיחות לקח לסגור, כמה עלה הלקוח) ומחזיר: "לקוח שנרכש ככה נשאר בממוצע X חודשים, פלוס-מינוס 3". הוא לא רואה שום דבר מהעתיד (רווח, upsell, הפניות), וזה נבדק במבחן אוטומטי. שלושת המודלים מסכימים כמעט לחלוטין, וכולם מצביעים על אותו דבר: <b>כמה קשה היה לסגור את הלקוח</b> הוא המנבא הכמעט-יחיד של כמה זמן הוא יישאר.</p>
+  </div>
+
+  <h2>השוואת המודלים (לקוחות בלבד, n = 3,163, 5-fold)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>מודל</th><th>RMSE (חודשים)</th><th>R²</th><th>הערה</th></tr></thead>
+    <tbody>
+      <tr><td>XGBoost</td><td class="num">2.84 ± 0.17</td><td class="num">0.944</td><td></td></tr>
+      <tr><td>LightGBM</td><td class="num">2.86 ± 0.16</td><td class="num">0.943</td><td></td></tr>
+      <tr class="win"><td>CatBoost (מוגש)</td><td class="num">2.80 ± 0.16</td><td class="num">0.946</td><td>RMSE הנמוך ביותר</td></tr>
+      <tr><td>ensemble (ממוצע השלושה)</td><td class="num">2.81 ± 0.17</td><td class="num">0.945</td><td>לא משפר על CatBoost לבד</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>שלוש השאלות של הברייף</h2>
+  <div class="card">
+    <h3>1. האם cumulative_profit צריך להיות פיצ'ר? לא.</h3>
+    <p>הרווח נצבר <i>לאורך</i> החיים שאנחנו מנסים לחזות: לקוח שנשאר 40 חודשים פשוט היו לו 40 חודשים לייצר רווח. ה-ablation מראה את הדליפה במספר: על אותן שורות, CatBoost עולה מ-R² 0.946 (משפך בלבד) ל-<b>0.975</b> עם הרווח. ה"שיפור" הזה הוא בדיוק המידע מהעתיד, ולכן מדיניות הפיצ'רים ב-<code>ml/features.py</code> דוחה כל עמודת תוצאה, ומגן הדליפה הוא מבחן יחידה שנכשל אם מישהו ינסה.</p>
+    <h3>2. אילו פיצ'רים שולטים, והאם שלושת המודלים מסכימים?</h3>
+    <p>כן, בצורה חריגה. חשיבות מבוססת gain בשלושתם:</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>פיצ'ר</th><th>XGBoost</th><th>LightGBM</th><th>CatBoost</th></tr></thead>
+      <tbody>
+        <tr class="win"><td><code>calls_to_closed</code></td><td class="num">0.86</td><td class="num">0.83</td><td class="num">0.92</td></tr>
+        <tr><td><code>ad_budget</code></td><td class="num">0.09</td><td class="num">0.14</td><td class="num">0.02</td></tr>
+        <tr><td>כל השאר יחד</td><td class="num">0.05</td><td class="num">0.03</td><td class="num">0.06</td></tr>
+      </tbody>
+    </table></div>
+    <p>הסיבה בדאטה עצמו: הוותק הוא מדרגות על שיחות-עד-סגירה: 36 חודשים ב-1–2 שיחות, 28 ב-3, 18 ב-4, 12 ב-5, ו-~7 ב-6 ומעלה, עם ±3 חודשים בלבד בתוך כל מדרגה (מתאם −0.95). רמת התקציב נראית חשובה לבדה (Mid 33.5 חודשים מול High 13.2 ו-Low 8.9) אבל פועלת בעיקר <i>דרך</i> השיחות: קמפיינים בינוניים מביאים לקוחות שנסגרים ב-1–4 שיחות, נמוכים וגבוהים מביאים לקוחות שדורשים 3–9.</p>
+    <h3>3. המנוף החזק ביותר על אורך חיי הלקוח, בשני משפטים</h3>
+    <p><b>לקוחות שקל לסגור נשארים; לקוחות שדרשו חמש שיחות ומעלה עוזבים תוך שנה. Northbound צריכה להתייחס לשיחות-עד-סגירה כאות אזהרה מוקדם ברגע החתימה: לנתב לקוחות שנסגרו בקושי לאונבורדינג ושימור מיד, ולהטות את הרכישה לקמפיינים בינוניים שהלידים שלהם נסגרים מהר, במקום לשלם יותר ללקוח ב-High על קשר קצר.</b></p>
+  </div>
+
+  <div class="notice">
+    <h3>השאלה של דור: "איך מידע על המשפך חוזה משהו על הלקוח?"</h3>
+    <p>נענתה בדף נפרד, <code>docs/notes/LTV_EXPLAINER_HE.html</code>. התמצית: כל שורה היא לקוח יחד עם ההקשר שבו נרכש; <code>calls_to_closed</code> ו-CAC הם המסע של הלקוח הספציפי מול המכירות, לא של הקמפיין. ו-R² של 0.95 עם מדרגות כאלה הוא תכונה של דאטה לתרגול; בעולם האמיתי הקשר קיים אבל רועש הרבה יותר.</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>POST /api/predict/ltv</code> מקבל 14 שדות משפך, מאמת שהם משפך תקין (ענו + לא ענו = לידים, מעקבים לא עולים, נסגר + לא נסגר = מעקב 5), מחזיר חודשים + ערך לכל מודל, ורושם את החיזוי ל-<code>prediction_log</code> עם הטוקן של המשתמש (RLS: כל אחד רואה רק את שלו). <code>GET /api/models</code> חושף את כל <code>metrics.json</code>; <code>GET /api/predictions</code> את החיזויים האחרונים של המשתמש.</p>
+    <p>לשונית <b>Predict</b>: טופס עם ברירות מחדל של לקוח אמיתי טיפוסי, התוצאה, פירוט לפי מודל, גרף החשיבות, ויומן החיזויים. לשונית <b>Findings</b>: טבלת ה-CV, ה-ablation, וחשיבויות שלושת המודלים זה לצד זה.</p>
+    <p><img src="img/m3_predict_live.jpg" alt="לשונית Predict באתר החי: טופס לקוח, תוצאה 27.6 חודשים מוגש על ידי CatBoost, פירוט לפי מודל וגרף חשיבות"></p>
+    <p>הדוגמה בצילום: לקוח Mid (₪3,000) שנסגר ב-3 שיחות ← 27.6 חודשים. בדיוק מדרגת "3 שיחות" (28.2 בממוצע בדאטה).</p>
+    <div class="artifacts"><span>ml/features.py</span><span>ml/evaluate.py</span><span>ml/train_ltv.py</span><span>ml/registry.py</span><span>models/ltv_*.joblib</span><span>models/metrics.json</span><span>app/schemas.py</span><span>app/routers/predict.py</span><span>docs/REPORT.md</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (57 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · מבחן מגן הדליפה עובר (ומוכח שנכשל על cumulative_profit).</li>
+      <li><span class="ok">עבר</span> · metrics.json: שלושה מודלים עם CV, חשיבויות, וקבצי joblib.</li>
+      <li><span class="ok">עבר</span> · ה-ablation עם רווח מקבל ציון גבוה יותר (מתעד את הדליפה).</li>
+      <li><span class="ok">עבר</span> · REPORT.md §P2 עונה על שלוש השאלות.</li>
+      <li><span class="ok">עבר</span> · <code>POST /api/predict/ltv</code> חי מחזיר 200 והחיזוי מופיע ב-prediction_log.</li>
+    </ol>
+  </div>
+
+  <h2>שתי תקלות חיות ומה למדנו</h2>
+  <div class="notice">
+    <h3>1. 502 אחרי הפריסה: OpenMP חסר בלינוקס</h3>
+    <p>הפריסה הראשונה של M3 קרסה בעלייה. זו הפריסה הראשונה שמייבאת xgboost/lightgbm בזמן ריצה, ותמונת הריצה של Railpack לא כוללת <code>libgomp</code>. אותה בעיה שהייתה במק עם libomp, בגרסת לינוקס. תוקן ב-PR #11: <code>aptPackages: ["libgomp1"]</code> ב-<code>railpack.json</code>. לקח: תלות מערכת של ספריות ML צריכה להיות בקובץ הפריסה, לא בזיכרון.</p>
+    <h3>2. ברירות מחדל בטופס שאינן משפך תקין</h3>
+    <p>חציון של כל עמודה בנפרד נתן 28 + 14 ≠ 41 והשרת דחה בצדק (422). תוקן ב-PR #12: ברירות המחדל הן הלקוח האמיתי הקרוב ביותר לחציונים (משפך תקין מעצם היותו אמיתי), והודעות הולידציה מוצגות במילים ולא כ-JSON.</p>
+  </div>
+
+  <h2>הבא בתור: M4, סיווג upsell</h2>
+  <div class="card">
+    <p>שלושה מסווגים ב-stratified 5-fold, בדיקת איזון מחלקות (42% חיובי) והחלטה על scale_pos_weight, baseline של המחלקה הרוב, שתי גרסאות (early: משפך בלבד; tenure: + ותק ידוע, עם הצדקה), וכלל עסקי "LTV > X וגם CAC < Y" מול המודל.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M3 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
