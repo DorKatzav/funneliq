@@ -14,9 +14,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import records
+from app.routers import insights, records
 
-APP_VERSION = "0.2.0"
+APP_VERSION = "0.3.0"
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 _started_at = time.time()
 
@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
         return RedirectResponse(url="/static/dashboard.html")
 
     app.include_router(records.router)
+    app.include_router(insights.router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     return app
 
