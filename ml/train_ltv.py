@@ -61,6 +61,18 @@ def _report(name: str, m: dict) -> None:
     print(f"{name:9s} RMSE {m['rmse_mean']:.3f} ± {m['rmse_std']:.3f} | R² {m['r2_mean']:.3f}")
 
 
+def representative_row(df: pd.DataFrame) -> dict[str, float]:
+    """The actual customer closest (z-score distance) to the column medians — used as form defaults.
+
+    Column-wise medians are NOT a valid funnel (answered + not answered may not equal leads),
+    so we pick a real row instead.
+    """
+    cols = FUNNEL_RAW
+    z = (df[cols] - df[cols].median()) / df[cols].std().replace(0, 1)
+    idx = z.pow(2).sum(axis=1).idxmin()
+    return {c: float(df.loc[idx, c]) for c in cols}
+
+
 def training_frame() -> pd.DataFrame:
     df = customers_only(clean(load_raw()))
     return df[df["ltv_months"].notna()].reset_index(drop=True)
@@ -105,7 +117,7 @@ def train(models_dir: Path = MODELS_DIR, n_splits: int = 5) -> dict:
         f"vs funnel-only {ablation['catboost_funnel_only_same_rows']['r2_mean']:.3f}"
     )
 
-    defaults = {c: float(df[c].median()) for c in FUNNEL_RAW}  # numeric funnel fields only (form defaults)
+    defaults = representative_row(df)  # a real customer nearest the medians: a valid funnel by construction
     payload = {
         "trained_at": utc_now(),
         "target": "ltv_months",
