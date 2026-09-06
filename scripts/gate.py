@@ -190,6 +190,46 @@ def check_live_records_with_token() -> None:
     assert len(body.get("rows", [])) == 5
 
 
+# ---------------------------------------------------------------- M2 checks
+def check_eda_incomplete_rows() -> None:
+    sys.path.insert(0, str(ROOT))
+    from ml.data import clean, load_raw
+    from ml.eda import overview_stats
+
+    stats = overview_stats(clean(load_raw()))
+    n = stats["counts"]["incomplete_rows"]
+    assert n == 33, f"incomplete rows = {n}, expected 33"
+    assert len(stats["conversion_by_tier"]) == 3, "expected 3 budget tiers"
+    assert stats["diminishing_returns"]["verdict"] == "diminishing", stats["diminishing_returns"]
+
+
+def check_findings_written() -> None:
+    path = ROOT / "docs" / "FINDINGS.md"
+    assert path.exists(), "docs/FINDINGS.md missing"
+    text = path.read_text(encoding="utf-8")
+    for needle in ("## 1.", "## 3.", "## 4.", "Verdict", "Best-converting tier", "D-M2-1", "D-M2-2"):
+        assert needle in text, f"FINDINGS.md lacks '{needle}'"
+
+
+def check_decisions_logged() -> None:
+    text = (ROOT / "PROJECT_LOG.md").read_text(encoding="utf-8")
+    assert "D-M2-1" in text and "D-M2-2" in text, "D-M2-1 / D-M2-2 not in PROJECT_LOG.md"
+    assert "APPROVED" in text, "decisions not marked approved"
+
+
+def check_live_overview() -> None:
+    import httpx
+
+    token = _gate_user_token()
+    headers = {"Authorization": f"Bearer {token}"}
+    res = httpx.get(f"{_live_url()}/api/insights/overview", headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert body["counts"]["rows"] == 3500, body["counts"]
+    assert {t["tier"] for t in body["conversion_by_tier"]} == {"Low", "Mid", "High"}
+    assert body["counts"]["incomplete_rows"] == 33
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -207,6 +247,14 @@ GATES: dict[int, list[Check]] = {
         ("RLS: signed-in user sees 3500 rows", check_rls_allows_authenticated),
         ("live /api/records -> 401 without token", check_live_records_requires_token),
         ("live /api/records -> 200 + total 3500 with token", check_live_records_with_token),
+    ],
+    2: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("EDA: 33 incomplete rows, 3 tiers, diminishing returns", check_eda_incomplete_rows),
+        ("FINDINGS.md answers the three P1 questions", check_findings_written),
+        ("D-M2-1 / D-M2-2 approved in PROJECT_LOG", check_decisions_logged),
+        ("live /api/insights/overview -> 200 with 3 tiers (Supabase rows)", check_live_overview),
     ],
 }
 
