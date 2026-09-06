@@ -14,8 +14,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
+from app.routers import records
 
-APP_VERSION = "0.1.0"
+APP_VERSION = "0.2.0"
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 _started_at = time.time()
 
@@ -32,6 +33,7 @@ def create_app() -> FastAPI:
             "version": APP_VERSION,
             "commit": (settings.railway_git_commit_sha or "dev")[:12],
             "env": settings.app_env,
+            "supabase_configured": bool(settings.supabase_url and settings.supabase_anon_key),
             "models_loaded": [],
             "uptime_s": round(time.time() - _started_at, 1),
         }
@@ -47,8 +49,9 @@ def create_app() -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def root() -> RedirectResponse:
-        return RedirectResponse(url="/static/index.html")
+        return RedirectResponse(url="/static/dashboard.html")
 
+    app.include_router(records.router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     return app
 
