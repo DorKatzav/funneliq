@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  tr.rule td { background: var(--tape-soft); font-weight: 600; }
+  .bands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; margin-block: 0.5rem 1rem; }
+  .band { border-radius: 8px; padding: 0.6rem 0.8rem; color: #fff; font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: center; }
+  .band.low { background: #6b7a86; } .band.mid { background: var(--tape); } .band.high { background: var(--gate); }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M5 · 2026-09-06</span>
+    <h1>M5: מי יהפוך ללקוח-על?</h1>
+    <p class="lede">חבילה 4 של הברייף: CatBoost על <code>referred</code> עם רמת התקציב כקטגוריה נייטיבית (בלי one-hot), חיפוש היפר-פרמטרים על 18 קונפיגורציות, ציון 0–100 חי באתר, ופרופיל של לקוחות-העל האמיתיים: כמה הם, איזה נתח מהרווח הם מביאים, כמה עלה להשיג אותם, ואיך לזהות אותם ביום החתימה.</p>
+    <span class="stamp">שער M5: עבר 7/7</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">0.784</div><div class="l">ROC-AUC של המודל המוגש (5-fold)</div></div>
+    <div class="kpi"><div class="v">16.7%</div><div class="l">מהלקוחות הם לקוחות-על (529)</div></div>
+    <div class="kpi"><div class="v">33.6%</div><div class="l">מכלל הרווח מגיע מהם</div></div>
+    <div class="kpi"><div class="v">₪991</div><div class="l">עלות רכישה ממוצעת, מול ₪1,527 לשאר</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>"לקוח-על" הוא לקוח שנשאר הרבה זמן, קונה עוד, וגם מפנה חברים. אימנו מודל שמנבא את החלק הקשה ביותר לניחוש, ההפניה, והפכנו את ההסתברות שלו לציון 0–100 שמופיע באתר לכל לקוח חדש. במקביל הסתכלנו על לקוחות-העל האמיתיים בדאטה: אחד מכל שישה לקוחות מביא שליש מהרווח, ועלה <b>פחות</b> להשיג אותו, לא יותר. והכי חשוב למייסד: כמעט כולם הגיעו מקמפיינים ברמת תקציב בינונית ונסגרו בשיחה אחת או שתיים. אפשר לזהות אותם ביום החתימה, בלי לחכות.</p>
+  </div>
+
+  <h2>חיפוש היפר-פרמטרים (18 קונפיגורציות, 3-fold, לקוחות בלבד n = 3,163)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>learning rate</th><th>depth</th><th>iterations</th><th>ROC-AUC (3-fold)</th><th>F1</th></tr></thead>
+    <tbody>
+      <tr class="win"><td class="num">0.03</td><td class="num">8</td><td class="num">300</td><td class="num">0.7867</td><td class="num">0.7326</td></tr>
+      <tr><td class="num">0.03</td><td class="num">4</td><td class="num">300</td><td class="num">0.7834</td><td class="num">0.7365</td></tr>
+      <tr><td class="num">0.03</td><td class="num">6</td><td class="num">300</td><td class="num">0.7830</td><td class="num">0.7371</td></tr>
+      <tr><td class="num">0.03</td><td class="num">8</td><td class="num">600</td><td class="num">0.7828</td><td class="num">0.7227</td></tr>
+      <tr><td class="num">0.03</td><td class="num">4</td><td class="num">600</td><td class="num">0.7822</td><td class="num">0.7349</td></tr>
+      <tr><td>…</td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="num">0.1</td><td class="num">8</td><td class="num">1000</td><td class="num">0.7633</td><td class="num">0.6762</td></tr>
+    </tbody>
+  </table></div>
+  <p>הדפוס בטבלה המלאה עקבי: יותר איטרציות ו-learning rate גבוה יותר <b>מזיקים</b>. עם ~3,000 שורות המודל מתאים-יתר מהר, והחיפוש בעצם בוחר כמה מעט להתאים. הקונפיגורציה הטובה ביותר (lr 0.03, depth 8, 300 איטרציות) נמדדה מחדש ב-5-fold ואומנה מחדש על כל השורות.</p>
+
+  <h2>המודל המוגש מול ה-baseline (stratified 5-fold)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>מודל</th><th>דיוק</th><th>precision</th><th>recall</th><th>F1</th><th>ROC-AUC</th></tr></thead>
+    <tbody>
+      <tr><td>baseline: המחלקה הרוב ("לא הפנה")</td><td class="num">57.3%</td><td class="num">—</td><td class="num">0</td><td class="num">0</td><td class="num">0.500</td></tr>
+      <tr class="win"><td>CatBoost, tier קטגורי (מוגש)</td><td class="num">75.1%</td><td class="num">0.676</td><td class="num">0.802</td><td class="num">0.734</td><td class="num">0.784</td></tr>
+    </tbody>
+  </table></div>
+  <p>חשיבות פיצ'רים: <code>calls_to_closed</code> 0.30, <code>calls_to_not_closed</code> 0.09, <code>budget_tier</code> 0.08, <code>answer_rate</code> 0.07, <code>conversion_rate</code> 0.06. גם כאן מספר השיחות עד סגירה מוביל, אבל רחוק מהשליטה המוחלטת שראינו בוותק: ההפניה היא שילוב.</p>
+
+  <h3>הציון 0–100</h3>
+  <p>הציון הוא ההסתברות כפול 100, מעוגל. על 3,163 הלקוחות באימון: ממוצע 43, סטיית תקן 28, טווח 3–90. שלוש רצועות:</p>
+  <div class="bands">
+    <div class="band low">Low · 0–39 · 1,447</div>
+    <div class="band mid">Medium · 40–69 · 940</div>
+    <div class="band high">High · 70–100 · 776</div>
+  </div>
+
+  <h2>פרופיל לקוחות-העל</h2>
+  <div class="card">
+    <p>הגדרה: <code>referred = Yes</code> וגם <code>upsell = 1</code> וגם ותק של 34 חודשים ומעלה (אחוזון 75 של הלקוחות). זה פרופיל של מי שכבר הוכיח את עצמו, מחושב חי משורות Supabase באותה פונקציה שרצה באימון.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th></th><th>לקוחות-על</th><th>כל השאר</th></tr></thead>
+      <tbody>
+        <tr><td>מספר</td><td class="num">529 (16.7%)</td><td class="num">2,634</td></tr>
+        <tr class="win"><td>נתח מכלל הרווח</td><td class="num">33.6%</td><td class="num">66.4%</td></tr>
+        <tr><td>רווח ממוצע ללקוח</td><td class="num">₪28,235</td><td class="num">₪11,189</td></tr>
+        <tr class="win"><td>עלות רכישה ממוצעת (CAC)</td><td class="num">₪991</td><td class="num">₪1,527</td></tr>
+        <tr><td>ותק ממוצע</td><td class="num">37.2 חודשים</td><td class="num">20.1 חודשים</td></tr>
+        <tr><td>נתח Mid tier</td><td class="num">99.8%</td><td class="num">42.2%</td></tr>
+        <tr><td>נסגרו ב-2 שיחות או פחות</td><td class="num">97.0%</td><td class="num">21.3%</td></tr>
+      </tbody>
+    </table></div>
+    <p>אחד מכל שישה לקוחות מביא שליש מהרווח, ועולה <b>פחות</b> להשגה מהלקוח הממוצע.</p>
+  </div>
+
+  <h2>שלוש השאלות של הברייף</h2>
+  <div class="card">
+    <h3>1. איזה נתח מהרווח הם מביאים?</h3>
+    <p>33.6% מכלל הרווח, מ-16.7% מהלקוחות. פי 2.5 מהרווח הממוצע ללקוח.</p>
+    <h3>2. כמה עלה להשיג אותם?</h3>
+    <p>₪991 בממוצע, מול ₪1,527 לשאר. הם לא "הלקוחות היקרים"; הם הזולים.</p>
+    <h3>3. איך לזהות אותם מוקדם יותר?</h3>
+    <p>הם גלויים ביום החתימה. 99.8% מגיעים מקמפיינים ברמת תקציב Mid (₪2,000–5,000) ו-97% נסגרים תוך שתי שיחות, מול 42% ו-21% אצל כל השאר. הציון מפרמל את זה (וה-API מגיש אותו), אבל הכלל הפשוט "Mid, נסגר ב-1–2 שיחות, CAC סביב ₪1,000" כבר מזהה את הסגמנט.</p>
+  </div>
+
+  <h2>המלצה למייסד</h2>
+  <div class="card">
+    <p>ביום החתימה: כל לקוח Mid שנסגר בשיחה אחת או שתיים נכנס מיד לתוכנית הפניות ולמסלול שימור. זה הרווח הזול ביותר במשפך. הציון משמש <b>לתעדוף</b> פנייה, לא לפסילה: ROC-AUC 0.78 אומר שהדירוג טוב אבל טעויות ברמת הלקוח הבודד שכיחות (precision 0.68).</p>
+  </div>
+
+  <div class="decision">
+    <h3>D-M5-1 · החיפוש ב-3-fold, המדידה הסופית ב-5-fold</h3>
+    <p>התוכנית הציעה 18 קונפיגורציות × 5 folds ואת 3-fold כחלופה אם החיפוש מתארך. החיפוש רץ ב-3-fold (54 אימונים במקום 90), והקונפיגורציה שנבחרה נמדדה מחדש ב-5-fold כדי שהמספר המדווח יהיה ברמת האמינות של M3–M4. המחיר: ה-AUC של החיפוש (0.7867) והסופי (0.7836) לא זהים והם מדווחים בנפרד. שני המספרים ב-<code>metrics.json</code> (<code>search_splits: 3</code>).</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>POST /api/predict/super-score</code> מחזיר ציון, הסתברות ורצועה, ונרשם ב-<code>prediction_log</code> דרך הטוקן של המשתמש. <code>GET /api/insights/super-customers</code> מחשב את הפרופיל חי משורות Supabase. בלשונית Predict נוסף פס ציון; לשונית Findings מציגה את הפרופיל, את "איך לזהות מוקדם", ואת חמש הקונפיגורציות המובילות בחיפוש.</p>
+    <p><img src="img/m5_predict_super_live.jpg" alt="לשונית Predict באתר החי: הלקוח הטיפוסי מקבל 27.6 חודשים, 73.1% צפוי לקנות עוד, וציון super customer 63 ברצועת Medium"></p>
+    <p>הדוגמה בצילום: הלקוח הטיפוסי (Mid ₪3,000, 3 שיחות עד סגירה, CAC ₪1,000): ציון 63, רצועת Medium. שלוש החבילות מוצגות זו מעל זו: 27.6 חודשים, 73.1% upsell, ציון 63.</p>
+    <p><img src="img/m5_findings_super_live.jpg" alt="לשונית Findings באתר החי: כרטיס P4 עם 529 לקוחות-על, 33.6% מהרווח, CAC ₪991, ותק 37.18 חודשים, וטבלת חמש הקונפיגורציות המובילות"></p>
+    <p><b>לקח טכני:</b> <code>sklearn.clone()</code> נכשל על CatBoost עם <code>cat_features</code>; <code>ml/evaluate.py::fresh()</code> בונה מודל חדש מ-<code>get_params()</code> לכל fold.</p>
+    <div class="artifacts"><span>ml/train_super.py</span><span>models/super.joblib</span><span>ml/evaluate.py</span><span>ml/registry.py</span><span>app/routers/predict.py</span><span>app/routers/insights.py</span><span>docs/REPORT.md</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (67 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · טבלת החיפוש: 18 שורות, <code>best_params</code> הוא ה-argmax של ROC-AUC, <code>super.joblib</code> קיים.</li>
+      <li><span class="ok">עבר</span> · ציונים על כל 3,500 השורות בטווח 0–100 ולא קבועים (סטיית תקן > 5).</li>
+      <li><span class="ok">עבר</span> · פרופיל לקוחות-העל: נתח רווח ב-(0,1) ו-CAC מדווחים.</li>
+      <li><span class="ok">עבר</span> · REPORT.md §P4 עונה על שלוש השאלות.</li>
+      <li><span class="ok">עבר</span> · חי: <code>POST /api/predict/super-score</code> ו-<code>GET /api/insights/super-customers</code> מחזירים 200.</li>
+    </ol>
+  </div>
+
+  <div class="notice">
+    <h3>הערה לעתיד (לא חוסמת)</h3>
+    <p>בטבלת הפרופיל בלשונית Findings, העמודה "כל השאר" נחתכת ברוחב מסך רגיל ודורשת גלילה אופקית. מועמד לתיקון קטן ב-M8 יחד עם אזהרת "רחוק מנתוני האימון" שנרשמה אחרי M3.</p>
+  </div>
+
+  <h2>הבא בתור: M6, פרדוקס המעקבים</h2>
+  <div class="card">
+    <p>חבילה 5: טבלת נשירה לכל שלב במשפך (נענה ← מעקב 1 ← … ← מעקב 5 ← סגירה), התפלגות מספר השיחות בעסקאות שנסגרו, ותשובה של כן/לא לשאלה "האם אחרי השיחה השלישית מבזבזים זמן", עם הסיבה. לשונית Follow-ups באתר.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M5 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>

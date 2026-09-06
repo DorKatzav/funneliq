@@ -84,3 +84,15 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Auth hardened: token role must be "authenticated" (service/anon tokens rejected by policy, tests added). scripts/smoke_live.py added.
 - Live: POST /api/predict/upsell verified; Predict tab shows 72.9% "likely to buy more" for the default customer with tenure 30, and the rule agrees. PR #14 merged.
 - Next: M5 — P4 super-customer score (CatBoost with categorical tier, grid search, 0–100 score, profile).
+
+## 2026-09-06 — M5: P4 super-customer score — GATE PASSED (7/7)
+- Customers only (n = 3,163), referral rate 42.7% (majority baseline accuracy 57.3%, F1 0). CatBoost with `budget_tier` as a native categorical; 18-config grid (lr {0.03, 0.1} × depth {4, 6, 8} × iterations {300, 600, 1000}) scored by stratified 3-fold ROC-AUC. Best lr 0.03 / depth 8 / 300 iterations (search AUC 0.7867); worst lr 0.1 / depth 8 / 1000 (0.7633). Pattern: more iterations and the higher learning rate hurt — the search is mostly choosing how little to fit.
+- Final 5-fold on the chosen config: ROC-AUC 0.784, F1 0.734, precision 0.676, recall 0.802, accuracy 75.1%. Importances: calls_to_closed 0.30, calls_to_not_closed 0.09, budget_tier 0.08, answer_rate 0.07.
+- Score = round(100 × p); on the training customers mean 43, std 28, range 3–90; bands Low 1,447 / Medium 940 / High 776.
+- Profile (referred = Yes ∧ upsell = 1 ∧ ltv_months ≥ 34, the 75th percentile): 529 super customers = 16.7% of customers and 33.6% of profit; avg profit ₪28,235 vs ₪11,189; avg CAC ₪991 vs ₪1,527 (cheaper, not dearer); tenure 37.2 vs 20.1 months; 99.8% Mid tier (vs 42.2%); 97.0% closed in ≤ 2 calls (vs 21.3%). Visible at signing → recommendation: route Mid-tier customers closed in ≤ 2 calls into referral + retention tracks; use the score to prioritise, not to exclude.
+- D-M5-1: hyperparameter search on 3-fold (the fallback PLAN §M5 allowed), final CV on 5-fold; both numbers reported separately, `search_splits: 3` in metrics.json. Cost: search AUC and served AUC differ slightly (0.7867 vs 0.7836).
+- Technical: sklearn `clone()` fails for CatBoost with `cat_features` → `ml/evaluate.py::fresh()` rebuilds from `get_params()`. 67 tests.
+- Live: PR #17 merged; Railway serves commit ec889d3 with `super` in models_loaded. POST /api/predict/super-score → default customer scores 63 (Medium); GET /api/insights/super-customers computes the profile from Supabase rows. Dashboard: score bar on Predict, P4 profile + top-5 search table on Findings (screenshots in docs/reports/img/m5_*.jpg).
+- Observation (not blocking): the Findings profile table clips the "everyone else" column at a normal viewport width; candidate for the M8 polish list next to the "far from training data" warning.
+- Housekeeping this session: `CLAUDE.md` added (language + reporting preferences, protocol, standing rules, lessons) so every new session starts with the same rules; APP_VERSION bumped to 0.5.0.
+- Next: M6 — P5 follow-up paradox (`ml/followups.py`, dropout table, closed-deal call distribution, keep/cut recommendation, Follow-ups tab).
