@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — Dashboard</title>
+<link rel="stylesheet" href="/static/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.min.js"></script>
+<script src="/static/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <span class="brand">FunnelIQ</span>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" data-tab="overview" aria-selected="true">Overview</button>
+    <button role="tab" data-tab="predict" aria-selected="false">Predict</button>
+    <button role="tab" data-tab="followups" aria-selected="false">Follow-ups</button>
+    <button role="tab" data-tab="budget" aria-selected="false">Budget</button>
+    <button role="tab" data-tab="findings" aria-selected="false">Findings</button>
+  </nav>
+  <span class="user" id="user-email"></span>
+  <button class="ghost" id="signout">Sign out</button>
+</header>
+
+<main class="content">
+  <section class="panel" id="panel-overview">
+    <div class="kpis">
+      <div class="kpi"><div class="v" id="kpi-total">…</div><div class="l">records in Supabase</div></div>
+      <div class="kpi"><div class="v" id="kpi-rls"><span class="badge ok">RLS on</span></div><div class="l">rows read with your token</div></div>
+    </div>
+    <div class="card">
+      <h2>Historical records</h2>
+      <p class="muted">First rows of <code>funnel_records</code>, fetched through the API with your session token.</p>
+      <div class="tablewrap"><table id="records"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card"><h2>Insights</h2><p class="muted">Correlations, budget→leads curve and conversion by tier arrive in the next milestone (P1).</p></div>
+  </section>
+
+  <section class="panel" id="panel-predict" hidden>
+    <div class="card"><h2>Predict</h2><p class="muted">Customer lifetime, upsell probability and super-customer score — coming in M3–M5.</p></div>
+  </section>
+  <section class="panel" id="panel-followups" hidden>
+    <div class="card"><h2>Follow-ups</h2><p class="muted">Dropout per follow-up stage and the recommendation — coming in M6.</p></div>
+  </section>
+  <section class="panel" id="panel-budget" hidden>
+    <div class="card"><h2>Budget simulator</h2><p class="muted">Allocate ₪50,000 across campaign sizes — coming in M7.</p></div>
+  </section>
+  <section class="panel" id="panel-findings" hidden>
+    <div class="card"><h2>Findings</h2><p class="muted">Model metrics and business recommendations — filled in as milestones complete.</p></div>
+  </section>
+</main>
+
+<script>
+  (async () => {
+    const session = await FunnelIQ.requireSession();
+    if (!session) return;
+    document.getElementById("user-email").textContent = session.user.email || "";
+    document.getElementById("signout").addEventListener("click", () => FunnelIQ.signOut());
+
+    // tabs
+    const tabs = document.querySelectorAll("nav.tabs button");
+    tabs.forEach((btn) => btn.addEventListener("click", () => {
+      tabs.forEach((b) => b.setAttribute("aria-selected", String(b === btn)));
+      document.querySelectorAll("section.panel").forEach((p) => { p.hidden = p.id !== `panel-${btn.dataset.tab}`; });
+    }));
+
+    // records
+    try {
+      const data = await FunnelIQ.api("/api/records?limit=10");
+      document.getElementById("kpi-total").textContent = FunnelIQ.fmt.int(data.total);
+      const cols = ["id", "ad_budget", "budget_tier", "num_leads", "leads_answered", "closed",
+                    "customer_acquisition_cost", "ltv_months", "upsell", "cumulative_profit", "referred"];
+      const table = document.getElementById("records");
+      table.tHead.innerHTML = "<tr>" + cols.map((c) => `<th>${c}</th>`).join("") + "</tr>";
+      table.tBodies[0].innerHTML = data.rows.map((r) =>
+        "<tr>" + cols.map((c) => `<td>${r[c] === null || r[c] === undefined ? "—" : r[c]}</td>`).join("") + "</tr>"
+      ).join("");
+    } catch (e) {
+      document.getElementById("kpi-total").textContent = "error";
+      document.getElementById("kpi-rls").innerHTML = `<span class="badge warn">${e.message}</span>`;
+    }
+  })();
+</script>
+</body>
+</html>
