@@ -22,3 +22,11 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Railway: service from GitHub main, Nixpacks, healthcheck `/health`; domain https://funneliq-production-4b63.up.railway.app. First domain the user pasted (`funneliq-production.up.railway.app`) belonged to a *different* Railway user's app — domains are global; always copy from the Networking panel.
 - Live `/health` reports the exact main commit (4cf8e93) → push-to-redeploy proven. Manual restart in Railway → `/health` 200 again with uptime reset (115.9 s), same commit → restart survival proven.
 - Next: M1 (Supabase project, schema + RLS, loader, JWT auth, login page).
+
+## 2026-09-06 — M1: Supabase data, RLS, login — GATE PASSED (8/8)
+- Supabase project `pcztrnvcymvxwwmcbxbt` (ES256 JWKS → no JWT secret anywhere). Self sign-up disabled (verified via /auth/v1/settings). Team user created; credentials only in .env.
+- Loader ran twice → 3,500 rows both times. RLS proven: anon 0 rows, signed-in user 3,500 rows. Live API: 401 without token, 200 + total 3500 with token. Browser: redirect to login, sign-in, dashboard with email + table, sign-out clears session.
+- Deploy incident: Railway switched the service to Railpack → "No start command detected"; old deploy kept serving. Fixed in PR #6 (railpack.json + railway.json builder RAILPACK).
+- RLS incident: policies.sql had not actually executed (SQL editor runs only the highlighted selection) → RLS on with no policies → 0 rows for everyone. Resolved with a single query that creates policies and returns counts (3500 | 3 | postgres).
+- Gate fix: secret scan now matches key material only (JWT shape, sb_secret_, SERVICE_KEY=eyJ...), after the word service_role in a SQL comment tripped it.
+- PRs: #4 (M1) merged, #6 (Railpack) merged. Next: approve D-M2-1 / D-M2-2, merge #5, verify Overview on the live URL.
