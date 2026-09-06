@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  pre { font-family: var(--mono); font-size: 0.82rem; line-height: 1.5; direction: ltr; text-align: left; unicode-bidi: isolate; background: #1b2733; color: #e8eef2; border-radius: 10px; padding: 1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0 1.25rem; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M0 · 2026-09-06</span>
+    <h1>M0: שלד פרוס ביום הראשון</h1>
+    <p class="lede">התחנה שבה עוד אין מודלים ואין לוגין, ובכל זאת יש כבר מוצר חי בכתובת ציבורית, עם בדיקות אוטומטיות על כל push ופריסה אוטומטית על כל מיזוג. מעכשיו כל תחנה מוסיפה קוד לתוך צינור שכבר עובד.</p>
+    <span class="stamp">שער M0: עבר 5/5</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">5/5</div><div class="l">בדיקות השער</div></div>
+    <div class="kpi"><div class="v">2</div><div class="l">PRs ממוזגים דרך CI</div></div>
+    <div class="kpi"><div class="v">4</div><div class="l">בדיקות pytest</div></div>
+    <div class="kpi"><div class="v">~47s</div><div class="l">ריצת CI ב-GitHub</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה: מה קרה היום</h3>
+    <p>פתחנו ריפו git משלו לפרויקט ופרסמנו אותו ב-GitHub. התקנו את כל ספריות ה-ML והשרת לסביבת <code>AI_dev</code> ונעלנו גרסאות. כתבנו שרת FastAPI מינימלי שעונה ב-<code>/health</code> "אני חי, זו הגרסה שלי, זה ה-commit שלי". חיברנו GitHub Actions שמריץ linter ובדיקות על כל push, ו-Railway שבונה ופורס מ-main. הכתובת החיה: <a href="https://funneliq-production-4b63.up.railway.app/health">funneliq-production-4b63.up.railway.app</a>.</p>
+  </div>
+
+  <h2>מה נבנה</h2>
+  <div class="card">
+    <ul>
+      <li><b>ריפו</b>: <a href="https://github.com/DorKatzav/funneliq">github.com/DorKatzav/funneliq</a> (ציבורי). קומיט בסיס עם הברייף, הדאטה והתכנון; PR #1 עם השלד; PR #2 תיקון קטן לשער. תיקיית הקורס מתעלמת מהתיקייה הזו ב-.gitignore.</li>
+      <li><b>שרת</b>: <code>app/main.py</code> עם <code>/health</code> (סטטוס, גרסה, commit, uptime), <code>/api/config</code> (רק ערכים ציבוריים: URL ו-anon key), ו-<code>/</code> שמפנה לדף סטטי. <code>app/config.py</code> קורא הגדרות מהסביבה; מפתח ה-service <b>בכוונה</b> לא קיים שם.</li>
+      <li><b>בדיקות</b>: ארבע ב-<code>tests/test_api.py</code>: שדות ה-health, ש-config לא חושף כלום מעבר לציבורי, ההפניה, והדף הסטטי.</li>
+      <li><b>CI</b>: <code>.github/workflows/ci.yml</code>: התקנה ← ruff ← pytest, על כל push ו-PR.</li>
+      <li><b>Railway</b>: <code>railway.json</code> (Nixpacks, uvicorn על <code>$PORT</code>, healthcheck ב-<code>/health</code>), <code>runtime.txt</code> = Python 3.11, משתני סביבה placeholder ל-Supabase.</li>
+      <li><b>שער</b>: <code>scripts/gate.py --m 0</code>: pytest, ruff, סריקת סודות ב-git, ריצת Actions אחרונה על main, ו-health חי.</li>
+      <li><b>תיעוד</b>: README עם badge ו-URL חי, <code>.env.example</code>, <code>requirements.txt</code> נעול.</li>
+    </ul>
+    <div class="artifacts"><span>app/main.py</span><span>app/config.py</span><span>tests/test_api.py</span><span>.github/workflows/ci.yml</span><span>railway.json</span><span>scripts/gate.py</span><span>requirements.txt</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (4 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · אין סודות ב-git (סריקת <code>service_role</code> ו-JWT).</li>
+      <li><span class="ok">עבר</span> · ריצת GitHub Actions אחרונה על main הצליחה.</li>
+      <li><span class="ok">עבר</span> · <code>/health</code> החי מחזיר 200 עם <code>status: ok</code>, ומדווח בדיוק על ה-commit של main (<code>4cf8e93</code>). זו ההוכחה ש-push ← redeploy עובד.</li>
+    </ol>
+    <p id="restart-line" style="margin:0.6rem 0 0"><b>הישרדות restart:</b> <span class="ok">עבר</span> · אחרי restart ידני ב-Railway, <code>/health</code> חזר 200 עם uptime שאופס (‏116 שניות) ואותו commit.</p>
+  </div>
+<pre>$ python scripts/gate.py --m 0
+[PASS] pytest green
+[PASS] ruff clean
+[PASS] no secrets in git
+[PASS] GitHub Actions latest run on main succeeded
+[PASS] live /health returns 200 + status ok
+GATE M0: PASS 5/5
+
+$ curl https://funneliq-production-4b63.up.railway.app/health
+{"status":"ok","version":"0.1.0","commit":"4cf8e933dc01","env":"dev","models_loaded":[],"uptime_s":297.5}</pre>
+
+  <h2>שלוש הפתעות ומה למדנו</h2>
+  <div class="notice">
+    <h3>1. libomp "מותקן" אבל לא באמת</h3>
+    <p>הבדיקה הראשונית של Homebrew הטעתה (הפקודה הצליחה גם כשהחבילה חסרה). xgboost ו-lightgbm קרסו בייבוא עד <code>brew install libomp</code>. הלקח: לבדוק את קובץ ה-dylib עצמו, לא את קוד היציאה של הפקודה. תועד ב-README.</p>
+    <h3>2. סורק הסודות תפס את עצמו</h3>
+    <p>הביטוי הרגולרי שמחפש <code>service_role</code> נמצא בתוך <code>gate.py</code>, אז הסריקה "מצאה סוד" בקובץ שלה. תוקן ב-PR #2: הסקריפט מוחרג מהסריקה של עצמו. לקח קטן על בדיקות שבודקות את עצמן.</p>
+    <h3>3. הדומיין הראשון ב-Railway היה של מישהו אחר</h3>
+    <p>הכתובת <code>funneliq-production.up.railway.app</code> החזירה אפליקציה של משתמש אחר (פרוטוטייפ בפורטוגזית). דומיינים ב-Railway גלובליים, ולכן הדומיין האמיתי קיבל סיומת: <code>-4b63</code>. הלקח: תמיד להעתיק מהפאנל Networking, לא להקליד מהזיכרון.</p>
+  </div>
+
+  <h2>הבא בתור: M1</h2>
+  <div class="card">
+    <p>Supabase: פרויקט חדש, סכמה ו-RLS, טעינת 3,500 השורות, אימות JWT בשרת, ומסך לוגין אמיתי. הצעדים הידניים שלך מרוכזים בסעיף 7 של <code>PLAN.md</code>: יצירת הפרויקט, העתקת המפתחות ל-<code>.env</code>, כיבוי הרשמה עצמית, יצירת משתמש הצוות, והרצת שני קובצי ה-SQL.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M0 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
