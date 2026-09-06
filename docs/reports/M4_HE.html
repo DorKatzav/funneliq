@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  tr.rule td { background: var(--tape-soft); font-weight: 600; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M4 · 2026-09-06</span>
+    <h1>M4: מי צפוי לקנות עוד?</h1>
+    <p class="lede">חבילה 3 של הברייף: שלושה מסווגים ל-<code>upsell</code>, בדיקת איזון מחלקות והחלטה מנומקת, כל המדדים לצד baseline של "תמיד לא", ושתי גרסאות פיצ'רים. ובסוף, השוואה הוגנת מול הכלל הפשוט מהברייף, שהסתיימה בתוצאה לא מחמיאה למודל, ומדווחת כמו שהיא.</p>
+    <span class="stamp">שער M4: עבר 7/7</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">0.795</div><div class="l">ROC-AUC של המודל המוגש (tenure / CatBoost)</div></div>
+    <div class="kpi"><div class="v">53.6%</div><div class="l">דיוק ה-baseline "תמיד לא" (F1 = 0)</div></div>
+    <div class="kpi"><div class="v">0.786</div><div class="l">F1 של הכלל העסקי, מול 0.771 למודל</div></div>
+    <div class="kpi"><div class="v">46%</div><div class="l">לקוחות שקנו עוד (כמעט מאוזן)</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>אימנו מודלים שינחשו מי מהלקוחות יקנה שירותים נוספים. הפעם התשובה פחות "נקייה" מהוותק: המודל הטוב ביותר מזהה 86% מהקונים, אבל אחד מכל שלושה שהוא מסמן לא קונה בסוף. הופתענו לגלות שכלל פשוט בשני מספרים, "ותק מעל 12 חודשים ועלות רכישה מתחת ל-₪2,000", מנצח את המודל במעט. זו לא כישלון של המודל; זה מידע חשוב למייסד: לרשימת פנייה ללקוחות קיימים לא צריך למידת מכונה, ולמי שנחתם היום, כשעדיין אין ותק, המודל הוא הכלי היחיד.</p>
+  </div>
+
+  <h2>המודלים מול ה-baseline מול הכלל (לקוחות בלבד, n = 3,163, stratified 5-fold)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>גרסה / מודל</th><th>דיוק</th><th>precision</th><th>recall</th><th>F1</th><th>ROC-AUC</th></tr></thead>
+    <tbody>
+      <tr><td>baseline: המחלקה הרוב ("לא")</td><td class="num">53.6%</td><td class="num">—</td><td class="num">0</td><td class="num">0</td><td class="num">0.500</td></tr>
+      <tr><td>early / XGBoost</td><td class="num">74.4%</td><td class="num">0.687</td><td class="num">0.824</td><td class="num">0.749</td><td class="num">0.775</td></tr>
+      <tr><td>early / LightGBM</td><td class="num">73.1%</td><td class="num">0.678</td><td class="num">0.799</td><td class="num">0.734</td><td class="num">0.772</td></tr>
+      <tr><td>early / CatBoost</td><td class="num">74.8%</td><td class="num">0.690</td><td class="num">0.832</td><td class="num">0.754</td><td class="num">0.778</td></tr>
+      <tr><td>tenure / XGBoost</td><td class="num">76.3%</td><td class="num">0.702</td><td class="num">0.849</td><td class="num">0.768</td><td class="num">0.788</td></tr>
+      <tr><td>tenure / LightGBM</td><td class="num">74.9%</td><td class="num">0.693</td><td class="num">0.825</td><td class="num">0.753</td><td class="num">0.786</td></tr>
+      <tr class="win"><td>tenure / CatBoost (מוגש)</td><td class="num">76.4%</td><td class="num">0.700</td><td class="num">0.859</td><td class="num">0.771</td><td class="num">0.795</td></tr>
+      <tr class="rule"><td>הכלל העסקי: LTV > 12 וגם CAC < 2,000</td><td class="num">77.9%</td><td class="num">0.713</td><td class="num">0.876</td><td class="num">0.786</td><td class="num">—</td></tr>
+    </tbody>
+  </table></div>
+  <p>הכלל כוונן על folds האימון ונמדד על folds הבדיקה, בדיוק כמו המודלים; לא הייתה לו גישה למידע שלמודל אין.</p>
+
+  <h2>ארבע השאלות של הברייף</h2>
+  <div class="card">
+    <h3>1. האם דיוק הוא מדד מספיק? לא.</h3>
+    <p>ה-baseline מגיע ל-53.6% דיוק בלי לסמן אף אחד (recall 0, F1 0). המודל מוסיף כ-23 נקודות דיוק, אבל המספרים שחשובים לרשימת פנייה הם precision ו-recall: המודל המוגש מוצא 86% מהקונים ב-70% דיוק סימון. ROC-AUC (0.795) הוא המבט שלא תלוי בסף.</p>
+    <h3>2. מה ה-baseline נותן, וכמה המודל מוסיף?</h3>
+    <p>F1 מ-0 ל-0.771; AUC מ-0.5 ל-0.795. גם גרסת early בלי ותק (F1 0.754) הרבה מעל ה-baseline.</p>
+    <h3>3. פיצ'ר אחד או שילוב?</h3>
+    <p>שילוב. בניגוד לוותק, אף פיצ'ר לא שולט: ב-early: <code>calls_to_closed</code> 0.23, <code>customer_acquisition_cost</code> 0.10, <code>conversion_rate</code> 0.10, <code>answer_rate</code> 0.09. כשמותר להשתמש בוותק: <code>ltv_months</code> 0.32 ואז CAC 0.11. ה-upsell עוקב אחרי אותן מדרגות של שיחות-עד-סגירה (74% ב-1 שיחה, 6% ב-7) ואחרי ה-tier (Mid 69% מול ~21%), אבל עלות הרכישה ושיעור ההמרה מוסיפים אות אמיתי.</p>
+    <h3>4. הכלל העסקי מול המודל: איפה כל אחד מנצח?</h3>
+    <div class="tablewrap"><table>
+      <thead><tr><th>tier</th><th>n</th><th>שיעור upsell</th><th>מודל F1 / recall</th><th>כלל F1 / recall</th></tr></thead>
+      <tbody>
+        <tr><td>Low</td><td class="num">571</td><td class="num">21%</td><td class="num">0.685 / 0.623</td><td class="num">0.708 / 0.656</td></tr>
+        <tr><td>Mid</td><td class="num">1,640</td><td class="num">69%</td><td class="num">0.814 / 0.966</td><td class="num">0.827 / 0.990</td></tr>
+        <tr><td>High</td><td class="num">952</td><td class="num">22%</td><td class="num">0.490 / 0.408</td><td class="num">0.489 / 0.379</td></tr>
+      </tbody>
+    </table></div>
+    <p>הכלל מנצח ב-Low וב-Mid ותיקו ב-High. שניהם חלשים ב-High (F1 ~0.49): לקוחות יקרים שקונים עוד הם המקרה הקשה. היתרונות של המודל נמצאים במקום אחר: הוא <b>מדרג</b> לפי הסתברות (הכלל רק כן/לא), הוא עובד ביום החתימה בלי ותק, והוא ישרוד אם הספים יזוזו.</p>
+  </div>
+
+  <div class="decision">
+    <h3>D-M4-1 · הוותק מותר, ורק כאן</h3>
+    <p>פנייה ל-upsell נעשית ללקוח <b>קיים</b>, ובאותו רגע הצוות יודע כמה זמן הוא כבר לקוח. זה מידע מהעבר, לא מהעתיד, ולכן עומד בעיקרון של דור ("אסור שלמודל יהיה מידע עתידי"). <code>ltv_months</code> רשום במפורש כיוצא מן הכלל היחיד ב-<code>ALLOWED_OUTCOMES</code>, רק לגרסת tenure. הגרסה early קיימת ליום החתימה.</p>
+  </div>
+  <div class="decision">
+    <h3>D-M4-2 · scale_pos_weight נשמר, בהסתייגות</h3>
+    <p>46/54 הוא כמעט מאוזן. משקל 1.16 העלה את F1 של XGBoost מ-0.741 ל-0.749, מעל הרף שהוצהר מראש (+0.005), ולכן נשמר. אבל האפקט זניח, וההחלטה לא הייתה שורדת בביטחון seed אחר. כתוב כך גם ב-REPORT.</p>
+  </div>
+
+  <h2>המלצה למייסד</h2>
+  <div class="card">
+    <p><b>ללקוחות קיימים:</b> הכלל "ותק מעל 12 חודשים ועלות רכישה מתחת ל-₪2,000" כרשימת פנייה ברירת-מחדל. פשוט, שקוף, ולא נופל מהמודל. <b>ללקוחות חדשים ביום החתימה:</b> המודל early, שמדרג לפי הסתברות ולא צריך ותק. לבדוק מחדש אם מבנה ה-tiers או ה-CAC ישתנה.</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>POST /api/predict/upsell</code>: עם ותק ידוע מפעיל את גרסת tenure ומחזיר גם את פסק-הדין של הכלל; בלי ותק נופל אוטומטית ל-early ואומר זאת. בלשונית Predict נוסף שדה "ותק ידוע" אופציונלי; לשונית Findings מציגה את הטבלה המלאה מול ה-baseline ומול הכלל, ופירוט לפי tier.</p>
+    <p><img src="img/m4_predict_upsell_live.jpg" alt="לשונית Predict באתר החי: הלקוח הטיפוסי עם ותק 30 חודשים, 72.9% צפוי לקנות עוד, הכלל העסקי מסכים"></p>
+    <p>הדוגמה בצילום: הלקוח הטיפוסי (Mid, 3 שיחות, CAC ₪1,000) עם ותק 30 חודשים: 72.9% "צפוי לקנות עוד", והכלל מסכים.</p>
+    <p><b>הקשחת אבטחה בתחנה הזו:</b> אחרי בדיקות הקצה, ה-API דורש עכשיו במפורש שה-role בטוקן יהיה <code>authenticated</code>; טוקן service או anon נדחה על-פי מדיניות ולא רק בגלל אלגוריתם לא מוגדר. נוסף <code>scripts/smoke_live.py</code> לבדיקות קצה חוזרות.</p>
+    <div class="artifacts"><span>ml/train_upsell.py</span><span>models/upsell_*_*.joblib</span><span>ml/registry.py</span><span>app/routers/predict.py</span><span>app/auth.py</span><span>scripts/smoke_live.py</span><span>docs/REPORT.md</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (63 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · metrics.json: 2 גרסאות × 3 מסווגים עם כל המדדים וקבצי joblib.</li>
+      <li><span class="ok">עבר</span> · המודל המוגש מעל ה-baseline ב-F1, ו-ROC-AUC > 0.55.</li>
+      <li><span class="ok">עבר</span> · הכלל העסקי כוונן, נמדד, והושווה לפי tier.</li>
+      <li><span class="ok">עבר</span> · REPORT.md §P3 עונה על ארבע השאלות.</li>
+      <li><span class="ok">עבר</span> · <code>POST /api/predict/upsell</code> חי מחזיר 200 עם הסתברות ופסק-דין של הכלל.</li>
+    </ol>
+  </div>
+
+  <div class="notice">
+    <h3>לקח מתודולוגי</h3>
+    <p>כשמשווים מודל לכלל, הכלל חייב לקבל את אותו טיפול: כוונון על folds האימון, מדידה על folds הבדיקה, אותם folds. אחרת "המודל ניצח" הוא תוצאה של השוואה לא הוגנת. כאן ההשוואה ההוגנת אמרה את ההפך, וזה בדיוק סוג הממצא שמייסד צריך לשמוע.</p>
+  </div>
+
+  <h2>הבא בתור: M5, ציון ה-super customer</h2>
+  <div class="card">
+    <p>CatBoost עם <code>budget_tier</code> קטגורי (טיפול נייטיבי), חיפוש היפר-פרמטרים (learning rate × depth × iterations, 18 קונפיגורציות), ציון 0–100 חי, ופרופיל ה-super customers: איזה נתח מהרווח הם, כמה עלה להשיג אותם, ואיך לזהות אותם מוקדם.</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M4 · 2026-09-06 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
