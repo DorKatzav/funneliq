@@ -91,3 +91,7 @@ label.tenure input { max-width: 22rem; }
 .scorebar { height: 0.7rem; background: var(--wind-soft); border-radius: 999px; overflow: hidden; margin: 0.25rem 0 0.5rem; }
 .scorefill { height: 100%; width: 0; background: var(--wind); transition: width 0.4s; }
 .scorefill.low { background: var(--line); } .scorefill.medium { background: var(--tape); } .scorefill.high { background: var(--gate); }
+
+.badge.info { background: var(--wind-soft); color: var(--wind); }
+p.verdict { font-size: 1.1rem; margin: 0.25rem 0 0.5rem; }
+.grid2 table.compact th, .grid2 table.compact td { white-space: normal; }  /* half-width cards: wrap instead of clipping */

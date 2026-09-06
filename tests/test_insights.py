@@ -58,3 +58,14 @@ def test_super_customers_profile_from_db_rows():
     assert body["n_customers"] == 3163 and body["n_super"] > 0
     assert 0 < body["share_of_total_profit"] < 1
     assert set(body["tier_distribution"]) <= {"Low", "Mid", "High"}
+
+
+def test_followups_from_db_rows():
+    rows = _db_like_rows(3500)
+    res = _client(rows).get("/api/insights/followups")
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert len(body["dropout"]["stages"]) == 6
+    assert body["recommendation"]["verdict"] in {"keep", "cut_after_3", "extend"}
+    assert body["recommendation"]["reason"] and body["recommendation"]["unexpected_stage"]
+    assert body["calls"]["closed"]["n"] == 3163
