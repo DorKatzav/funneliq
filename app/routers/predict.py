@@ -9,7 +9,7 @@ from supabase import Client
 
 from app.auth import UserContext, get_current_user
 from app.db import get_user_client
-from app.schemas import CustomerInput, LtvPrediction
+from app.schemas import CustomerInput, LtvPrediction, UpsellPrediction
 from ml.registry import ModelRegistry
 
 log = logging.getLogger("funneliq.predict")
@@ -43,6 +43,20 @@ def predict_ltv(
     result["rmse_months"] = served_cv.get("rmse_mean")
     log_prediction(client, "ltv", customer.model_dump(), result)
     return LtvPrediction(**result)
+
+
+@router.post("/predict/upsell", response_model=UpsellPrediction)
+def predict_upsell(
+    customer: CustomerInput,
+    registry: ModelRegistry = Depends(get_registry),
+    client: Client = Depends(get_user_client),
+) -> UpsellPrediction:
+    """P3: probability the customer buys additional services, plus the brief's business-rule verdict."""
+    result = registry.predict_upsell(customer.funnel_dict())
+    cv = registry.metrics.get("upsell", {}).get("cv", {}).get(result["variant"], {}).get(result["model"], {})
+    result["roc_auc"] = cv.get("roc_auc")
+    log_prediction(client, "upsell", customer.model_dump(), result)
+    return UpsellPrediction(**result)
 
 
 @router.get("/models")

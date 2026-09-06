@@ -183,5 +183,405 @@
       "min": 1.0,
       "max": 56.0
     }
+  },
+  "upsell": {
+    "trained_at": "2026-09-06T17:29:26+00:00",
+    "target": "upsell",
+    "training_policy": "customers only (purchased = 1); rows without ltv_months dropped so both variants share rows",
+    "n_train": 3163,
+    "class_balance": {
+      "0": 1697,
+      "1": 1466
+    },
+    "baseline": {
+      "majority_class": 0,
+      "accuracy": 0.5365,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": 0.5
+    },
+    "imbalance": {
+      "positive_share": 0.4635,
+      "neg_pos_ratio": 1.1576,
+      "xgboost_plain": {
+        "n_splits": 5,
+        "n_rows": 3163,
+        "accuracy": 0.7404,
+        "accuracy_std": 0.0094,
+        "precision": 0.6892,
+        "precision_std": 0.0085,
+        "recall": 0.8015,
+        "recall_std": 0.0212,
+        "f1": 0.741,
+        "f1_std": 0.0111,
+        "roc_auc": 0.7755,
+        "roc_auc_std": 0.0119
+      },
+      "xgboost_weighted": {
+        "n_splits": 5,
+        "n_rows": 3163,
+        "accuracy": 0.7442,
+        "accuracy_std": 0.0114,
+        "precision": 0.6868,
+        "precision_std": 0.0098,
+        "recall": 0.824,
+        "recall_std": 0.0204,
+        "f1": 0.7491,
+        "f1_std": 0.0122,
+        "roc_auc": 0.7752,
+        "roc_auc_std": 0.0115
+      },
+      "use_scale_pos_weight": true,
+      "scale_pos_weight_used": 1.1576,
+      "reason": "classes are close to balanced; weighting is kept only if it improves F1 by > 0.005 on the early variant"
+    },
+    "variants": {
+      "early": {
+        "features": [
+          "ad_budget",
+          "num_leads",
+          "leads_answered",
+          "leads_not_answered",
+          "followup_1",
+          "followup_2",
+          "followup_3",
+          "followup_4",
+          "followup_5",
+          "not_closed",
+          "closed",
+          "calls_to_closed",
+          "calls_to_not_closed",
+          "customer_acquisition_cost",
+          "answer_rate",
+          "conversion_rate",
+          "cost_per_lead",
+          "budget_tier"
+        ]
+      },
+      "tenure": {
+        "features": [
+          "ad_budget",
+          "num_leads",
+          "leads_answered",
+          "leads_not_answered",
+          "followup_1",
+          "followup_2",
+          "followup_3",
+          "followup_4",
+          "followup_5",
+          "not_closed",
+          "closed",
+          "calls_to_closed",
+          "calls_to_not_closed",
+          "customer_acquisition_cost",
+          "answer_rate",
+          "conversion_rate",
+          "cost_per_lead",
+          "budget_tier",
+          "ltv_months"
+        ]
+      }
+    },
+    "variant_served": "tenure",
+    "model_served": "catboost",
+    "cv": {
+      "early": {
+        "xgboost": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.7442,
+          "accuracy_std": 0.0114,
+          "precision": 0.6868,
+          "precision_std": 0.0098,
+          "recall": 0.824,
+          "recall_std": 0.0204,
+          "f1": 0.7491,
+          "f1_std": 0.0122,
+          "roc_auc": 0.7752,
+          "roc_auc_std": 0.0115
+        },
+        "lightgbm": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.7313,
+          "accuracy_std": 0.0093,
+          "precision": 0.6784,
+          "precision_std": 0.0047,
+          "recall": 0.7988,
+          "recall_std": 0.0266,
+          "f1": 0.7335,
+          "f1_std": 0.0128,
+          "roc_auc": 0.7717,
+          "roc_auc_std": 0.0089
+        },
+        "catboost": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.7483,
+          "accuracy_std": 0.0069,
+          "precision": 0.6895,
+          "precision_std": 0.0053,
+          "recall": 0.8315,
+          "recall_std": 0.014,
+          "f1": 0.7538,
+          "f1_std": 0.0078,
+          "roc_auc": 0.7783,
+          "roc_auc_std": 0.0131
+        },
+        "best": "catboost"
+      },
+      "tenure": {
+        "xgboost": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.7629,
+          "accuracy_std": 0.0093,
+          "precision": 0.7019,
+          "precision_std": 0.0097,
+          "recall": 0.8493,
+          "recall_std": 0.0185,
+          "f1": 0.7685,
+          "f1_std": 0.0098,
+          "roc_auc": 0.7881,
+          "roc_auc_std": 0.0095
+        },
+        "lightgbm": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.749,
+          "accuracy_std": 0.0071,
+          "precision": 0.6926,
+          "precision_std": 0.0091,
+          "recall": 0.8247,
+          "recall_std": 0.0184,
+          "f1": 0.7528,
+          "f1_std": 0.0078,
+          "roc_auc": 0.7861,
+          "roc_auc_std": 0.0082
+        },
+        "catboost": {
+          "n_splits": 5,
+          "n_rows": 3163,
+          "accuracy": 0.7642,
+          "accuracy_std": 0.0108,
+          "precision": 0.7001,
+          "precision_std": 0.0067,
+          "recall": 0.8588,
+          "recall_std": 0.0211,
+          "f1": 0.7714,
+          "f1_std": 0.0123,
+          "roc_auc": 0.795,
+          "roc_auc_std": 0.011
+        },
+        "best": "catboost"
+      }
+    },
+    "importances": {
+      "early": {
+        "xgboost": {
+          "budget_tier": 0.28022,
+          "calls_to_closed": 0.26821,
+          "customer_acquisition_cost": 0.08738,
+          "ad_budget": 0.05854,
+          "conversion_rate": 0.02502,
+          "leads_answered": 0.02463,
+          "followup_5": 0.02427,
+          "cost_per_lead": 0.02364,
+          "followup_1": 0.02279,
+          "followup_2": 0.02221,
+          "followup_4": 0.02188,
+          "followup_3": 0.02159,
+          "num_leads": 0.02066,
+          "not_closed": 0.02042,
+          "answer_rate": 0.02021,
+          "calls_to_not_closed": 0.02012,
+          "leads_not_answered": 0.01926,
+          "closed": 0.01895
+        },
+        "lightgbm": {
+          "calls_to_closed": 0.31997,
+          "customer_acquisition_cost": 0.10989,
+          "conversion_rate": 0.09322,
+          "answer_rate": 0.08385,
+          "cost_per_lead": 0.07203,
+          "followup_1": 0.03715,
+          "ad_budget": 0.03534,
+          "leads_not_answered": 0.03254,
+          "leads_answered": 0.03117,
+          "followup_3": 0.031,
+          "calls_to_not_closed": 0.03073,
+          "num_leads": 0.03058,
+          "followup_2": 0.02702,
+          "followup_4": 0.02167,
+          "followup_5": 0.02064,
+          "not_closed": 0.01692,
+          "closed": 0.00628,
+          "budget_tier": 0.0
+        },
+        "catboost": {
+          "calls_to_closed": 0.2263,
+          "customer_acquisition_cost": 0.1008,
+          "conversion_rate": 0.09955,
+          "answer_rate": 0.08974,
+          "cost_per_lead": 0.08074,
+          "leads_answered": 0.04832,
+          "leads_not_answered": 0.04799,
+          "calls_to_not_closed": 0.04687,
+          "followup_3": 0.04139,
+          "followup_1": 0.03873,
+          "followup_2": 0.03625,
+          "followup_4": 0.03325,
+          "num_leads": 0.03234,
+          "not_closed": 0.02872,
+          "followup_5": 0.02627,
+          "budget_tier": 0.00915,
+          "ad_budget": 0.00863,
+          "closed": 0.00495
+        }
+      },
+      "tenure": {
+        "xgboost": {
+          "ltv_months": 0.1855,
+          "customer_acquisition_cost": 0.1767,
+          "calls_to_closed": 0.16181,
+          "ad_budget": 0.05431,
+          "cost_per_lead": 0.03262,
+          "followup_2": 0.03242,
+          "followup_1": 0.03144,
+          "conversion_rate": 0.03103,
+          "followup_3": 0.03081,
+          "followup_4": 0.03073,
+          "leads_answered": 0.03063,
+          "num_leads": 0.03018,
+          "not_closed": 0.03008,
+          "leads_not_answered": 0.02958,
+          "answer_rate": 0.02952,
+          "followup_5": 0.02871,
+          "calls_to_not_closed": 0.02782,
+          "closed": 0.0261,
+          "budget_tier": 0.0
+        },
+        "lightgbm": {
+          "ltv_months": 0.36683,
+          "customer_acquisition_cost": 0.12451,
+          "answer_rate": 0.08246,
+          "conversion_rate": 0.07562,
+          "cost_per_lead": 0.06226,
+          "calls_to_closed": 0.04758,
+          "followup_2": 0.02915,
+          "leads_not_answered": 0.02876,
+          "leads_answered": 0.02788,
+          "calls_to_not_closed": 0.02551,
+          "followup_1": 0.02529,
+          "followup_3": 0.02462,
+          "num_leads": 0.02204,
+          "followup_4": 0.01971,
+          "followup_5": 0.01541,
+          "not_closed": 0.01249,
+          "ad_budget": 0.00583,
+          "closed": 0.00403,
+          "budget_tier": 0.0
+        },
+        "catboost": {
+          "ltv_months": 0.31694,
+          "customer_acquisition_cost": 0.10529,
+          "conversion_rate": 0.08136,
+          "answer_rate": 0.07425,
+          "cost_per_lead": 0.06845,
+          "leads_not_answered": 0.04419,
+          "calls_to_not_closed": 0.04224,
+          "followup_1": 0.03405,
+          "calls_to_closed": 0.03363,
+          "followup_3": 0.03069,
+          "followup_2": 0.0293,
+          "leads_answered": 0.02926,
+          "num_leads": 0.02238,
+          "followup_4": 0.02206,
+          "followup_5": 0.01893,
+          "not_closed": 0.0167,
+          "closed": 0.01133,
+          "ad_budget": 0.00999,
+          "budget_tier": 0.00895
+        }
+      }
+    },
+    "business_rule": {
+      "definition": "flag for outreach if ltv_months > ltv_threshold and customer_acquisition_cost < cac_threshold",
+      "ltv_threshold": 12,
+      "cac_threshold": 2000,
+      "f1_on_all_rows": 0.7858,
+      "cv": {
+        "accuracy": 0.7787,
+        "precision": 0.7126,
+        "recall": 0.8759,
+        "f1": 0.7858
+      },
+      "model_cv_oof": {
+        "accuracy": 0.7641,
+        "precision": 0.7002,
+        "recall": 0.8588,
+        "f1": 0.7714,
+        "roc_auc": 0.7941
+      },
+      "by_tier": [
+        {
+          "tier": "Low",
+          "n": 571,
+          "positive_rate": 0.2137,
+          "model": {
+            "accuracy": 0.8774,
+            "precision": 0.76,
+            "recall": 0.623,
+            "f1": 0.6847
+          },
+          "rule": {
+            "accuracy": 0.8844,
+            "precision": 0.7692,
+            "recall": 0.6557,
+            "f1": 0.708
+          }
+        },
+        {
+          "tier": "Mid",
+          "n": 1640,
+          "positive_rate": 0.6939,
+          "model": {
+            "accuracy": 0.6945,
+            "precision": 0.704,
+            "recall": 0.9657,
+            "f1": 0.8144
+          },
+          "rule": {
+            "accuracy": 0.7128,
+            "precision": 0.7104,
+            "recall": 0.9895,
+            "f1": 0.827
+          }
+        },
+        {
+          "tier": "High",
+          "n": 952,
+          "positive_rate": 0.2164,
+          "model": {
+            "accuracy": 0.8162,
+            "precision": 0.6131,
+            "recall": 0.4078,
+            "f1": 0.4898
+          },
+          "rule": {
+            "accuracy": 0.8288,
+            "precision": 0.6903,
+            "recall": 0.3786,
+            "f1": 0.489
+          }
+        }
+      ],
+      "positives_flagged": {
+        "rule": 1802,
+        "model": 1798,
+        "actual": 1466
+      }
+    }
   }
 }

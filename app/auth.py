@@ -59,7 +59,10 @@ def verify_token(token: str, settings: Settings) -> dict:
     """Decode and verify a Supabase access token. Raises jwt.PyJWTError / ValueError on failure."""
     alg = jwt.get_unverified_header(token).get("alg", "")
     key = _signing_key(token, alg, settings)
-    return jwt.decode(token, key, algorithms=[alg], audience=AUDIENCE, options={"require": ["exp", "sub"]})
+    claims = jwt.decode(token, key, algorithms=[alg], audience=AUDIENCE, options={"require": ["exp", "sub"]})
+    if claims.get("role") != "authenticated":
+        raise ValueError(f"token role is not 'authenticated' (got {claims.get('role')!r})")
+    return claims
 
 
 def get_current_user(

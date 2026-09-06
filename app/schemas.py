@@ -50,5 +50,15 @@ class LtvPrediction(BaseModel):
     rmse_months: float | None = None
 
 
+class UpsellPrediction(BaseModel):
+    probability: float
+    flag: bool
+    rule_flag: bool | None = None
+    variant: str
+    model: str
+    rule: str
+    roc_auc: float | None = None
+
+
 class ModelsInfo(BaseModel):
     metrics: dict
