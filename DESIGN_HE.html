@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — מסמך תכנון (טיוטה לאישור)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef;
+    --card: #ffffff;
+    --ink: #1b2733;
+    --ink-soft: #46545f;
+    --wind: #0f5c6e;
+    --wind-soft: #e3eef1;
+    --tape: #c9560c;
+    --tape-soft: #fbe9dc;
+    --gate: #2f7d46;
+    --gate-soft: #e7f2ea;
+    --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start;
+  }
+  main { max-width: 62rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+
+  code {
+    font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate;
+    background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px;
+    padding: 0.05em 0.35em; white-space: nowrap;
+  }
+  code[dir="rtl"] { direction: rtl; }
+  pre {
+    font-family: var(--mono); font-size: 0.82rem; line-height: 1.5;
+    direction: ltr; text-align: left; unicode-bidi: isolate;
+    background: #1b2733; color: #e8eef2; border-radius: 10px;
+    padding: 1rem 1.25rem; overflow-x: auto; margin: 0.75rem 0 1.25rem;
+  }
+  pre .c { color: #9fb3c0; }
+
+  .eyebrow {
+    font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind);
+    border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem;
+  }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3.1rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  .decisions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.5rem; }
+  .chip { background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem 0.9rem; font-size: 0.9rem; font-weight: 600; }
+  .chip b { color: var(--wind); }
+
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.75rem; margin: 3rem 0 1rem; }
+  h2 .num { font-family: var(--mono); font-size: 0.9rem; color: var(--tape); letter-spacing: 0.1em; margin-inline-end: 0.75rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.3rem; margin: 1.75rem 0 0.5rem; }
+  h4 { margin: 1.25rem 0 0.35rem; font-size: 1.05rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+
+  /* option cards for architectural decisions */
+  .options { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 0.9rem; margin-block: 0.75rem 1.25rem; }
+  .opt { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; position: relative; }
+  .opt.rec { border: 2px solid var(--gate); background: var(--gate-soft); }
+  .opt.rec::before {
+    content: "✓ מומלץ"; position: absolute; inset-block-start: -0.8rem; inset-inline-end: 1rem;
+    background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.8rem;
+    padding: 0.05rem 0.65rem; border-radius: 4px; transform: rotate(2deg);
+  }
+  .opt.no { opacity: 0.75; border-style: dashed; }
+  .opt h4 { margin: 0.25rem 0 0.4rem; }
+  .opt .pro { color: var(--gate); }
+  .opt .con { color: var(--tape); }
+  .opt ul { margin: 0.3rem 0 0; padding-inline-start: 1.2rem; font-size: 0.97rem; }
+
+  .flow {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem;
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 1rem 1.25rem; margin-block: 1.25rem 1.5rem;
+  }
+  .flow .node {
+    font-family: var(--mono); font-size: 0.8rem; font-weight: 600; direction: ltr; unicode-bidi: isolate;
+    border: 1.5px dashed var(--wind); color: var(--wind); border-radius: 6px; padding: 0.3rem 0.6rem; background: var(--wind-soft);
+  }
+  .flow .node.app { border-style: solid; background: var(--card); color: var(--ink); }
+  .flow .arrow { color: var(--tape); font-weight: 700; }
+  .flow .caption { width: 100%; font-size: 0.9rem; color: var(--ink-soft); margin-block-start: 0.25rem; }
+
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block-start: 1rem; position: relative; }
+  .gate::before {
+    content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem;
+    background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg);
+  }
+  .gate ul { margin: 0.25rem 0 0; }
+
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.ok { color: var(--gate); font-weight: 700; white-space: nowrap; }
+  td.no { color: var(--tape); font-weight: 700; white-space: nowrap; }
+
+  .rail { border-inline-start: 3px solid var(--wind); padding-inline-start: 1.75rem; }
+  .station { position: relative; margin-block-end: 1.25rem; }
+  .station::before {
+    content: attr(data-m); position: absolute; inset-inline-start: -3.05rem; inset-block-start: 0.4rem;
+    width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center;
+    background: var(--wind); color: #fff; font-family: var(--mono); font-weight: 600; font-size: 0.85rem;
+    border-radius: 50%; border: 3px solid var(--paper);
+  }
+  .station.opt-m::before { background: var(--ink-soft); }
+  .station h3 { margin: 0 0 0.25rem; }
+  .goal { color: var(--ink-soft); margin: 0 0 0.75rem; font-size: 0.98rem; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.9rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; position: relative; padding-inline-start: 2.6rem; margin-block-end: 0.6rem; }
+  .steps li::before {
+    content: counter(step); position: absolute; inset-inline-start: 0; inset-block-start: 0.1rem;
+    width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--tape); color: #fff;
+    font-family: var(--mono); font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; justify-content: center;
+  }
+
+  .approve { background: var(--card); border: 2px solid var(--wind); border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .approve ol { margin: 0.5rem 0 0; }
+  .approve li { margin-block-end: 0.6rem; }
+  .approve .id { font-family: var(--mono); color: var(--wind); font-weight: 600; margin-inline-end: 0.4rem; }
+
+  .dod { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; }
+  .dod ul { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 2.5rem; }
+  .dod li { margin-block-end: 0.5rem; break-inside: avoid; padding-inline-start: 1.5rem; position: relative; }
+  .dod li::before { content: "☐"; position: absolute; inset-inline-start: 0; color: var(--wind); font-weight: 700; }
+  @media (max-width: 640px) { .dod ul { columns: 1; } }
+
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  details > summary { cursor: pointer; font-weight: 600; color: var(--wind); }
+  details > summary:focus-visible { outline: 2px solid var(--tape); outline-offset: 2px; }
+  a { color: var(--wind); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · מסמך תכנון · טיוטה לאישור · 2026-09-05</span>
+    <h1>FunnelIQ: מדאטה של משפך שיווקי למוצר פרוס עם לוגין</h1>
+    <p class="lede">
+      זה מסמך התכנון (design) של הפרויקט. הוא סוגר את כל ההחלטות הארכיטקטוניות <b>לפני</b> שורת קוד אחת.
+      אחרי שתאשר אותו, אכתוב ממנו את <code>PLAN.md</code> המפורט (תחנות עבודה, שערי בדיקה, סימני כשל) בדיוק כמו ב-Northwind.
+      בסוף המסמך יש רשימת החלטות ממוספרת שאתה מאשר או דוחה אחת-אחת.
+    </p>
+    <div class="decisions">
+      <span class="chip">ריפו: <b>git עצמאי + GitHub ציבורי</b></span>
+      <span class="chip">שרת: <b>FastAPI</b></span>
+      <span class="chip">דפדפן: <b>HTML/JS + Chart.js</b> (React אופציונלי בסוף)</span>
+      <span class="chip">ML: <b>סקריפטים + בדיקות</b></span>
+      <span class="chip">סביבה: <b>conda AI_dev</b></span>
+      <span class="chip">חשבונות Supabase + Railway: <b>קיימים</b></span>
+    </div>
+  </header>
+
+  <div class="info">
+    <h3>מה הברייף מודד בפועל (תזכורת קצרה)</h3>
+    <ul>
+      <li><b>שלושה עמודי תשתית</b>: GitHub (README, קומיטים קטנים, PR, Actions), Supabase (טבלה + טעינה חוזרת + Auth + RLS), Railway (URL ציבורי, משתני סביבה, health check, פריסה אוטומטית מ-push).</li>
+      <li><b>שש חבילות אנליטיות</b>: EDA וניקוי, רגרסיה ל-<code>ltv_months</code>, סיווג <code>upsell</code>, ציון super customer מ-<code>referred</code>, פרדוקס המעקבים, אופטימיזציית תקציב של ₪50,000.</li>
+      <li><b>הבר</b>: זר פותח את ה-URL, מתחבר, מקבל חיזוי ללקוח חדש, רואה את תובנות המעקבים והתקציב וקורא את ההמלצות. בלי שתיגע בכלום.</li>
+    </ul>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">01</span>שלוש החלטות ארכיטקטוניות פתוחות</h2>
+  <p>בכל אחת יש חלופות אמיתיות. הצגתי אותן עם המלצה מנומקת. כל השאר במסמך נגזר מההמלצות האלה.</p>
+
+  <h3>החלטה A: איך המידע מגיע מ-Supabase למשתמש (הלב של דרישת ה-RLS)</h3>
+  <p>הברייף דורש ש-<b>מסד הנתונים עצמו</b> יאכוף שרק משתמש מחובר קורא דאטה (Row Level Security), ושהקריאות יגיעו עם הטוקן של המשתמש המחובר. שרת שקורא הכל עם מפתח ה-service עוקף את זה.</p>
+  <div class="options">
+    <div class="opt rec">
+      <h4>A1: כל הדרך דרך ה-API, עם הטוקן של המשתמש</h4>
+      <p>הדפדפן מתחבר עם supabase-js (anon key), מקבל JWT, ושולח אותו בכל קריאה ל-FastAPI. השרת מאמת את החתימה, ואז פונה ל-Supabase <b>עם אותו טוקן</b>. Postgres אוכף את ה-RLS. מפתח ה-service לא קיים על השרת ב-Railway בכלל, רק בסקריפט הטעינה המקומי.</p>
+      <ul>
+        <li class="pro">נקודת כניסה אחת, RLS נאכף באמת, הרשאות מינימליות. בדיוק לשון הברייף.</li>
+        <li class="con">צריך אימות JWT בשרת (ספרייה קטנה, PyJWT).</li>
+      </ul>
+    </div>
+    <div class="opt">
+      <h4>A2: הדפדפן קורא ישירות מ-Supabase, ה-API רק לחיזויים</h4>
+      <ul>
+        <li class="pro">פחות קוד שרת.</li>
+        <li class="con">לוגיקת דאטה מתפצלת בין JS ל-Python; ה-API "לא קורא מ-Supabase בזמן ריצה" כפי שהברייף דורש.</li>
+      </ul>
+    </div>
+    <div class="opt no">
+      <h4>A3: ה-API קורא הכל עם service key</h4>
+      <ul>
+        <li class="con">נפסלת. הברייף אומר במפורש שזה עוקף את ה-RLS.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>החלטה B: איפה המודלים המאומנים חיים</h3>
+  <div class="options">
+    <div class="opt rec">
+      <h4>B1: אימון מקומי, קבצי מודל מקומטים בריפו</h4>
+      <p>סקריפטי אימון מייצרים <code>models/*.joblib</code> וקובץ מטריקות JSON. הקבצים קטנים (מגה-בייטים בודדים). Railway פורס אותם עם הקוד. כל קומיט של מודל הוא גרסה שאפשר לחזור אליה.</p>
+      <ul>
+        <li class="pro">פריסה דטרמיניסטית, אתחול מהיר, "איזה מודל ענה" תמיד ידוע.</li>
+        <li class="con">אימון מחדש דורש קומיט מחדש. זה למעשה versioning, לא חיסרון.</li>
+      </ul>
+    </div>
+    <div class="opt">
+      <h4>B2: אימון בזמן העלייה של השרת</h4>
+      <ul>
+        <li class="con">אתחול איטי ב-Railway, תוצאות שונות בין פריסות, קשה לשחזר.</li>
+      </ul>
+    </div>
+    <div class="opt">
+      <h4>B3: Supabase Storage</h4>
+      <ul>
+        <li class="con">עוד מנגנון בלי תועלת אמיתית בגודל הזה.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>החלטה C: מבנה האפליקציה</h3>
+  <div class="options">
+    <div class="opt rec">
+      <h4>C1: שירות אחד. FastAPI מגיש גם את ה-API וגם את קבצי ה-HTML/JS</h4>
+      <ul>
+        <li class="pro">פריסה אחת ב-Railway, URL אחד, בלי CORS. אם React יגיע בסוף, ה-build שלו פשוט מחליף את תיקיית ה-static.</li>
+      </ul>
+    </div>
+    <div class="opt">
+      <h4>C2: שני שירותים (API + אתר סטטי)</h4>
+      <ul>
+        <li class="con">מיותר עכשיו. רלוונטי רק אם React יגיע.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">02</span>הארכיטקטורה</h2>
+  <section class="flow" aria-label="זרימת הנתונים">
+    <span class="node">funnel_marketing_data.csv</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node app">scripts/load_data.py</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">Supabase Postgres (RLS)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node app">FastAPI (Railway)</span>
+    <span class="arrow" aria-hidden="true">←</span>
+    <span class="node">browser: login + dashboard</span>
+    <span class="caption">הזרימה הראשית. ענף צד: <code>ml/train_*.py</code> מאמנים על ה-CSV ומייצרים <code>models/*.joblib</code> שה-API טוען בעלייה. GitHub הוא מקור האמת; push ל-main מפעיל Actions ו-redeploy ב-Railway.</span>
+  </section>
+
+<pre>
+                     ┌──────────────────────────────────────────────┐
+                     │  GitHub (public repo)                        │
+                     │  push → Actions (ruff + pytest) → Railway    │
+                     └──────────────────────────────────────────────┘
+                                          │ redeploy
+                                          ▼
+ Browser (static HTML/JS)          FastAPI on Railway                 Supabase
+ ───────────────────────           ─────────────────────              ────────────────────
+ login.html                        GET  /health                       Auth (email+password)
+   supabase-js + ANON key ───────► session JWT                         │
+ dashboard.html                                                        │
+   fetch(..., Bearer JWT) ───────► auth.py: verify JWT (JWKS) ─────────┘
+                                   db.py: supabase client
+                                          .postgrest.auth(user_jwt) ──► funnel_records (RLS: authenticated only)
+                                   /api/records, /api/insights/*  ◄──── rows the policy allows
+                                   /api/predict/{ltv,upsell,super} ◄── models/*.joblib (ml/registry.py)
+                                   /api/simulate/budget            ◄── models/profit.joblib + ml/simulator.py
+                                   /api/predictions (log)          ──► prediction_log (RLS: own rows)
+
+ Local only (never on Railway):  scripts/load_data.py  ── SERVICE key ──► truncate + insert 3,500 rows
+</pre>
+
+  <div class="notice">
+    <h3>עיקרון מפתח: מפתח ה-service לא עולה ל-Railway</h3>
+    <p>השרת המפורס מחזיק רק URL + anon key + מפתח ציבורי לאימות JWT. אין לו יכולת לעקוף RLS גם אם ירצה. מפתח ה-service נמצא רק ב-<code>.env</code> המקומי, לשימוש סקריפט הטעינה. זו הדגמה ישירה של "anon בדפדפן, service בשרת" בגרסה המחמירה שלה, וזה נימוק יפה לראיון.</p>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">03</span>מבנה הריפו</h2>
+<pre>
+Funnell_IQ_Marketing/                <span class="c"># git init here; GitHub: funneliq (public)</span>
+├── app/                             <span class="c"># FastAPI</span>
+│   ├── main.py                      <span class="c"># app factory, static mount, /health</span>
+│   ├── config.py                    <span class="c"># env settings (pydantic-settings)</span>
+│   ├── auth.py                      <span class="c"># JWT verification dependency (JWKS, HS256 fallback)</span>
+│   ├── db.py                        <span class="c"># per-request supabase client bound to the user's JWT</span>
+│   ├── schemas.py                   <span class="c"># pydantic request/response models</span>
+│   └── routers/
+│       ├── records.py               <span class="c"># /api/records</span>
+│       ├── insights.py              <span class="c"># /api/insights/{overview,followups,super-customers}</span>
+│       ├── predict.py               <span class="c"># /api/predict/{ltv,upsell,super-score}</span>
+│       └── simulate.py              <span class="c"># /api/simulate/budget</span>
+├── ml/                              <span class="c"># the six work packages as a testable package</span>
+│   ├── data.py                      <span class="c"># load + clean (single source of truth for cleaning rules)</span>
+│   ├── features.py                  <span class="c"># feature sets per task + LEAKAGE GUARD</span>
+│   ├── evaluate.py                  <span class="c"># 5-fold CV, metrics, importances (shared by all trainers)</span>
+│   ├── train_ltv.py                 <span class="c"># P2: XGB / LGBM / CatBoost regression</span>
+│   ├── train_upsell.py              <span class="c"># P3: three classifiers + business rule comparison</span>
+│   ├── train_super.py               <span class="c"># P4: tuned CatBoost with categorical budget_tier</span>
+│   ├── train_profit.py              <span class="c"># P6: profit model</span>
+│   ├── followups.py                 <span class="c"># P5: dropout analysis</span>
+│   ├── simulator.py                 <span class="c"># P6: allocation strategies → expected profit</span>
+│   ├── eda.py                       <span class="c"># P1: findings (missing, correlations, tiers, curve)</span>
+│   └── registry.py                  <span class="c"># loads models/*.joblib + metrics.json for the API</span>
+├── models/                          <span class="c"># committed artifacts: ltv_*.joblib, upsell_*.joblib, super.joblib, profit.joblib, metrics.json</span>
+├── static/                          <span class="c"># login.html, dashboard.html, app.js, styles.css (Chart.js + supabase-js from CDN)</span>
+├── scripts/
+│   ├── load_data.py                 <span class="c"># CSV → Supabase (SERVICE key, local only, idempotent)</span>
+│   ├── train_all.py                 <span class="c"># runs every trainer, writes models/ + metrics.json</span>
+│   └── gate.py                      <span class="c"># python scripts/gate.py --m 3  → PASS n/n (like validate_pipeline.py)</span>
+├── db/
+│   ├── schema.sql                   <span class="c"># tables + generated columns</span>
+│   └── policies.sql                 <span class="c"># RLS policies</span>
+├── tests/                           <span class="c"># pytest: leakage guard, API auth, simulator math, loader parsing</span>
+├── docs/
+│   ├── FINDINGS.md                  <span class="c"># P1 findings note (required by brief)</span>
+│   ├── REPORT.md                    <span class="c"># business write-up, all six packages</span>
+│   └── reports/M*_HE.html           <span class="c"># Hebrew HTML report per milestone</span>
+├── data/funnel_marketing_data.csv   <span class="c"># provided dataset (small, committed); generated dumps are gitignored</span>
+├── .github/workflows/ci.yml         <span class="c"># ruff + pytest on every push and PR</span>
+├── requirements.txt                 <span class="c"># pinned</span>
+├── railway.json                     <span class="c"># start command + healthcheck path</span>
+├── .env.example  .gitignore  README.md  PLAN.md  PROJECT_LOG.md  DESIGN_HE.html
+</pre>
+  <p><b>למה חבילה נפרדת ל-ML ולא בתוך ה-API?</b> כי אותו קוד ניקוי ופיצ'רים חייב לרוץ גם באימון וגם בשירות. אם ניקוי ה-CSV חי בסקריפט אחד וה-API מנקה אחרת, המודל מקבל קלט שהוא לא ראה מעולם. <code>ml/data.py</code> ו-<code>ml/features.py</code> הם מקור האמת היחיד.</p>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">04</span>מסד הנתונים והאימות</h2>
+
+  <h3>סכמה</h3>
+  <ul>
+    <li><b><code>funnel_records</code></b>: 19 עמודות המקור + <code>id</code> (מספר השורה ב-CSV, כדי שטעינה חוזרת תהיה דטרמיניסטית) + עמודה מחושבת <code>budget_tier</code> (Low ≤1500 · Mid 2000–5000 · High >5000) + <code>referred</code> כ-boolean.</li>
+    <li>ערכים חסרים ב-<code>ltv_months</code> ו-<code>cumulative_profit</code> נשמרים כ-NULL. הניקוי לצורכי מודל קורה ב-Python, לא במסד. ככה ה-EDA יכול לספור בדיוק כמה שורות חסרות.</li>
+    <li><b><code>prediction_log</code></b>: <code>user_id</code>, <code>model</code>, <code>input jsonb</code>, <code>output jsonb</code>, <code>created_at</code>. כל חיזוי שמשתמש מבקש נרשם. זה נותן לאפליקציה גם <b>כתיבה</b> ל-Supabase בזמן ריצה, לא רק קריאה, ומאפשר בדשבורד "החיזויים האחרונים שלי".</li>
+  </ul>
+
+  <h3>מדיניות RLS</h3>
+  <ul>
+    <li><code>funnel_records</code>: SELECT מותר ל-<code>authenticated</code> בלבד. אין INSERT/UPDATE דרך ה-API (הטעינה היא עם service key שעוקף RLS בכוונה, מקומית).</li>
+    <li><code>prediction_log</code>: INSERT ו-SELECT רק על שורות שבהן <code>user_id = auth.uid()</code>.</li>
+    <li><b>הוכחה בשער הבדיקה:</b> שאילתה עם anon key בלי טוקן מחזירה 0 שורות; עם טוקן של משתמש מחובר מחזירה 3,500.</li>
+  </ul>
+
+  <h3>זרימת הלוגין</h3>
+  <ol class="steps">
+    <li>מבקר לא מחובר רואה רק את <code>login.html</code>. הדשבורד בודק session בטעינה ומפנה ללוגין אם אין.</li>
+    <li>supabase-js (עם anon key, שמגיע מ-<code>GET /api/config</code> כדי שלא יהיה hard-coded בקובץ סטטי) עושה <code>signInWithPassword</code>.</li>
+    <li>כל <code>fetch</code> לדשבורד שולח <code>Authorization: Bearer &lt;access_token&gt;</code>.</li>
+    <li><code>app/auth.py</code> מאמת את החתימה מול ה-JWKS של הפרויקט (Supabase החדש חותם ב-ES256; נשמור fallback ל-HS256 עם <code>SUPABASE_JWT_SECRET</code> למקרה של פרויקט ישן). בלי טוקן תקף: 401.</li>
+    <li><code>app/db.py</code> יוצר לקוח supabase ומצמיד אליו את הטוקן של המשתמש, כך שכל שאילתה עוברת RLS.</li>
+    <li>Sign-out מנקה את ה-session בדפדפן ומחזיר ללוגין. הרשמה עצמית <b>כבויה</b> בהגדרות Supabase; משתמשים נוצרים ידנית ב-dashboard של Supabase (זה כלי פנימי).</li>
+  </ol>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">05</span>העבודה האנליטית: שש החבילות</h2>
+
+  <div class="notice">
+    <h3>מדיניות דליפה (leakage): מה מותר להיות פיצ'ר בכל משימה</h3>
+    <p>הכלל: פיצ'ר לגיטימי רק אם העסק מחזיק אותו <b>ברגע החיזוי</b>. נגדיר ב-<code>ml/features.py</code> שתי קבוצות, ובדיקה אוטומטית (leakage guard) שנכשלת אם מודל מנסה להשתמש בעמודת תוצאה בלי היתר מפורש.</p>
+    <ul>
+      <li><b>FUNNEL (זמן רכישה)</b>: <code>ad_budget</code>, <code>num_leads</code>, <code>leads_answered</code>, <code>leads_not_answered</code>, <code>followup_1..5</code>, <code>not_closed</code>, <code>closed</code>, <code>calls_to_closed</code>, <code>calls_to_not_closed</code>, <code>customer_acquisition_cost</code>. פלוס פיצ'רים מהונדסים: <code>answer_rate</code>, <code>conversion_rate</code> (closed/num_leads), <code>cost_per_lead</code>, <code>budget_tier</code>.</li>
+      <li><b>OUTCOMES (תוצאות)</b>: <code>ltv_months</code>, <code>purchased</code>, <code>upsell</code>, <code>cumulative_profit</code>, <code>referred</code>. לעולם לא פיצ'ר, אלא אם יש הצדקה כתובה לאותה משימה.</li>
+    </ul>
+  </div>
+
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>חבילה</th><th>מטרה</th><th>פיצ'רים</th><th>מה נחשף באפליקציה</th></tr></thead>
+      <tbody>
+        <tr><td>P1 חקירה וניקוי</td><td>להבין את הדאטה לפני שסומכים עליו</td><td>—</td><td>פאנל Overview: חסרים, מתאמים ל-profit, עקומת תקציב←לידים, המרה לפי tier</td></tr>
+        <tr><td>P2 רגרסיה</td><td><code>ltv_months</code></td><td>FUNNEL בלבד. <code>cumulative_profit</code> מוצא: הוא נצבר לאורך החיים, כלומר הוא <b>תוצאה של</b> ltv. נריץ ניסוי ablation "עם profit" רק כדי להראות את ה-R² המנופח כראיה בדוח.</td><td>טופס "לקוח חדש" ← חיזוי חודשים + השוואת 3 המודלים + חשיבות פיצ'רים</td></tr>
+        <tr><td>P3 סיווג</td><td><code>upsell</code></td><td>שתי גרסאות: <b>early</b> (FUNNEL) ו-<b>tenure-aware</b> (FUNNEL + <code>ltv_months</code>). ההצדקה לשנייה: פנייה ל-upsell נעשית ללקוח קיים, שהוותק שלו ידוע. הכלל העסקי בברייף עצמו משתמש ב-LTV. נדווח על שתיהן, נשרת את זו שמנצחת עם הצדקה כתובה.</td><td>הסתברות upsell + הכלל העסקי מול המודל (איפה כל אחד מנצח)</td></tr>
+        <tr><td>P4 super customer</td><td><code>referred</code></td><td>FUNNEL + <code>budget_tier</code> קטגורי ב-CatBoost (טיפול נייטיבי). כוונון: learning rate × depth × iterations, 5-fold stratified.</td><td>ציון 0–100 + פרופיל ה-super customers (נתח מהרווח, CAC ממוצע)</td></tr>
+        <tr><td>P5 פרדוקס המעקבים</td><td>לבדוק את טענת מנהל המכירות</td><td>סטטיסטיקה תיאורית: נשירה בכל שלב, מספר מעקבים לעסקאות שנסגרו</td><td>גרף נשירה + המלצה מנוסחת</td></tr>
+        <tr><td>P6 אופטימיזציית תקציב</td><td><code>cumulative_profit</code> ← סימולטור</td><td>FUNNEL. הסימולטור מקבל רק תקציב, וממלא את שאר הפיצ'רים מ"פרופיל טיפוסי" (חציון) של כל רמת תקציב. הדאטה מכיל בדיוק 16 רמות בדידות (500 עד 20,000), אז הפרופיל מוגדר היטב.</td><td>סימולטור: בוחרים חלוקה של ₪50,000 ← רווח צפוי + השוואת אסטרטגיות + המלצה</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>הערות מתודולוגיות שיכריעו בשלב ה-EDA (לא עכשיו)</h3>
+  <ul>
+    <li><b><code>purchased</code></b>: 337 שורות עם 0. אם ללקוחות שלא רכשו יש בכל זאת ltv ו-profit, זה סימן לרעש בדאטה. הצעה: מודלי P2/P3/P4 מאומנים על לקוחות בלבד (purchased = 1), עם תיעוד. ההכרעה אחרי בדיקה.</li>
+    <li><b>ערכים חסרים</b>: רק 33 שורות (4 ב-ltv, 29 ב-profit). ברירת מחדל: להשמיט אותן מהאימון של המשימה שבה זו עמודת המטרה, ולהשאיר אותן בכל השאר. לא לבצע imputation לעמודת מטרה.</li>
+    <li><b>איזון מחלקות</b>: upsell = 42% חיובי, referred = 39% חיובי. שתיהן מאוזנות סבירות, אז ההשערה היא ש-<code>scale_pos_weight</code> לא נדרש. נבדוק עם ובלי, ונתעד.</li>
+    <li><b>כפילות של המשפך</b>: <code>closed + not_closed</code> ו-<code>leads_answered + leads_not_answered</code> כנראה קולינאריים. לעצי boosting זה לא מפריע, אבל זה ישפיע על פרשנות החשיבות. יתועד.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">06</span>ה-API והדשבורד</h2>
+
+  <h3>נקודות קצה</h3>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>נתיב</th><th>אימות</th><th>מה עושה</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /health</code></td><td>לא</td><td>גרסה, מודלים טעונים, זמן עלייה. ל-Railway healthcheck.</td></tr>
+        <tr><td><code>GET /api/config</code></td><td>לא</td><td>מחזיר URL + anon key לדפדפן (ציבוריים מעצם הגדרתם).</td></tr>
+        <tr><td><code>GET /api/records</code></td><td>כן</td><td>דפדוף ברשומות היסטוריות מ-Supabase, עם הטוקן של המשתמש.</td></tr>
+        <tr><td><code>GET /api/insights/overview</code></td><td>כן</td><td>P1: חסרים, מתאמים, עקומת תקציב←לידים, המרה לפי tier. מחושב מהדאטה ב-Supabase בזמן ריצה.</td></tr>
+        <tr><td><code>GET /api/insights/followups</code></td><td>כן</td><td>P5: נשירה לפי שלב + המלצה.</td></tr>
+        <tr><td><code>GET /api/insights/super-customers</code></td><td>כן</td><td>P4: פרופיל ה-super customers.</td></tr>
+        <tr><td><code>POST /api/predict/ltv</code></td><td>כן</td><td>P2: פיצ'רי FUNNEL ← חודשים (3 מודלים + ממוצע).</td></tr>
+        <tr><td><code>POST /api/predict/upsell</code></td><td>כן</td><td>P3: הסתברות + החלטת הכלל העסקי להשוואה.</td></tr>
+        <tr><td><code>POST /api/predict/super-score</code></td><td>כן</td><td>P4: ציון 0–100.</td></tr>
+        <tr><td><code>POST /api/simulate/budget</code></td><td>כן</td><td>P6: רשימת {budget, count} ← רווח צפוי לכל אסטרטגיה + המנצחת.</td></tr>
+        <tr><td><code>GET /api/models</code></td><td>כן</td><td>מטריקות CV, חשיבות פיצ'רים, גרסה, תאריך אימון (מ-<code>metrics.json</code>).</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>מסכי הדשבורד (דף אחד, ניווט בלשוניות)</h3>
+  <ul>
+    <li><b>Login</b>: אימייל + סיסמה, הודעת שגיאה, כפתור sign-out בכל מסך.</li>
+    <li><b>Overview</b>: כרטיסי KPI (שורות, חסרים, המרה כוללת), גרף תקציב←לידים, המרה לפי tier, מתאמים ל-profit.</li>
+    <li><b>Predict</b>: טופס לקוח חדש ← שלושת החיזויים בבת אחת (LTV, upsell, super score) עם הסבר קצר וחשיבות פיצ'רים.</li>
+    <li><b>Follow-ups</b>: גרף נשירה, מספר מעקבים לעסקאות שנסגרו, ההמלצה.</li>
+    <li><b>Budget</b>: הסימולטור. אסטרטגיות מוכנות (2×20k+10k · 10×5k · 25×2k · 100×500) + בונה חלוקה חופשי שחייב לסכום ל-50,000.</li>
+    <li><b>Findings</b>: ההמלצות העסקיות (מ-REPORT.md) + טבלת המודלים והמטריקות.</li>
+  </ul>
+  <p>שפת הממשק: אנגלית (כמו הקוד). הדוחות שלנו לעצמנו: עברית.</p>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">07</span>בדיקות, CI ופריסה</h2>
+  <h3>בדיקות (pytest)</h3>
+  <ul>
+    <li><b>Leakage guard</b>: מבחן שנכשל אם עמודת OUTCOME נכנסת לרשימת הפיצ'רים של משימה בלי היתר.</li>
+    <li><b>ניקוי</b>: <code>ml/data.py</code> מחזיר 3,500 שורות, סופר 33 חסרות, ממפה referred ל-boolean.</li>
+    <li><b>API</b>: <code>/health</code> 200; נתיבים מוגנים מחזירים 401 בלי טוקן; עם טוקן מזויף-בבדיקה (מפתח בדיקה) מחזירים 200. Supabase נדמה (mock) בבדיקות, לא נקרא באמת.</li>
+    <li><b>מודלים</b>: כל artifact נטען, מקבל שורת קלט תקינה, מחזיר צורה נכונה וטווח סביר (ציון 0–100, הסתברות 0–1).</li>
+    <li><b>סימולטור</b>: אסטרטגיה חייבת לסכום ל-50,000; רמות תקציב מחוץ לדאטה נדחות.</li>
+    <li>אימון מלא <b>לא</b> רץ ב-CI (איטי). רץ מקומית דרך <code>scripts/train_all.py</code>.</li>
+  </ul>
+  <h3>GitHub Actions</h3>
+  <p>על כל push ו-PR: התקנת תלויות מ-<code>requirements.txt</code>, <code>ruff check</code>, <code>pytest</code>. Badge ב-README.</p>
+  <h3>Railway</h3>
+  <ul>
+    <li>שירות מחובר לריפו, branch main. Start: <code>uvicorn app.main:app --host 0.0.0.0 --port $PORT</code>. Healthcheck: <code>/health</code>.</li>
+    <li>משתני סביבה: <code>SUPABASE_URL</code>, <code>SUPABASE_ANON_KEY</code>, <code>SUPABASE_JWT_SECRET</code> (fallback בלבד). <b>לא</b> service key.</li>
+    <li>בדיקת הישרדות: restart ידני מהדשבורד של Railway ← <code>/health</code> חוזר 200.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">08</span>פרוטוקול העבודה (מה קורה בכל תחנה)</h2>
+  <p>זה מה שביקשת: התהליך מ-Northwind, עם השדרוגים של הברייף הזה (branches ו-PRs).</p>
+  <ol class="steps">
+    <li><b>Branch</b>: כל תחנה נפתחת ב-feature branch, למשל <code>feat/m3-ltv-regression</code>. main תמיד ירוק ופרוס.</li>
+    <li><b>הסבר פשוט בהתחלה</b>: לפני הקוד, פסקה אחת בעברית על מה עושים ולמה (בקשה שלך מ-Northwind).</li>
+    <li><b>בנייה</b> עם בדיקות לצד הקוד. קומיטים קטנים ומתוארים.</li>
+    <li><b>שער בדיקה</b>: <code>python scripts/gate.py --m N</code> מדפיס PASS n/n. לא ממשיכים בלי ירוק.</li>
+    <li><b>דוח HTML בעברית</b>: <code>docs/reports/M&lt;N&gt;_HE.html</code> לפי מערכת העיצוב הזו, נפתח בדפדפן אוטומטית.</li>
+    <li><b>סיכום באנגלית בטרמינל</b>: קצר, מקצועי, מה נעשה ומה הלאה.</li>
+    <li><b>אובסידיאן</b>: עדכון <code>Projects/FunnelIQ/</code> בכספת: דף הבית (טבלת סטטוס), פתק תחנה, יומן לפי תאריך, ופתק ההחלטות (<code dir="rtl">החלטות.md</code>) אם התקבלה החלטה.</li>
+    <li><b>PR ← merge ← Railway</b>: push, פתיחת PR עם תיאור, CI ירוק, merge ל-main, אימות שה-URL החי התעדכן.</li>
+  </ol>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">09</span>תחנות העבודה (תמצית; הפירוט המלא יהיה ב-PLAN.md)</h2>
+  <div class="rail">
+    <article class="station" data-m="M0"><div class="card">
+      <h3>שלד פרוס ביום הראשון</h3>
+      <p class="goal">"hello" חי ב-Railway לפני שורת ML אחת. בדיוק העצה של הברייף.</p>
+      <ul>
+        <li>git init, ריפו GitHub ציבורי, <code>.gitignore</code>, <code>.env.example</code>.</li>
+        <li>התקנה ל-AI_dev: xgboost, lightgbm (דורש <code>brew install libomp</code> במק), catboost, fastapi, supabase, pyjwt, pydantic-settings, ruff.</li>
+        <li>FastAPI עם <code>/health</code>, pytest ראשון, Actions, railway.json, פריסה.</li>
+      </ul>
+      <div class="gate"><ul><li>CI ירוק ב-GitHub · ה-URL הציבורי מחזיר 200 ב-<code>/health</code> · restart שורד.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M1"><div class="card">
+      <h3>Supabase: דאטה, RLS, לוגין</h3>
+      <p class="goal">שלושת העמודים מחוברים באמת. זו התחנה עם הכי הרבה "צעדים ידניים" שלך (מפתחות, משתמש ראשון).</p>
+      <ul>
+        <li><code>db/schema.sql</code> + <code>db/policies.sql</code> מורצים ב-SQL editor; <code>scripts/load_data.py</code> טוען 3,500 שורות, אידמפוטנטי.</li>
+        <li><code>app/auth.py</code>, <code>app/db.py</code>, <code>/api/records</code>; <code>login.html</code> + שלד <code>dashboard.html</code>.</li>
+      </ul>
+      <div class="gate"><ul>
+        <li>טעינה פעמיים ← עדיין 3,500 שורות.</li>
+        <li>anon בלי טוקן ← 0 שורות; עם טוקן ← 3,500 (RLS מוכח).</li>
+        <li><code>/api/records</code>: 401 בלי טוקן, 200 עם.</li>
+        <li>בדפדפן על ה-URL החי: לוגין ← דשבורד ← sign-out ← חזרה ללוגין.</li>
+      </ul></div>
+    </div></article>
+
+    <article class="station" data-m="M2"><div class="card">
+      <h3>P1: חקירה, ניקוי, פאנל Overview</h3>
+      <ul><li><code>ml/data.py</code>, <code>ml/eda.py</code>, <code>docs/FINDINGS.md</code> עם התשובות לשלוש השאלות של הברייף, <code>/api/insights/overview</code>, לשונית Overview עם גרפים.</li></ul>
+      <div class="gate"><ul><li>33 שורות חסרות מזוהות ומטופלות לפי המדיניות · טבלת המרה לפי tier · עקומת תקציב←לידים עם מסקנה כתובה (לינארי או תשואה פוחתת) · הפאנל חי ב-URL.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M3"><div class="card">
+      <h3>P2: רגרסיה ל-ltv_months</h3>
+      <ul><li><code>ml/features.py</code> עם leakage guard, <code>ml/evaluate.py</code>, <code>ml/train_ltv.py</code> (3 מודלים, 5-fold, RMSE + R², חשיבות), ניסוי ablation עם profit, <code>/api/predict/ltv</code>, טופס Predict.</li></ul>
+      <div class="gate"><ul><li>מבחן ה-leakage עובר · 3 מודלים עם CV מתועד ב-<code>metrics.json</code> · השוואת חשיבויות · חיזוי חי ב-URL · שתי התשובות של הברייף כתובות ב-REPORT.md.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M4"><div class="card">
+      <h3>P3: סיווג upsell</h3>
+      <ul><li>3 מסווגים, stratified CV, בדיקת איזון, baseline של המחלקה הרוב, Accuracy/Precision/Recall/F1/ROC-AUC, גרף חשיבות, הכלל העסקי מול המודל, <code>/api/predict/upsell</code>.</li></ul>
+      <div class="gate"><ul><li>המודל מנצח את ה-baseline במדד שנבחר עם הצדקה · טבלת "הכלל מול המודל" · חיזוי חי.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M5"><div class="card">
+      <h3>P4: ציון super customer</h3>
+      <ul><li>CatBoost עם <code>budget_tier</code> קטגורי, חיפוש היפר-פרמטרים מתועד, ציון 0–100, פרופיל ה-super customers, <code>/api/predict/super-score</code>, <code>/api/insights/super-customers</code>.</li></ul>
+      <div class="gate"><ul><li>טבלת החיפוש שמורה · הציון בטווח 0–100 על כל הדאטה · נתח הרווח ו-CAC של ה-super customers מדווחים · חי ב-URL.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M6"><div class="card">
+      <h3>P5: פרדוקס המעקבים</h3>
+      <ul><li><code>ml/followups.py</code>, נשירה לכל שלב, התפלגות <code>calls_to_closed</code>, המלצה כן/לא עם נימוק, לשונית Follow-ups.</li></ul>
+      <div class="gate"><ul><li>הגרף חי · השלב ה"לא צפוי" מזוהה ומוסבר · ההמלצה כתובה בדשבורד וב-REPORT.md.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M7"><div class="card">
+      <h3>P6: מודל רווח וסימולטור תקציב</h3>
+      <ul><li><code>ml/train_profit.py</code>, <code>ml/simulator.py</code> (פרופיל טיפוסי לרמת תקציב, אסטרטגיות, השוואה), <code>/api/simulate/budget</code>, לשונית Budget.</li></ul>
+      <div class="gate"><ul><li>ארבע האסטרטגיות של הברייף מדורגות · בונה חופשי מאמת סכום 50,000 · המלצה למייסד כתובה · חי ב-URL.</li></ul></div>
+    </div></article>
+
+    <article class="station" data-m="M8"><div class="card">
+      <h3>סגירה</h3>
+      <ul><li>README מקצועי (ארכיטקטורה, הרצה מקומית, URL חי, badge), <code>docs/REPORT.md</code> שלם, דוח סופי בעברית, אובסידיאן מעודכן, "מבחן הזר" על ה-URL, הקלטת דמו אופציונלית.</li></ul>
+      <div class="gate"><ul><li>כל סעיפי ה-Definition of Done מסומנים.</li></ul></div>
+    </div></article>
+
+    <article class="station opt-m" data-m="M9"><div class="card">
+      <h3>אופציונלי: React</h3>
+      <p class="goal">רק אם נשאר זמן ורצון. מחליף את <code>static/</code> ב-build של Vite + React. ה-API לא משתנה.</p>
+    </div></article>
+  </div>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">10</span>סיכונים ידועים</h2>
+  <ul>
+    <li><b>lightgbm במק</b> צריך <code>libomp</code> מ-Homebrew. ב-Railway (לינוקס) אין בעיה.</li>
+    <li><b>חתימת JWT של Supabase</b>: פרויקטים חדשים משתמשים ב-ES256 עם JWKS; ישנים ב-HS256 עם secret. הקוד יתמוך בשניהם, ונבדוק מה הפרויקט שלך.</li>
+    <li><b>גודל build ב-Railway</b>: catboost + lightgbm + xgboost הם כמה מאות MB. הפריסה תיקח 3–5 דקות. סביר.</li>
+    <li><b>Railway trial</b>: 30 יום קרדיט. אם יפוג, Render הוא תחליף ישיר (אותו Dockerfile/start command).</li>
+    <li><b>דאטה "מלוכלך במכוון"</b>: יכולות להיות הפתעות ב-EDA (למשל purchased=0 עם profit). המדיניות: לתעד ולהכריע במקום, לא לתקן בשקט.</li>
+  </ul>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">11</span>Definition of Done</h2>
+  <div class="dod"><ul>
+    <li>ריפו GitHub ציבורי עם README, schema.sql, CI ירוק, לפחות PR אחד ממוזג</li>
+    <li>URL חי ב-Railway עם <code>/health</code>, שורד restart, מתעדכן מ-push</li>
+    <li>לוגין Supabase Auth: לא מחובר רואה רק לוגין; sign-out עובד</li>
+    <li>RLS מוכח: anon ללא טוקן = 0 שורות</li>
+    <li>service key לא קיים ב-Railway ולא בריפו</li>
+    <li>3,500 שורות נטענות עם סקריפט חוזר</li>
+    <li>P1: FINDINGS.md עונה על 3 השאלות</li>
+    <li>P2: 3 מודלים, CV, חשיבויות, הצדקת דליפה</li>
+    <li>P3: מדדים מול baseline, כלל עסקי מול מודל</li>
+    <li>P4: CatBoost מכוונן, ציון 0–100 חי, פרופיל</li>
+    <li>P5: גרף נשירה + המלצה בדשבורד</li>
+    <li>P6: סימולטור חי + המלצה למייסד</li>
+    <li>REPORT.md מסכם את כל ההמלצות</li>
+    <li>אובסידיאן: דף בית, החלטות, פתק לכל תחנה, יומנים</li>
+    <li>מבחן הזר עבר</li>
+  </ul></div>
+
+  <!-- ============================================================ -->
+  <h2><span class="num">12</span>מה אני צריך ממך: רשימת אישורים</h2>
+  <div class="approve">
+    <p>תוכל לענות "מאשר הכל", או לציין מספרים לשינוי.</p>
+    <ol>
+      <li><span class="id">D1</span>גישה A1: כל הדאטה עובר דרך ה-API עם הטוקן של המשתמש; service key רק מקומי.</li>
+      <li><span class="id">D2</span>גישה B1: מודלים מאומנים מקומית ומקומטים לריפו כ-joblib + metrics.json.</li>
+      <li><span class="id">D3</span>גישה C1: שירות אחד ב-Railway מגיש API + קבצים סטטיים.</li>
+      <li><span class="id">D4</span>מדיניות הדליפה: FUNNEL בלבד ל-LTV ול-super score; ל-upsell שתי גרסאות (early / tenure-aware) והכרעה לפי ראיות.</li>
+      <li><span class="id">D5</span>טבלת <code>prediction_log</code> לרישום חיזויים (כתיבה ל-Supabase בזמן ריצה, RLS על שורות המשתמש).</li>
+      <li><span class="id">D6</span>ה-CSV המסופק מקומט לריפו (קטן, נדרש לאימון); דאמפים שנוצרים לא.</li>
+      <li><span class="id">D7</span>הרשמה עצמית כבויה; משתמשי צוות נוצרים ידנית ב-Supabase.</li>
+      <li><span class="id">D8</span>פרוטוקול העבודה בסעיף 08: branch לכל תחנה, שער, דוח HTML בעברית, סיכום אנגלי בטרמינל, אובסידיאן, PR.</li>
+      <li><span class="id">D9</span>סדר התחנות M0–M8, React כ-M9 אופציונלי.</li>
+      <li><span class="id">D10</span>שם הריפו ב-GitHub: <code>funneliq</code> (או שם אחר שתבחר).</li>
+    </ol>
+  </div>
+
+  <footer>FunnelIQ · מסמך תכנון · טיוטה 1 · 2026-09-05 · הצעד הבא אחרי האישור: כתיבת <code>PLAN.md</code> + <code>PLAN_HE.html</code> ותחילת M0.</footer>
+</main>
+</body>
+</html>
