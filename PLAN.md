@@ -50,7 +50,7 @@ GitHub push → Actions (ruff + pytest) ; Railway watches main → redeploy → 
 ## 2. Repository structure
 
 ```text
-Funnell_IQ_Marketing/                 git root; GitHub: DorKatzav/funneliq (public)
+Funnell_IQ/                 git root; GitHub: DorKatzav/funneliq (public)
 ├── app/
 │   ├── __init__.py
 │   ├── main.py            create_app(): mounts routers + /static, GET /health, GET /api/config
