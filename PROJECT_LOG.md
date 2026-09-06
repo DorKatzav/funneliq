@@ -74,3 +74,13 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Predictions: non-increasing in calls_to_closed (35.7 → 35.6 → 27.6 → 19.2 → 12.9 → 7.0 → 6.9 → 6.8 → 6.3), within ±1.4 months of the empirical group means, three models within 1 month of each other, live == local artifacts (diff 0.000), absurd inputs stay in range.
 - Observations to keep in mind (not bugs): an all-zero funnel still returns a plausible-looking 24.7 months, and atypical combinations (₪800 budget with 42 leads) extrapolate — a "distance from training data" warning in the form is a candidate improvement for M8.
 - prediction_log grew exactly by the number of calls; median latency 671 ms (Railway ↔ Supabase round trip incl. the log insert); overview and health consistent.
+
+## 2026-09-06 — M4: P3 upsell classification — GATE PASSED (7/7)
+- Customers only (n = 3,163), 46.3% positive. scale_pos_weight 1.16 tested on the early variant: F1 0.741 → 0.749; kept because it cleared the pre-declared +0.005 bar — marginal, documented as such.
+- CV (stratified 5-fold): early/CatBoost AUC 0.778 F1 0.754; tenure/CatBoost AUC 0.795 F1 0.771 (served). Majority baseline: accuracy 53.6%, F1 0. Accuracy alone is not a sufficient metric (REPORT §P3).
+- Business rule from the brief, tuned on train folds and scored OOF: LTV > 12 and CAC < 2,000 → F1 0.786, above the model's OOF F1 0.771. By tier: rule wins Low (0.708 vs 0.685) and Mid (0.827 vs 0.814), ties High (0.489 vs 0.490). Recommendation: rule for existing customers, early model at signing (ranks by probability; no tenure needed).
+- Upsell is a combination, not one feature: early importances calls_to_closed 0.23, CAC 0.10, conversion_rate 0.10; with tenure allowed ltv_months 0.32.
+- D-M4-1: ltv_months is the only outcome allowed as a feature, and only for the tenure variant — outreach targets existing customers whose tenure is known (past, not future). Registered in ml/features.ALLOWED_OUTCOMES.
+- Auth hardened: token role must be "authenticated" (service/anon tokens rejected by policy, tests added). scripts/smoke_live.py added.
+- Live: POST /api/predict/upsell verified; Predict tab shows 72.9% "likely to buy more" for the default customer with tenure 30, and the rule agrees. PR #14 merged.
+- Next: M5 — P4 super-customer score (CatBoost with categorical tier, grid search, 0–100 score, profile).
