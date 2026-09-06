@@ -93,6 +93,12 @@
           <div class="muted" id="up-sub">upsell probability (press Predict)</div>
         </div>
         <p class="muted" id="up-rule"></p>
+        <h2 style="margin-top:1.25rem">Super-customer score</h2>
+        <div class="result compact-result">
+          <div class="big" id="sc-score">—</div>
+          <div class="muted" id="sc-sub">0–100 likelihood to stay, spend and refer (press Predict)</div>
+        </div>
+        <div class="scorebar"><div class="scorefill" id="sc-fill"></div></div>
         <h2 style="margin-top:1.25rem">What drives the lifetime prediction</h2>
         <canvas id="chart-ltv-imp" height="200"></canvas>
       </div>
@@ -127,6 +133,21 @@
       <div class="tablewrap"><table id="up-cv"><thead><tr><th>variant / model</th><th>accuracy</th><th>precision</th><th>recall</th><th>F1</th><th>ROC-AUC</th></tr></thead><tbody></tbody></table></div>
       <p class="muted" id="up-rule-text"></p>
       <div class="tablewrap"><table id="up-tier"><thead><tr><th>tier</th><th>n</th><th>upsell rate</th><th>model F1</th><th>rule F1</th><th>model recall</th><th>rule recall</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card">
+      <h2>P4 · Super customers — who they are and how to spot them early</h2>
+      <div class="kpis" id="sc-kpis"></div>
+      <div class="grid2">
+        <div>
+          <div class="tablewrap"><table id="sc-profile" class="compact"><thead><tr><th></th><th>super customers</th><th>everyone else</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div>
+          <p class="muted">Hyperparameter search (CatBoost, budget tier as a native categorical, 3-fold ROC-AUC). Top 5 of 18:</p>
+          <div class="tablewrap"><table id="sc-search" class="compact"><thead><tr><th>learning rate</th><th>depth</th><th>iterations</th><th>ROC-AUC</th></tr></thead><tbody></tbody></table></div>
+          <p class="muted" id="sc-cv"></p>
+        </div>
+      </div>
+      <p id="sc-spot"></p>
     </div>
     <div class="card"><h2>Business recommendations</h2><p class="muted">Collected in <code>docs/REPORT.md</code>; the lever for customer longevity is documented under P2.</p></div>
   </section>
@@ -254,6 +275,11 @@
         document.getElementById("up-rule").textContent = up.rule_flag === null
           ? `Business rule (${up.rule}) needs a known tenure — enter it above to compare.`
           : `Business rule (${up.rule}): ${up.rule_flag ? "flag for outreach" : "do not flag"} — ${up.rule_flag === up.flag ? "agrees with the model" : "disagrees with the model"}.`;
+        const sc = await FunnelIQ.api("/api/predict/super-score", { method: "POST", body: JSON.stringify(payload) });
+        document.getElementById("sc-score").textContent = sc.score;
+        document.getElementById("sc-sub").textContent = `${sc.band} · likelihood to stay, spend and refer · ROC-AUC ${sc.roc_auc ? sc.roc_auc.toFixed(2) : "—"}`;
+        document.getElementById("sc-fill").style.width = sc.score + "%";
+        document.getElementById("sc-fill").className = "scorefill " + sc.band.toLowerCase();
         const r = await FunnelIQ.api("/api/predict/ltv", { method: "POST", body: JSON.stringify(payload) });
         document.getElementById("ltv-months").textContent = r.months;
         document.getElementById("ltv-sub").textContent = `months expected · served by ${r.served} · typical error ±${(r.rmse_months || 0).toFixed(1)} months`;
@@ -282,6 +308,31 @@
         `Rule thresholds were tuned on the training folds and scored on the held-out folds, exactly like the models. It flags ${br.positives_flagged.rule.toLocaleString()} customers vs ${br.positives_flagged.model.toLocaleString()} for the model (${br.positives_flagged.actual.toLocaleString()} actually upsold).`;
       document.querySelector("#up-tier tbody").innerHTML = br.by_tier.map((t) =>
         `<tr><td>${t.tier}</td><td>${t.n}</td><td>${(100 * t.positive_rate).toFixed(0)}%</td><td>${t.model.f1.toFixed(3)}</td><td>${t.rule.f1.toFixed(3)}</td><td>${t.model.recall.toFixed(3)}</td><td>${t.rule.recall.toFixed(3)}</td></tr>`).join("");
+    }
+
+    const sup = models && models.metrics.super;
+    let supLive = null;
+    try { supLive = await FunnelIQ.api("/api/insights/super-customers"); } catch (e) { /* profile card shows training-time numbers */ }
+    if (sup) {
+      const pr = supLive || sup.profile, f = FunnelIQ.fmt;
+      document.getElementById("sc-kpis").innerHTML = [
+        [f.int(pr.n_super), `super customers (${f.pct(pr.share_of_customers)} of customers)`],
+        [f.pct(pr.share_of_total_profit), "of total profit"],
+        [f.money(pr.avg_cac_super), `avg acquisition cost (others ${f.money(pr.avg_cac_others)})`],
+        [pr.avg_ltv_super + " mo", `avg tenure (others ${pr.avg_ltv_others} mo)`],
+      ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+      const es = pr.early_signal;
+      document.querySelector("#sc-profile tbody").innerHTML = [
+        ["avg profit per customer", f.money(pr.avg_profit_super), f.money(pr.avg_profit_others)],
+        ["Mid-tier share", f.pct(es.share_mid_tier), f.pct(es.rest_share_mid_tier)],
+        ["closed in ≤ 2 calls", f.pct(es.share_closed_in_2_calls), f.pct(es.rest_share_closed_in_2_calls)],
+        ["definition", pr.definition, ""],
+      ].map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+      const top = [...sup.search].sort((a, b) => b.roc_auc - a.roc_auc).slice(0, 5);
+      document.querySelector("#sc-search tbody").innerHTML = top.map((r, i) =>
+        `<tr${i === 0 ? ' class="win"' : ""}><td>${r.learning_rate}</td><td>${r.depth}</td><td>${r.iterations}</td><td>${r.roc_auc.toFixed(4)}</td></tr>`).join("");
+      document.getElementById("sc-cv").textContent = `Chosen configuration re-scored with 5-fold CV: ROC-AUC ${sup.cv.roc_auc.toFixed(3)}, F1 ${sup.cv.f1.toFixed(3)} (majority baseline accuracy ${(100 * sup.baseline.accuracy).toFixed(1)}%, F1 0).`;
+      document.getElementById("sc-spot").innerHTML = `<b>How to spot them early:</b> ${f.pct(es.share_mid_tier)} of super customers come from Mid-budget campaigns and ${f.pct(es.share_closed_in_2_calls)} closed within two calls — visible on the day they sign. Route Mid-tier customers closed in ≤ 2 calls into a referral programme and a retention track.`;
     }
 
     if (ltv) {

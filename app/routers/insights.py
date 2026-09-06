@@ -14,6 +14,7 @@ from supabase import Client
 
 from app.db import get_user_client
 from ml.eda import overview_stats
+from ml.train_super import super_customer_profile
 
 router = APIRouter(prefix="/api/insights", tags=["insights"])
 
@@ -54,3 +55,9 @@ def clear_cache() -> None:
 def overview(client: Client = Depends(get_user_client)) -> dict:
     """P1: missing values, correlations with profit, budget→leads curve, conversion by tier."""
     return _cached("overview", lambda: overview_stats(fetch_all_records(client)))
+
+
+@router.get("/super-customers")
+def super_customers(client: Client = Depends(get_user_client)) -> dict:
+    """P4: who the super customers are (referred + upsell + long tenure), computed from Supabase rows."""
+    return _cached("super-customers", lambda: super_customer_profile(fetch_all_records(client)))

@@ -48,3 +48,13 @@ def test_overview_is_cached_between_calls():
     rows.clear()  # if the second call recomputed, counts would drop to 0
     second = tc.get("/api/insights/overview").json()
     assert first["counts"]["rows"] == second["counts"]["rows"] == 120
+
+
+def test_super_customers_profile_from_db_rows():
+    rows = _db_like_rows(3500)
+    res = _client(rows).get("/api/insights/super-customers")
+    assert res.status_code == 200, res.text
+    body = res.json()
+    assert body["n_customers"] == 3163 and body["n_super"] > 0
+    assert 0 < body["share_of_total_profit"] < 1
+    assert set(body["tier_distribution"]) <= {"Low", "Mid", "High"}

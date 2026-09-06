@@ -21,6 +21,15 @@ from sklearn.metrics import (
 from sklearn.model_selection import KFold, StratifiedKFold
 
 
+def fresh(model):
+    """An unfitted copy with the same parameters. sklearn's clone() rejects CatBoost estimators
+    that were given cat_features, so fall back to rebuilding from get_params()."""
+    try:
+        return clone(model)
+    except RuntimeError:
+        return model.__class__(**model.get_params())
+
+
 def _mean_std(values: list[float]) -> tuple[float, float]:
     arr = np.asarray(values, dtype=float)
     return float(arr.mean()), float(arr.std(ddof=0))
@@ -31,7 +40,7 @@ def cv_regression(model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5, seed:
     kf = KFold(n_splits=n_splits, shuffle=True, random_state=seed)
     rmse, r2 = [], []
     for train_idx, test_idx in kf.split(X):
-        est = clone(model)
+        est = fresh(model)
         est.fit(X.iloc[train_idx], y.iloc[train_idx])
         pred = est.predict(X.iloc[test_idx])
         rmse.append(float(np.sqrt(mean_squared_error(y.iloc[test_idx], pred))))
@@ -53,7 +62,7 @@ def cv_classification(model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5, s
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
     scores: dict[str, list[float]] = {k: [] for k in ("accuracy", "precision", "recall", "f1", "roc_auc")}
     for train_idx, test_idx in skf.split(X, y):
-        est = clone(model)
+        est = fresh(model)
         est.fit(X.iloc[train_idx], y.iloc[train_idx])
         proba = est.predict_proba(X.iloc[test_idx])[:, 1]
         pred = (proba >= 0.5).astype(int)
@@ -107,7 +116,7 @@ def oof_proba(model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5, seed: int
     skf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
     out = np.zeros(len(X), dtype=float)
     for train_idx, test_idx in skf.split(X, y):
-        est = clone(model)
+        est = fresh(model)
         est.fit(X.iloc[train_idx], y.iloc[train_idx])
         out[test_idx] = est.predict_proba(X.iloc[test_idx])[:, 1]
     return out

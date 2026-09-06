@@ -56,11 +56,13 @@ class ModelRegistry:
         metrics: dict,
         ltv_models: dict[str, object],
         upsell_models: dict[str, object] | None = None,
+        super_model: object | None = None,
     ):
         self.models_dir = models_dir
         self.metrics = metrics
         self.ltv_models = ltv_models
         self.upsell_models = upsell_models or {}  # key: "<variant>_<name>"
+        self.super_model = super_model
 
     @classmethod
     def load(cls, models_dir: Path = MODELS_DIR) -> ModelRegistry:
@@ -77,11 +79,16 @@ class ModelRegistry:
                 path = models_dir / f"upsell_{variant}_{name}.joblib"
                 if path.exists():
                     upsell_models[f"{variant}_{name}"] = joblib.load(path)
-        return cls(models_dir, metrics, ltv_models, upsell_models)
+        super_path = models_dir / "super.joblib"
+        super_model = joblib.load(super_path) if super_path.exists() else None
+        return cls(models_dir, metrics, ltv_models, upsell_models, super_model)
 
     @property
     def loaded(self) -> list[str]:
-        return [f"ltv_{n}" for n in self.ltv_models] + [f"upsell_{k}" for k in self.upsell_models]
+        names = [f"ltv_{n}" for n in self.ltv_models] + [f"upsell_{k}" for k in self.upsell_models]
+        if self.super_model is not None:
+            names.append("super")
+        return names
 
     # ------------------------------------------------------------------ P2
     def predict_ltv(self, customer: dict) -> dict:
@@ -139,3 +146,19 @@ class ModelRegistry:
                 f"ltv_months > {cfg['ltv_threshold']} and customer_acquisition_cost < {cfg['cac_threshold']}"
             ),
         }
+
+    # ------------------------------------------------------------------ P4
+    def super_score(self, customer: dict) -> dict:
+        """0–100 likelihood of becoming a super customer (referred), with a band."""
+        if self.super_model is None:
+            raise RuntimeError("super-customer model is not loaded")
+        X = build_features(customer_frame(customer), "super", categorical=True)
+        proba = float(self.super_model.predict_proba(X)[0][1])
+        score = int(round(100 * proba))
+        bands = self.metrics.get("super", {}).get("score_bands") or [
+            {"min": 0, "max": 39, "band": "Low"},
+            {"min": 40, "max": 69, "band": "Medium"},
+            {"min": 70, "max": 100, "band": "High"},
+        ]
+        band = next((b["band"] for b in bands if b["min"] <= score <= b["max"]), "High")
+        return {"score": score, "probability": round(proba, 4), "band": band}

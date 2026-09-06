@@ -60,5 +60,12 @@ class UpsellPrediction(BaseModel):
     roc_auc: float | None = None
 
 
+class SuperScore(BaseModel):
+    score: int
+    probability: float
+    band: str
+    roc_auc: float | None = None
+
+
 class ModelsInfo(BaseModel):
     metrics: dict

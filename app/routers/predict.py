@@ -9,7 +9,7 @@ from supabase import Client
 
 from app.auth import UserContext, get_current_user
 from app.db import get_user_client
-from app.schemas import CustomerInput, LtvPrediction, UpsellPrediction
+from app.schemas import CustomerInput, LtvPrediction, SuperScore, UpsellPrediction
 from ml.registry import ModelRegistry
 
 log = logging.getLogger("funneliq.predict")
@@ -57,6 +57,19 @@ def predict_upsell(
     result["roc_auc"] = cv.get("roc_auc")
     log_prediction(client, "upsell", customer.model_dump(), result)
     return UpsellPrediction(**result)
+
+
+@router.post("/predict/super-score", response_model=SuperScore)
+def predict_super_score(
+    customer: CustomerInput,
+    registry: ModelRegistry = Depends(get_registry),
+    client: Client = Depends(get_user_client),
+) -> SuperScore:
+    """P4: 0–100 likelihood of becoming a super customer (stays, spends, refers)."""
+    result = registry.super_score(customer.funnel_dict())
+    result["roc_auc"] = registry.metrics.get("super", {}).get("cv", {}).get("roc_auc")
+    log_prediction(client, "super", customer.model_dump(), result)
+    return SuperScore(**result)
 
 
 @router.get("/models")
