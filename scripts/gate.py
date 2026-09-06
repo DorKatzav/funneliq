@@ -403,6 +403,44 @@ def check_live_super() -> None:
     assert 0 < prof.json()["share_of_total_profit"] < 1, prof.json()
 
 
+# ---------------------------------------------------------------- M6 checks
+def check_followups_offline() -> None:
+    sys.path.insert(0, str(ROOT))
+    from ml.data import clean, load_raw
+    from ml.followups import followup_insights
+
+    ins = followup_insights(clean(load_raw()))
+    stages = ins["dropout"]["stages"]
+    assert len(stages) == 6, f"{len(stages)} stages, expected 6"
+    assert all(0 <= s["dropout_rate"] <= 1 for s in stages), stages
+    r = ins["recommendation"]
+    assert r["verdict"] in {"keep", "cut_after_3", "extend"} and r["reason"] and r["unexpected_stage"], r
+
+
+def check_report_p5() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    needles = (
+        "## P5",
+        "behaves unexpectedly",
+        "follow-ups does a closed deal",
+        "Recommendation: should the team stop",
+    )
+    for needle in needles:
+        assert needle in text, f"REPORT.md §P5 lacks '{needle}'"
+
+
+def check_live_followups() -> None:
+    import httpx
+
+    headers = {"Authorization": f"Bearer {_gate_user_token()}"}
+    res = httpx.get(f"{_live_url()}/api/insights/followups", headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert len(body["dropout"]["stages"]) == 6, body["dropout"]["stages"]
+    r = body["recommendation"]
+    assert r["verdict"] in {"keep", "cut_after_3", "extend"} and r["reason"], r
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -455,6 +493,13 @@ GATES: dict[int, list[Check]] = {
         ("super-customer profile: profit share and CAC reported", check_super_profile),
         ("REPORT.md §P4 answers the brief", check_report_p4),
         ("live POST /api/predict/super-score + GET /api/insights/super-customers", check_live_super),
+    ],
+    6: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("followups on the CSV: 6 stages, verdict + reason + unexpected stage", check_followups_offline),
+        ("REPORT.md §P5 answers the brief", check_report_p5),
+        ("live GET /api/insights/followups -> 200 with 6 stages and a recommendation", check_live_followups),
     ],
 }
 

@@ -165,3 +165,39 @@ and a retention track; they are the cheapest profit in the funnel.
 
 **Caveat.** Referral is noisier than lifetime (AUC 0.78, not 0.95): the score ranks well but individual
 mistakes are common, so use it to prioritise outreach, not to exclude anyone.
+
+## P5 — The follow-up paradox: is the team wasting time after the third call?
+
+**Setup.** All 3,500 campaigns. Dropout per stage = 1 − (leads at the next stage ÷ leads at this stage), aggregated over the sums, overall and by budget tier. Calls-to-close comes from the customers (n = 3,163); calls for lost deals from every campaign with at least one lost deal (n = 3,451).
+
+| stage | leads remaining (mean per campaign) | dropout | Low | Mid | High |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| answered → follow-up 1 | 21.9 | **21.7%** | 24.5% | 22.0% | 21.0% |
+| follow-up 1 → follow-up 2 | 16.3 | **25.7%** | 26.9% | 25.7% | 25.4% |
+| follow-up 2 → follow-up 3 | 13.2 | **18.6%** | 19.4% | 18.6% | 18.5% |
+| follow-up 3 → follow-up 4 | 11.9 | **10.4%** | 10.9% | 10.4% | 10.3% |
+| follow-up 4 → follow-up 5 | 8.4 | **29.2%** | 31.6% | 29.3% | 28.8% |
+| follow-up 5 → closed | 3.0 | **64.1%** | 66.7% | 57.2% | 70.1% |
+
+### Which stage behaves unexpectedly?
+
+**follow-up 3 → follow-up 4.** 'follow-up 3 → follow-up 4' loses 10.4% of the remaining leads, lower than the 23.7% median of the other follow-up stages. The pattern is the same in every budget tier, so it is a property of the sales process, not of campaign size. Leads that are still talking after the third call are the committed ones; the big losses happen earlier (after the first and second follow-ups) and at the close itself (64.1% of follow-up-5 leads do not sign).
+
+### How many follow-ups does a closed deal typically need?
+
+Median **3 calls**, interquartile range 2–5, mean 3.70. **48% of closed deals needed more than 3 calls** and 16% needed more than 5. Lost deals take about as many: median 4, mean 3.99 — the number of calls alone does not tell a sale from a loss.
+
+| calls to close | customers | share of sales | mean tenure (months) | mean profit | upsell rate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 1–2 | 1,073 | 33.9% | 36.4 | ₪24,777 | 69% |
+| 3 | 571 | 18.1% | 28.2 | ₪18,944 | 70% |
+| 4–5 | 997 | 31.5% | 14.0 | ₪5,993 | 28% |
+| 6+ | 522 | 16.5% | 6.7 | ₪2,001 | 9% |
+
+### Recommendation: should the team stop following up after the third call?
+
+**No — do not stop after the third call.** 48% of closed deals needed more than 3 calls (median 3, 75th percentile 5); stopping after the third call would forfeit those sales. 16% needed more than 5 calls (below the 25% bar for extending the tracked window).
+
+A sale closed in 1–2 calls stays 36.4 months on average (profit ₪24,777); one closed after 6+ calls stays 6.7 months (₪2,001). Late closes are real sales, but smaller ones. The lever is therefore not *whether* to keep calling but *whom*: the calls-to-close signal already drives the lifetime prediction (P2) and the super-customer score (P4), so late-closing leads should be worked with the expectation of a smaller account, not dropped.
+
+Rules used (in `ml/followups.py`): cut only if < 15% of closed deals needed > 3 calls; extend only if ≥ 25% needed > 5; the unexpected stage is the follow-up transition farthest from the median of the others.

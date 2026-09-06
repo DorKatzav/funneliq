@@ -14,6 +14,7 @@ from supabase import Client
 
 from app.db import get_user_client
 from ml.eda import overview_stats
+from ml.followups import followup_insights
 from ml.train_super import super_customer_profile
 
 router = APIRouter(prefix="/api/insights", tags=["insights"])
@@ -61,3 +62,9 @@ def overview(client: Client = Depends(get_user_client)) -> dict:
 def super_customers(client: Client = Depends(get_user_client)) -> dict:
     """P4: who the super customers are (referred + upsell + long tenure), computed from Supabase rows."""
     return _cached("super-customers", lambda: super_customer_profile(fetch_all_records(client)))
+
+
+@router.get("/followups")
+def followups(client: Client = Depends(get_user_client)) -> dict:
+    """P5: dropout per follow-up stage, calls-to-close distribution and the keep/cut recommendation."""
+    return _cached("followups", lambda: followup_insights(fetch_all_records(client)))

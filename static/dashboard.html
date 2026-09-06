@@ -111,7 +111,37 @@
   </section>
 
   <section class="panel" id="panel-followups" hidden>
-    <div class="card"><h2>Follow-ups</h2><p class="muted">Dropout per follow-up stage and the recommendation — coming in M6.</p></div>
+    <div class="kpis" id="fu-kpis"></div>
+    <div class="card" id="fu-reco">
+      <h2>Should the team stop after the third call?</h2>
+      <p id="fu-verdict" class="verdict">…</p>
+      <p id="fu-reason"></p>
+      <p class="muted" id="fu-value"></p>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Leads remaining at each stage</h2>
+        <p class="muted">Mean per campaign, from the leads generated down to the deals closed.</p>
+        <canvas id="chart-fu-remaining" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h2>Dropout per stage, by budget tier</h2>
+        <p class="muted" id="fu-unexpected">…</p>
+        <canvas id="chart-fu-dropout" height="220"></canvas>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <h2>How many calls does a sale take?</h2>
+        <p class="muted" id="fu-calls-text">…</p>
+        <canvas id="chart-fu-calls" height="220"></canvas>
+      </div>
+      <div class="card">
+        <h2>What a late close is worth</h2>
+        <p class="muted">Customers grouped by the number of calls it took to close them.</p>
+        <div class="tablewrap"><table id="fu-value-table" class="compact"><thead><tr><th>calls to close</th><th>customers</th><th>share of sales</th><th>mean tenure</th><th>mean profit</th><th>upsell rate</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
   </section>
   <section class="panel" id="panel-budget" hidden>
     <div class="card"><h2>Budget simulator</h2><p class="muted">Allocate ₪50,000 across campaign sizes — coming in M7.</p></div>
@@ -228,6 +258,60 @@
         Object.entries(s.funnel_consistency).map(([k, v]) => `<li>${k}: <b>${f.pct(v)}</b></li>`).join("");
     } catch (e) {
       document.getElementById("dim-text").textContent = "insights unavailable: " + e.message;
+    }
+
+    // ---------------- Follow-ups (P5) ----------------
+    try {
+      const fu = await FunnelIQ.api("/api/insights/followups");
+      const f = FunnelIQ.fmt, r = fu.recommendation, d = fu.dropout, c = fu.calls;
+      const wind = "#0f5c6e", tape = "#c9560c", gate = "#2f7d46", line = "#c9d2cd";
+      const verdictText = { keep: "No — keep following up after the third call", cut_after_3: "Yes — stop after the third call", extend: "No — and track more follow-ups than today" }[r.verdict] || r.verdict;
+      const verdictClass = { keep: "ok", cut_after_3: "warn", extend: "info" }[r.verdict] || "ok";
+      document.getElementById("fu-kpis").innerHTML = [
+        [c.closed.median, "median calls to close a sale"],
+        [f.pct(c.closed.share_gt_3), "of sales needed more than 3 calls"],
+        [r.unexpected_stage, "stage that behaves unexpectedly"],
+        [`<span class="badge ${verdictClass}">${r.verdict.replace("_", " ")}</span>`, "recommendation"],
+      ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+      document.getElementById("fu-verdict").innerHTML = `<span class="badge ${verdictClass}">${r.verdict.replace(/_/g, " ")}</span> <b>${verdictText}.</b>`;
+      document.getElementById("fu-reason").textContent = r.reason;
+      document.getElementById("fu-value").textContent = r.value_note;
+      document.getElementById("fu-unexpected").textContent = r.unexpected_note;
+      new Chart(document.getElementById("chart-fu-remaining"), {
+        type: "line",
+        data: { labels: d.remaining.map((x) => x.stage), datasets: [{ label: "mean leads remaining", data: d.remaining.map((x) => x.mean), borderColor: wind, backgroundColor: wind, fill: false, tension: 0.2 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: "leads per campaign" }, grid: { color: line } } } },
+      });
+      const tiers = ["Low", "Mid", "High"], tierColors = { Low: line, Mid: gate, High: wind };
+      new Chart(document.getElementById("chart-fu-dropout"), {
+        type: "bar",
+        data: {
+          labels: d.stages.map((s) => s.stage.replace("follow-up", "f")),
+          datasets: [
+            ...tiers.map((t) => ({ label: t, data: d.stages.map((s) => 100 * (s.dropout_rate_by_tier[t] ?? 0)), backgroundColor: tierColors[t] })),
+            { label: "all", type: "line", data: d.stages.map((s) => 100 * s.dropout_rate), borderColor: tape, backgroundColor: tape, tension: 0.2 },
+          ],
+        },
+        options: { scales: { y: { beginAtZero: true, title: { display: true, text: "dropout (%)" } } } },
+      });
+      const keys = Array.from(new Set([...Object.keys(c.closed.distribution || {}), ...Object.keys(c.not_closed.distribution || {})])).map(Number).sort((a, b) => a - b);
+      new Chart(document.getElementById("chart-fu-calls"), {
+        type: "bar",
+        data: {
+          labels: keys,
+          datasets: [
+            { label: "closed deals (share of sales)", data: keys.map((k) => 100 * ((c.closed.distribution || {})[k] || 0) / c.closed.n), backgroundColor: gate },
+            { label: "lost deals (share of losses)", data: keys.map((k) => 100 * ((c.not_closed.distribution || {})[k] || 0) / c.not_closed.n), backgroundColor: tape },
+          ],
+        },
+        options: { scales: { x: { title: { display: true, text: "calls" } }, y: { beginAtZero: true, title: { display: true, text: "%" } } } },
+      });
+      document.getElementById("fu-calls-text").textContent =
+        `Closed deals: median ${c.closed.median} calls (IQR ${c.closed.p25}–${c.closed.p75}), ${f.pct(c.closed.share_gt_3)} needed more than 3 and ${f.pct(c.closed.share_gt_5)} more than 5. Lost deals: median ${c.not_closed.median}, mean ${c.not_closed.mean}.`;
+      document.querySelector("#fu-value-table tbody").innerHTML = c.value_by_calls.map((v) =>
+        `<tr><td>${v.calls}</td><td>${f.int(v.n)}</td><td>${f.pct(v.share_of_closed)}</td><td>${v.mean_ltv_months} mo</td><td>${f.money(v.mean_profit)}</td><td>${f.pct(v.upsell_rate)}</td></tr>`).join("");
+    } catch (e) {
+      document.getElementById("fu-verdict").textContent = "follow-up insights unavailable: " + e.message;
     }
 
     // ---------------- Predict + Findings (P2) ----------------
