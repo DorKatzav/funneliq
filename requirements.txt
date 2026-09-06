@@ -1,0 +1,27 @@
+# Pinned on 2026-09-06 from conda env AI_dev (Python 3.11). Update deliberately, one at a time.
+
+# API
+fastapi==0.141.1
+uvicorn==0.52.3
+pydantic==2.13.4
+pydantic-settings==2.15.0
+python-dotenv==1.2.2
+httpx==0.28.1
+
+# Supabase + auth
+supabase==2.31.0
+PyJWT==2.13.0
+cryptography==50.0.0
+
+# Data + ML
+numpy==2.4.6
+pandas==3.0.3
+scikit-learn==1.9.0
+xgboost==3.2.0
+lightgbm==4.7.0
+catboost==1.2.10
+joblib==1.6.0
+
+# Dev / CI
+pytest==9.1.1
+ruff==0.16.6

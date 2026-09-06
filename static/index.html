@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ</title>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #eef1ef; color: #1b2733; display: grid; place-items: center; min-height: 100vh; }
+  main { background: #fff; border: 1px solid #c9d2cd; border-radius: 12px; padding: 2rem 2.5rem; max-width: 28rem; }
+  h1 { margin: 0 0 .5rem; color: #0f5c6e; }
+  code { background: #f0ede6; padding: .1em .35em; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>FunnelIQ</h1>
+  <p>Marketing intelligence for Northbound Media.</p>
+  <p>M0 skeleton is live. Service health: <code>/health</code> · API docs: <code>/api/docs</code>.</p>
+  <p id="status">Checking…</p>
+</main>
+<script>
+  fetch("/health").then(r => r.json()).then(h => {
+    document.getElementById("status").textContent = `status ${h.status} · build ${h.commit} · up ${h.uptime_s}s`;
+  }).catch(() => { document.getElementById("status").textContent = "health check failed"; });
+</script>
+</body>
+</html>
