@@ -43,11 +43,22 @@ class CustomerInput(BaseModel):
         return self.model_dump()
 
 
+class Novelty(BaseModel):
+    """How unusual the input is compared with the training customers (M8 'far from training data' warning)."""
+
+    max_z: float | None = None
+    feature: str | None = None
+    outside_training_range: list[str] = []
+    flag: bool = False
+    note: str = ""
+
+
 class LtvPrediction(BaseModel):
     months: float
     by_model: dict[str, float]
     served: str
     rmse_months: float | None = None
+    novelty: Novelty | None = None
 
 
 class UpsellPrediction(BaseModel):

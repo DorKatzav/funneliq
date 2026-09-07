@@ -1,0 +1,91 @@
+{
+  "n": 3163,
+  "policy": "customers only (purchased = 1), the frame the P2/P3/P4 models are trained on",
+  "features": {
+    "ad_budget": {
+      "mean": 4842.3965,
+      "std": 4096.3292,
+      "min": 500.0,
+      "max": 20000.0
+    },
+    "num_leads": {
+      "mean": 47.6911,
+      "std": 23.9966,
+      "min": 11.0,
+      "max": 139.0
+    },
+    "leads_answered": {
+      "mean": 28.9943,
+      "std": 14.0451,
+      "min": 5.0,
+      "max": 84.0
+    },
+    "leads_not_answered": {
+      "mean": 18.6968,
+      "std": 10.8971,
+      "min": 6.0,
+      "max": 68.0
+    },
+    "followup_1": {
+      "mean": 22.7095,
+      "std": 11.29,
+      "min": 3.0,
+      "max": 66.0
+    },
+    "followup_2": {
+      "mean": 16.8909,
+      "std": 8.4882,
+      "min": 2.0,
+      "max": 51.0
+    },
+    "followup_3": {
+      "mean": 13.7518,
+      "std": 6.9799,
+      "min": 1.0,
+      "max": 42.0
+    },
+    "followup_4": {
+      "mean": 12.3275,
+      "std": 6.2764,
+      "min": 1.0,
+      "max": 37.0
+    },
+    "followup_5": {
+      "mean": 8.7328,
+      "std": 4.556,
+      "min": 1.0,
+      "max": 27.0
+    },
+    "not_closed": {
+      "mean": 5.5552,
+      "std": 3.4359,
+      "min": 0.0,
+      "max": 20.0
+    },
+    "closed": {
+      "mean": 3.1777,
+      "std": 1.4461,
+      "min": 1.0,
+      "max": 9.0
+    },
+    "calls_to_closed": {
+      "mean": 3.7031,
+      "std": 1.6519,
+      "min": 1.0,
+      "max": 9.0
+    },
+    "calls_to_not_closed": {
+      "mean": 3.9232,
+      "std": 1.127,
+      "min": 0.0,
+      "max": 7.0
+    },
+    "customer_acquisition_cost": {
+      "mean": 1437.4587,
+      "std": 817.7913,
+      "min": 400.0,
+      "max": 6666.0
+    }
+  },
+  "warn_z": 3.0
+}

@@ -95,3 +95,5 @@ label.tenure input { max-width: 22rem; }
 .badge.info { background: var(--wind-soft); color: var(--wind); }
 p.verdict { font-size: 1.1rem; margin: 0.25rem 0 0.5rem; }
 .grid2 table.compact th, .grid2 table.compact td { white-space: normal; }  /* half-width cards: wrap instead of clipping */
+
+p.warn { color: var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 0.5rem 0.8rem; font-size: 0.9rem; }

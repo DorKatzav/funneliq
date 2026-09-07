@@ -58,6 +58,16 @@ def create_app() -> FastAPI:
     app.include_router(predict.router)
     app.include_router(simulate.router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+    @app.middleware("http")
+    async def no_stale_static(request, call_next):
+        """Browsers kept serving the previous dashboard.html after a deploy (seen after M7):
+        make them revalidate static files on every load — they are small."""
+        response = await call_next(request)
+        if request.url.path.startswith("/static/"):
+            response.headers["Cache-Control"] = "no-cache"
+        return response
+
     return app
 
 
