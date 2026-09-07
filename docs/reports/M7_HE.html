@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .verdict { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 1rem 1.25rem; margin-block: 1rem; font-size: 1.15rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  tr.odd td { background: var(--tape-soft); }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח תחנה · M7 · 2026-09-07</span>
+    <h1>M7: לאן ילכו <span dir="ltr">₪50,000</span>?</h1>
+    <p class="lede">חבילה 6 של הברייף: מודל רווח לקמפיין (שלושה רגרסורים על פיצ'רי המשפך בלבד), פרופיל טיפוסי לכל אחת מ-16 רמות התקציב, וסימולטור שמחלק את התקציב החודשי בין קמפיינים: חמש אסטרטגיות מוכנות מדורגות לפי רווח צפוי, מול הממוצע שנצפה בפועל, ובונה חופשי שמשחרר את הכפתור רק כשהסכום הוא בדיוק <span dir="ltr">₪50,000</span>.</p>
+    <span class="stamp">שער M7: עבר 7/7</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">25 × <span dir="ltr">₪2,000</span></div><div class="l">האסטרטגיה המנצחת, גם לפי המודל וגם לפי הנתונים</div></div>
+    <div class="kpi"><div class="v"><span dir="ltr">₪543,950</span></div><div class="l">רווח צפוי על <span dir="ltr">₪50,000</span> (פי 10.9), מול <span dir="ltr">₪14,932</span> לריכוז</div></div>
+    <div class="kpi"><div class="v"><span dir="ltr">₪2,000</span></div><div class="l">רמת התקציב הטובה ביותר לכל <span dir="ltr">₪1,000</span></div></div>
+    <div class="kpi"><div class="v">0.66</div><div class="l">R² של מודל הרווח המוגש (CatBoost), RMSE <span dir="ltr">₪6,515</span></div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>המייסד שואל אם לשים את כל הכסף בשניים-שלושה קמפיינים גדולים או לפזר אותו על הרבה קטנים. הנתונים חד-משמעיים: קמפיין ברמת תקציב בינונית (<span dir="ltr">₪2,000–5,000</span>) מכניס בממוצע כ-<span dir="ltr">₪22,000</span>, קמפיין גדול (<span dir="ltr">₪6,000</span> ומעלה) מכניס כ-<span dir="ltr">₪5,000</span>, וקמפיין קטן (עד <span dir="ltr">₪1,500</span>) כ-<span dir="ltr">₪1,000–3,000</span>. זו מדרגה, לא שיפוע: תקציב גדול יותר קונה יותר לידים (ראינו ב-M2) אבל לא יותר רווח לקמפיין. לכן 25 קמפיינים של <span dir="ltr">₪2,000</span> צפויים להכניס פי 36 מ-2×20,000+10,000. ההסתייגות המרכזית היא תפעולית: להריץ 25 קמפיינים בחודש זה עסק אחר לגמרי מלהריץ שלושה.</p>
+  </div>
+
+  <h2>מודל הרווח (3,471 קמפיינים עם רווח מתועד, 5-fold)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>מודל</th><th>RMSE (₪)</th><th>R²</th></tr></thead>
+    <tbody>
+      <tr><td>XGBoost</td><td class="num">6,661 ± 1,633</td><td class="num">0.647</td></tr>
+      <tr><td>LightGBM</td><td class="num">6,594 ± 1,713</td><td class="num">0.654</td></tr>
+      <tr class="win"><td>CatBoost (מוגש)</td><td class="num">6,515 ± 1,680</td><td class="num">0.662</td></tr>
+    </tbody>
+  </table></div>
+  <p>סטיית התקן של הרווח היא <span dir="ltr">₪11,228</span>, ו-9.7% מהקמפיינים הם באפס (לא-רוכשים, שנשארים בדאטה בכוונה לפי D-M2-1: קמפיין בלי רווח הוא תוצאה אמיתית שהסימולטור חייב לראות). כמו בוותק וב-upsell, <code>calls_to_closed</code> הוא הפיצ'ר החשוב ביותר (0.53), ואחריו <code>answer_rate</code> ו-<code>budget_tier</code>.</p>
+
+  <h2>עקומת המודל: רווח לקמפיין לפי רמת תקציב</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>תקציב</th><th>קמפיינים בדאטה</th><th>רווח לקמפיין (מודל)</th><th>ממוצע שנצפה</th><th>רווח לכל ₪1,000 (מודל)</th></tr></thead>
+    <tbody>
+      <tr><td class="num">₪500</td><td class="num">109</td><td class="num">₪1,184</td><td class="num">₪1,110</td><td class="num">₪2,369</td></tr>
+      <tr><td class="num">₪1,000</td><td class="num">217</td><td class="num">₪2,104</td><td class="num">₪2,240</td><td class="num">₪2,104</td></tr>
+      <tr><td class="num">₪1,500</td><td class="num">297</td><td class="num">₪3,300</td><td class="num">₪3,275</td><td class="num">₪2,200</td></tr>
+      <tr class="win"><td class="num">₪2,000</td><td class="num">407</td><td class="num">₪21,758</td><td class="num">₪21,749</td><td class="num">₪10,879</td></tr>
+      <tr><td class="num">₪3,000</td><td class="num">327</td><td class="num">₪21,910</td><td class="num">₪21,980</td><td class="num">₪7,303</td></tr>
+      <tr><td class="num">₪5,000</td><td class="num">312</td><td class="num">₪21,562</td><td class="num">₪21,725</td><td class="num">₪4,312</td></tr>
+      <tr><td class="num">₪6,000</td><td class="num">195</td><td class="num">₪5,334</td><td class="num">₪5,171</td><td class="num">₪889</td></tr>
+      <tr><td class="num">₪10,000</td><td class="num">194</td><td class="num">₪5,147</td><td class="num">₪5,107</td><td class="num">₪515</td></tr>
+      <tr><td class="num">₪20,000</td><td class="num">71</td><td class="num">₪4,892</td><td class="num">₪4,762</td><td class="num">₪245</td></tr>
+    </tbody>
+  </table></div>
+  <p>(תשע מתוך 16 הרמות; הטבלה המלאה ב-<code>docs/REPORT.md</code> §P6 ובלשונית Budget.) המודל והנתונים מסכימים בכל רמה בטווח של אחוזים בודדים.</p>
+
+  <h2>חמש האסטרטגיות, מדורגות</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>אסטרטגיה</th><th>קמפיינים</th><th>רווח צפוי (מודל)</th><th>לפי הממוצע שנצפה</th><th>תשואה</th></tr></thead>
+    <tbody>
+      <tr class="win"><td class="num">1</td><td>25 × <span dir="ltr">₪2,000</span></td><td class="num">25</td><td class="num">₪543,950</td><td class="num">₪543,720</td><td class="num">10.9×</td></tr>
+      <tr><td class="num">2</td><td>10 × <span dir="ltr">₪5,000</span></td><td class="num">10</td><td class="num">₪215,620</td><td class="num">₪217,251</td><td class="num">4.3×</td></tr>
+      <tr><td class="num">3</td><td>100 × <span dir="ltr">₪500</span></td><td class="num">100</td><td class="num">₪118,430</td><td class="num">₪110,970</td><td class="num">2.4×</td></tr>
+      <tr><td class="num">4</td><td>5 × <span dir="ltr">₪10,000</span></td><td class="num">5</td><td class="num">₪25,737</td><td class="num">₪25,536</td><td class="num">0.5×</td></tr>
+      <tr><td class="num">5</td><td>2 × <span dir="ltr">₪20,000</span> + 1 × <span dir="ltr">₪10,000</span></td><td class="num">3</td><td class="num">₪14,932</td><td class="num">₪14,632</td><td class="num">0.3×</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>ההכרעה: לרכז או לפזר?</h2>
+  <div class="verdict">
+    <b>לפזר, בתוך רמת התקציב הבינונית.</b> 25 × <span dir="ltr">₪2,000</span> צפוי להחזיר <span dir="ltr">₪543,950</span> על <span dir="ltr">₪50,000</span>; שני הקמפיינים הגדולים ועוד אחד בינוני-גדול מחזירים <span dir="ltr">₪14,932</span>. המודל והנתונים הגולמיים מסכימים על המנצח ועל הדירוג כולו. הפער הוא לא תוצר של המודל: זו מדרגת ה-tiers בדאטה, שבה קמפיין Mid מרוויח פי ארבעה מקמפיין High בשבריר מהעלות.
+  </div>
+
+  <div class="decision">
+    <h3>D-M7-1 · הרווח הצפוי לרמה = המודל בממוצע על הקמפיינים האמיתיים, לא על "הקמפיין החציוני"</h3>
+    <p>התוכנית הציעה להזין למודל פרופיל טיפוסי (חציון של כל פיצ'ר) לכל רמת תקציב. עשינו כך וקיבלנו בדיוק את אות הכשל שהתוכנית הזהירה ממנו: קמפיין של <span dir="ltr">₪500</span> קיבל <span dir="ltr">₪4,615</span> מול <span dir="ltr">₪1,110</span> שנצפה, ו-100×500 זינק למקום השני. הסיבה: המודל לא ליניארי בספירות המשפך, והחציון של כל עמודה בנפרד הוא קמפיין שלא קיים. הפתרון: בזמן האימון מחשבים לכל רמה את ממוצע התחזיות על הקמפיינים האמיתיים ושומרים אותו ב-<code>models/profiles.json</code> ליד הפרופיל החציוני (שנשאר לשקיפות). ה-API עדיין לא צריך מסד נתונים. המחיר: הסימולטור מוגבל ל-16 רמות התקציב שבדאטה; אין אקסטרפולציה לרמות חדשות, וזה בכוונה.</p>
+  </div>
+
+  <h2>הסתייגויות למייסד</h2>
+  <div class="card">
+    <ul>
+      <li><b>קיבולת.</b> 25 קמפיינים בחודש דורשים 25 קריאייטיבים, דפי נחיתה וצוות מכירות שיעבוד את הלידים (מ-M6: מכירה לוקחת חציון 3 שיחות). אם הצוות לא יכול, 10 × <span dir="ltr">₪5,000</span> עדיין מנצח ריכוז בפער עצום.</li>
+      <li><b>הרמות הקטנות רועשות.</b> ב-<span dir="ltr">₪500</span> יש 109 קמפיינים והחציון נמוך בהרבה מהממוצע; 100×500 נשען על החלק הכי פחות אמין בעקומה.</li>
+      <li><b>אין אקסטרפולציה.</b> הסימולטור מכיר רק את 16 הרמות שבדאטה ומניח שקמפיינים בלתי תלויים (בלי רוויה של קהל ב-25 קמפיינים מקבילים).</li>
+      <li><b>זה מבנה של דאטה תרגולי.</b> הרווח כאן הוא כמעט פונקציה של tier; בייצור צריך לאמוד את העקומה מחדש מקמפיינים אמיתיים לפני שסומכים על החלוקה.</li>
+    </ul>
+    <p><b>מה לומר למייסד בחודש הבא:</b> את <span dir="ltr">₪50,000</span> לקמפיינים ברמה הבינונית: 25 × <span dir="ltr">₪2,000</span> אם הצוות עומד בזה, אחרת 10 × <span dir="ltr">₪5,000</span>. להפסיק לקנות קמפיינים של <span dir="ltr">₪10,000</span> ומעלה עד שהנתונים יראו שהם מרוויחים יותר מ-<span dir="ltr">₪5,000</span> כל אחד. לעקוב אחרי רווח לקמפיין לפי רמה; הסימולטור מדרג מחדש אוטומטית כשמאמנים מחדש.</p>
+  </div>
+
+  <h2>מה חי באתר</h2>
+  <div class="card">
+    <p><code>GET /api/simulate/presets</code> מחזיר את חמש האסטרטגיות מדורגות, את עקומת הרווח, את המנצח לפי המודל ולפי הנתונים והאם הם מסכימים. <code>POST /api/simulate/budget</code> מקבל חלוקה חופשית ומחזיר 422 אם הסכום אינו בדיוק <span dir="ltr">₪50,000</span> או שרמת תקציב לא קיימת. לשונית Budget: ארבעה KPI, טבלת האסטרטגיות (מודל מול נצפה), גרף העקומה עם מספר הקמפיינים לרמה, ובונה חופשי עם סכום רץ וכפתור שנעול עד שהסכום מדויק.</p>
+    <p><img src="img/m7_budget_live.jpg" alt="לשונית Budget באתר החי: חמש האסטרטגיות מדורגות, 25×2,000 מנצחת עם 543,950 שקל, עקומת הרווח לפי רמת תקציב"></p>
+    <p><img src="img/m7_builder_blocked.jpg" alt="הבונה החופשי באתר החי: סכום שאינו 50,000 שקל משאיר את כפתור Simulate נעול"></p>
+    <div class="artifacts"><span>ml/train_profit.py</span><span>ml/simulator.py</span><span>models/profit.joblib</span><span>models/profiles.json</span><span>app/routers/simulate.py</span><span>tests/test_simulator.py</span><span>docs/REPORT.md §P6</span></div>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (88 בדיקות: ולידציית סכום, רמה לא מוכרת, כל האסטרטגיות = 50,000, מדרגת ה-tiers, ה-API).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · מודל הרווח: שלושה רגרסורים ב-CV, artifact מוגש, 16 רמות ב-profiles.json.</li>
+      <li><span class="ok">עבר</span> · חמש אסטרטגיות, כל אחת בדיוק 50,000, מדורגות.</li>
+      <li><span class="ok">עבר</span> · המודל והנתונים מסכימים על המנצח.</li>
+      <li><span class="ok">עבר</span> · REPORT.md §P6 נוצר מהקוד (<code>python -m ml.simulator --write-report</code>): הכרעה, הסתייגויות, "מה לומר בחודש הבא".</li>
+      <li><span class="ok">עבר</span> · חי: presets מדורגים; <code>/budget</code> מחזיר 422 על סכום שגוי ו-200 על חלוקה תקינה; הבונה חוסם סכום שגוי (צילום).</li>
+    </ol>
+  </div>
+
+  <h2>הבא בתור: M8, סגירה ומסירה</h2>
+  <div class="card">
+    <p>README מלא (ארכיטקטורה, התקנה, פקודות, צילומים), REPORT.md עם תקציר מנהלים למייסד, סגירת PROJECT_LOG והאובסידיאן, "מבחן הזר" בדפדפן נקי, ורשימת הליטוש שנצברה (אזהרת "רחוק מנתוני האימון" בטופס החיזוי).</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M7 · 2026-09-07 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
