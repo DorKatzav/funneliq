@@ -129,3 +129,7 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Not done, by choice: M9 (React front-end) — the vanilla dashboard covers the brief; a 3–5 minute demo recording (`docs/demo.md`) is optional and left to Dor. React (M9): worth it only if the tool outlives the course or as a portfolio piece — analysis, UI changes and an hours estimate (12–18 session hours for full parity) in `docs/notes/REACT_HE.html`.
 
 **PROJECT CLOSED — 2026-09-07.** Nine milestones (M0–M8), 24 pull requests, six analytical packages live behind login at https://funneliq-production-4b63.up.railway.app. Stranger test: see `docs/STRANGER_TEST.md`.
+
+## 2026-09-07 — After closing: M9 planned, then deferred
+- Dor's framing changed: the repo is a professional portfolio piece (the course submission is a separate project). React (M9) was planned in full — decisions D-M9-1…4, three PRs, gates, 13–16 session hours — in `docs/notes/M9_PLAN_HE.html` and PLAN.md §M9, then **deferred** by Dor. On resumption he wants a single full plan that also includes the M10 candidates (Hebrew i18n, saved scenarios, comparison, chart system, guest/user management, mobile, demo GIF); those are now listed in PLAN.md §M9.
+- Repo tidied for GitHub: merged branches pruned, description / homepage / topics set, release `v0.8.0` ("project complete, M0–M8") tagged on main.

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — תוכנית M9: React</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  pre { font-family: var(--mono); font-size: 0.82rem; direction: ltr; text-align: left; background: #1b2733; color: #eef1ef; border-radius: 10px; padding: 1rem 1.2rem; overflow-x: auto; line-height: 1.5; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .decision { border: 2px solid var(--wind); background: var(--card); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1rem; }
+  .decision h3 { margin: 0 0 0.3rem; font-size: 1.1rem; color: var(--wind); }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "שער"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .approve { border: 2px dashed var(--tape); background: var(--tape-soft); border-radius: 10px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.sum td { background: var(--wind-soft); font-weight: 700; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · תוכנית תחנה · M9 · 2026-09-07 · ממתין לאישור</span>
+    <h1>M9: הממשק ב-React, בלי לגעת בתשתית</h1>
+    <p class="lede">המטרה: להפוך את FunnelIQ לפריט תיק עבודות של full-stack. אותם חמישה מסכים, אותן תשובות, אותו API ואותה אבטחה, בממשק React + TypeScript שנבנה מראש ומוגש מאותו שירות ב-Railway. שלושה PRs, כל אחד מסתיים באתר חי ושלם; הממשק הישן נמחק רק אחרי שמבחן הזר עובר בגרסה החדשה.</p>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">0</div><div class="l">שינויים ב-<code>app/</code>, ב-<code>ml/</code>, ב-Supabase או ב-Railway</div></div>
+    <div class="kpi"><div class="v">3</div><div class="l">PRs (M9a תשתית + 2 מסכים, M9b 3 מסכים, M9c פריסה וסגירה)</div></div>
+    <div class="kpi"><div class="v">13–16</div><div class="l">שעות סשן, 2 ימים מרוכזים + חצי יום ליטוש</div></div>
+    <div class="kpi"><div class="v">5 / 5</div><div class="l">מסכים בזהות מלאה + 5 שיפורי חוויה שנכללים</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>אנחנו מחליפים רק את "הפנים" של האתר. השרת, המודלים, הנתונים והלוגין נשארים כמו שהם, ורק הקובץ שהדפדפן מקבל משתנה: במקום HTML אחד עם JavaScript משובץ, אפליקציית React שנבנית מראש לקבצים סטטיים ומקומטת לריפו, בדיוק כמו שהמודלים מקומטים היום. בכל שלב אפשר לחזור לממשק הישן בקומיט אחד. בסוף מקבלים ניווט אמיתי בין מסכים, ולידציה תוך כדי הקלדה, לקוח ש"עובר" ממסך התחזית לסימולטור, וקוד שקל להוסיף לו מסך שישי.</p>
+  </div>
+
+  <h2>1. היקף: מה נכנס ומה לא</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>נכנס (parity + חוויה)</th><th>לא נכנס (אולי M10)</th></tr></thead>
+    <tbody>
+      <tr><td>חמשת המסכים בזהות מלאה: Overview, Predict, Follow-ups, Budget, Findings</td><td>עברית/i18n מלא בממשק (המבנה יהיה RTL-ready עם logical properties)</td></tr>
+      <tr><td>ניתוב אמיתי: <code>/overview</code> … <code>/budget</code>, לינקים ישירים, "אחורה", לשונית נשמרת ברענון</td><td>שמירת תרחישי תקציב בשם ב-Supabase (טבלה + RLS חדשים)</td></tr>
+      <tr><td>ולידציה חיה בטופס Predict: השדה שמפר זהות משפך מסומן תוך כדי הקלדה, עם הערך שיסגור את הפער</td><td>Recharts או עיצוב גרפים חדש (נשארים עם Chart.js דרך react-chartjs-2)</td></tr>
+      <tr><td>לקוח משותף: "25 לקוחות כאלה" מ-Predict נכנס ל-Budget בלחיצה</td><td>ניהול משתמשים / הרשמה (נשאר ידני ב-Supabase, D7)</td></tr>
+      <tr><td>מצבי טעינה ושגיאה ברורים (skeletons, "נסה שוב")</td><td>אפליקציית מובייל; responsive בסיסי כן</td></tr>
+      <tr><td>אזהרת "רחוק מנתוני האימון", יומן החיזויים, הבונה הנעול ב-50,000</td><td>שינוי כלשהו ב-API, במודלים או בתשובות</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>2. החלטות לאישור</h2>
+  <div class="decision">
+    <h3>D-M9-1 · הסטאק: Vite + React 18 + TypeScript, react-router, TanStack Query, react-chartjs-2, supabase-js, Vitest + Playwright</h3>
+    <p><b>חלופות:</b> Next.js (נפסל: צריך שרת Node, סותר "שירות אחד"); Recharts (נפסל להיקף הזה: כתיבה מחדש של 10 גרפים); Redux (מיותר: TanStack Query + context קטן מספיקים). <b>למה:</b> Vite בונה לקבצים סטטיים, react-chartjs-2 שומר את קונפיגורציות Chart.js הקיימות, TypeScript עם טיפוסים שנוצרים מ-<code>/api/openapi.json</code> נותן חוזה אמיתי מול ה-API. <b>מחיר:</b> Node על המחשב של דור (nvm), ועוד שפה בריפו.</p>
+  </div>
+  <div class="decision">
+    <h3>D-M9-2 · הבנייה מקומטת: <code>npm run build</code> מקומית ← <code>static/app/</code> בריפו; CI בונה מחדש ונכשל אם יש סטייה</h3>
+    <p><b>חלופות:</b> (א) Railpack עם Node + Python באותו image (נפסל: כבר היו שני תיקוני פריסה ב-Railpack, ובנייה בזמן deploy מוסיפה נקודת כשל); (ב) Actions בונה ומקמט בקומיט אוטומטי ל-main (נפסל: קומיטים של בוט ולולאות טריגר). <b>למה:</b> זה בדיוק העיקרון של D2 למודלים: מה שבריפו הוא מה שרץ, הפריסה דטרמיניסטית, ו-Railway לא צריך Node. CI מריץ <code>npm ci && npm run build</code> ומשווה ל-<code>static/app/</code> (drift check) כך שאי-אפשר לשכוח לבנות. <b>מחיר:</b> קבצי build בריפו (~300KB, עם hash בשמות; הבעיה של המטמון מ-M7 נעלמת מבנית).</p>
+  </div>
+  <div class="decision">
+    <h3>D-M9-3 · דו-קיום עד מבחן הזר: React ב-<code>/app/</code>, הממשק הישן נשאר ב-<code>/static/dashboard.html</code>; ההחלפה (<code>/</code> ← <code>/app/</code>) ומחיקת הישן רק ב-M9c</h3>
+    <p><b>למה:</b> בכל רגע יש אתר שלם ועובד; אם משהו נשבר ביום השלישי, revert של PR אחד מחזיר את המצב הקודם. <b>מחיר:</b> שלושה ימים עם שני ממשקים בריפו.</p>
+  </div>
+  <div class="decision">
+    <h3>D-M9-4 · שפת הממשק: אנגלית, מבנה RTL-ready (CSS logical properties, <code>dir</code> על השורש)</h3>
+    <p><b>למה:</b> תיק עבודות באנגלית; עברית למייסד היא תוספת של שעתיים-שלוש כשיהיה צורך, ולא צריך לשבור כלום בשבילה.</p>
+  </div>
+
+  <h2>3. ארכיטקטורה</h2>
+  <pre>frontend/                         ← קוד המקור (Vite + React + TS)
+  src/
+    main.tsx, App.tsx             ← router, QueryClient, session guard
+    lib/api.ts                    ← fetch עם Bearer מה-session; טיפוסים מ-openapi (openapi-typescript)
+    lib/supabase.ts               ← createClient מ-/api/config (כמו היום)
+    lib/funnel.ts                 ← זהויות המשפך (answered+not = leads, closed+not = f5, …) לולידציה חיה
+    state/customer.tsx            ← ה"לקוח הנוכחי" המשותף ל-Predict ול-Budget
+    components/                   ← Kpi, Card, DataTable, ChartCard (react-chartjs-2), VerdictBadge, ErrorBox, Skeleton
+    pages/Overview.tsx Predict.tsx Followups.tsx Budget.tsx Findings.tsx Login.tsx
+    tests/*.test.tsx              ← Vitest: funnel.ts, הבונה (נעילה ב-50,000), פורמטים
+  e2e/stranger.spec.ts            ← Playwright: 11 שלבי מבחן הזר מול שרת מקומי עם משתמש הבדיקה (.env, לא ב-CI)
+static/app/                       ← תוצר build מקומט (index.html + assets/*.[hash].js|css)
+app/main.py                       ← שינוי אחד בלבד ב-M9c: "/" מפנה ל-/app/ במקום ל-/static/dashboard.html
+.github/workflows/ci.yml          ← שלב חדש: node 20 → npm ci → lint → test → build → drift check על static/app/</pre>
+  <p>מה ש<b>לא</b> נוגעים בו: <code>app/auth.py</code>, <code>app/db.py</code>, כל ה-routers, <code>ml/</code>, <code>models/</code>, <code>db/</code>, Supabase, Railway. הבדיקות הקיימות (91) והשערים M0–M8 ממשיכים לרוץ כמו שהם.</p>
+
+  <h2>4. שלושה PRs, שלושה שערים</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>PR</th><th>מה נבנה</th><th>שער (חייב לעבור לפני מיזוג)</th><th>שעות</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><b>M9a</b> <code>feat/m9a-react-shell</code></td>
+        <td>nvm + Node 20; Vite + TS + router; session guard ולוגין; לקוח API מטופס; shell עם ניווט; <b>Overview</b> ו-<b>Findings</b> בזהות מלאה; CI עם שלב build + drift check; React חי ב-<code>/app/</code> לצד הישן</td>
+        <td><code>npm run lint/test/build</code> ירוקים; drift check עובר; pytest+ruff ללא שינוי; חי: <code>/app/</code> מחזיר 200, לוגין עובד, Overview ו-Findings מציגים את אותם מספרים כמו הממשק הישן (צילום זה-לצד-זה)</td>
+        <td class="num">5–6</td>
+      </tr>
+      <tr>
+        <td><b>M9b</b> <code>feat/m9b-react-screens</code></td>
+        <td><b>Predict</b> (ולידציה חיה, שלוש תוצאות, אזהרת חריגות, יומן), <b>Follow-ups</b>, <b>Budget</b> (אסטרטגיות, עקומה, בונה נעול, "לקוחות כאלה" מ-Predict); Vitest לזהויות המשפך ולנעילת הבונה</td>
+        <td>כל הבדיקות ירוקות; חי: התוצאות של Predict זהות ל-API (ותק, upsell, ציון); הבונה נעול על סכום שגוי; Budget מקבל לקוח מ-Predict</td>
+        <td class="num">5–6</td>
+      </tr>
+      <tr>
+        <td><b>M9c</b> <code>feat/m9c-react-cutover</code></td>
+        <td>Playwright למבחן הזר (11 שלבים); <code>/</code> ← <code>/app/</code>; מחיקת <code>static/dashboard.html</code>, <code>app.js</code>, <code>styles.css</code> הישנים; responsive ונגישות מקלדת; README + GIF של 30 שניות; דוח M9 בעברית; PROJECT_LOG; אובסידיאן; גרסה 1.0.0</td>
+        <td>Playwright עובר מקומית; מבחן הזר של דור בפרופיל נקי PASS; <code>gate.py --m 9</code>: כל השערים M0–M8 offline + build + drift + חי</td>
+        <td class="num">3–4</td>
+      </tr>
+      <tr class="sum"><td colspan="3">סה"כ</td><td class="num">13–16</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="gate">
+    <p><b>שער M9 (הסופי, ב-<code>scripts/gate.py --m 9</code>):</b> (1) pytest + ruff ירוקים; (2) <code>npm run lint && npm test && npm run build</code> ירוקים; (3) drift check: <code>static/app/</code> זהה לתוצר build; (4) כל בדיקות ה-offline של M0–M8; (5) חי: <code>/</code> מפנה ל-<code>/app/</code>, ה-bundle נטען, <code>/health</code> מציג גרסה 1.0.0; (6) הממשק הישן לא קיים בריפו; (7) מבחן הזר ב-React מתועד PASS; (8) REPORT/README/דוח M9 מעודכנים.</p>
+  </div>
+
+  <h2>5. לוח זמנים מוצע</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>יום</th><th>בוקר</th><th>אחר הצהריים</th><th>בסוף היום</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>דור: nvm + Node (10 דק'). קלוד: תשתית, לוגין, לקוח API, shell, Overview</td><td>Findings, CI build + drift, פריסה ל-<code>/app/</code>, צילומים, דוח M9a</td><td>PR M9a ממוזג; אתר חי עם שני ממשקים</td></tr>
+      <tr><td>2</td><td>Predict עם ולידציה חיה ואזהרת חריגות; Follow-ups</td><td>Budget + בונה + לקוח משותף; Vitest; דוח M9b</td><td>PR M9b ממוזג; React בזהות מלאה</td></tr>
+      <tr><td>3 (חצי)</td><td>Playwright, cutover, מחיקת הישן, ליטוש</td><td>דור: מבחן הזר. קלוד: README + GIF, דוח M9, סגירה</td><td>PR M9c ממוזג; גרסה 1.0.0</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>6. סיכונים ומה עושים איתם</h2>
+  <div class="card">
+    <ul>
+      <li><b>Node לא מותקן.</b> דור מריץ: <code>brew install nvm</code> → <code>nvm install 20</code>. עד אז אי-אפשר להתחיל; זה הצעד הראשון של יום 1.</li>
+      <li><b>הבנייה ב-CI שונה מהמקומית</b> (גרסאות Node/npm). <code>.nvmrc</code> + <code>package-lock.json</code> + <code>npm ci</code>; ה-drift check תופס כל הבדל לפני המיזוג.</li>
+      <li><b>הפניית <code>/</code></b> משנה את מה שמשתמש רואה ראשון. נעשית רק ב-M9c ורק אחרי מבחן הזר; revert של קומיט אחד מחזיר.</li>
+      <li><b>ההרשאות של Claude Code</b> חסמו בעבר הזרקת session לדפדפן. לצילומים ולבדיקות חיות דור מחובר לאתר בטאב שלו (עבד ב-M7–M8).</li>
+      <li><b>גלישת היקף.</b> הכל מחוץ לטבלת "נכנס" נרשם כ-M10 ולא נכנס לשום PR של M9.</li>
+      <li><b>הזמן.</b> אם יום 2 מתארך, Budget עובר ליום 3 ו-M9c מתקצר (Playwright נשאר, GIF יכול לחכות). לא מוחקים את הישן בלי מבחן זר.</li>
+    </ul>
+  </div>
+
+  <h2>7. מה נדרש מדור</h2>
+  <div class="card">
+    <ol>
+      <li>לאשר את התוכנית ואת D-M9-1…4 (או לשנות: למשל Recharts במקום react-chartjs-2 = ‎+3 שעות; עברית בממשק = ‎+2–3 שעות).</li>
+      <li>להתקין Node ביום 1: <code>brew install nvm</code>, <code>nvm install 20</code>, ולהגיד לי כשמותקן.</li>
+      <li>להיות מחובר לאתר החי בטאב בכרום כשאני צריך צילומים (אגיד מתי).</li>
+      <li>לסקור את הדוח העברי ולאשר מיזוג בסוף כל אחד משלושת ה-PRs.</li>
+      <li>לבצע את מבחן הזר בפרופיל נקי ביום 3.</li>
+    </ol>
+  </div>
+
+  <div class="approve">
+    <h3>לאישור</h3>
+    <p>"מאשר" = מתחילים ביום 1 עם התקנת Node, ואני פותח את <code>feat/m9a-react-shell</code>, מעדכן את PLAN.md (§M9), את ה-Obsidian ואת PROJECT_LOG, ומתחיל בתשתית. אפשר גם "מאשר עם שינויים: …".</p>
+  </div>
+
+  <footer>FunnelIQ · תוכנית M9 · 2026-09-07 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
