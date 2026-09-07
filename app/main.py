@@ -14,7 +14,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import get_settings
-from app.routers import insights, predict, records
+from app.routers import insights, predict, records, simulate
 from ml.registry import ModelRegistry
 
 APP_VERSION = "0.6.0"
@@ -56,6 +56,7 @@ def create_app() -> FastAPI:
     app.include_router(records.router)
     app.include_router(insights.router)
     app.include_router(predict.router)
+    app.include_router(simulate.router)
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
     return app
 

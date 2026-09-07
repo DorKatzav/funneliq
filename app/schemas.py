@@ -69,3 +69,36 @@ class SuperScore(BaseModel):
 
 class ModelsInfo(BaseModel):
     metrics: dict
+
+
+class AllocationItem(BaseModel):
+    budget: int = Field(..., gt=0, description="One of the budget levels seen in the data")
+    count: int = Field(..., ge=1, description="How many campaigns at this budget")
+
+
+class BudgetAllocation(BaseModel):
+    allocation: list[AllocationItem] = Field(..., min_length=1)
+    total: int = Field(50_000, gt=0)
+
+
+class CampaignLine(BaseModel):
+    budget: int
+    count: int
+    spend: int
+    profile_n: int
+    predicted_profit_per_campaign: float
+    empirical_profit_per_campaign: float | None = None
+    expected_profit: float
+    empirical_profit: float | None = None
+
+
+class SimulationResult(BaseModel):
+    total_budget: int
+    n_campaigns: int
+    expected_profit: float
+    empirical_profit: float | None = None
+    roi_model: float
+    roi_empirical: float | None = None
+    per_campaign: list[CampaignLine]
+    served_model: str | None = None
+    rmse_per_campaign: float | None = None

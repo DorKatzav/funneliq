@@ -144,7 +144,33 @@
     </div>
   </section>
   <section class="panel" id="panel-budget" hidden>
-    <div class="card"><h2>Budget simulator</h2><p class="muted">Allocate ₪50,000 across campaign sizes — coming in M7.</p></div>
+    <div class="kpis" id="bg-kpis"></div>
+    <div class="grid2">
+      <div class="card">
+        <h2>Five ways to split ₪50,000</h2>
+        <p class="muted" id="bg-verdict">…</p>
+        <div class="tablewrap"><table id="bg-presets" class="compact"><thead><tr><th>#</th><th>strategy</th><th>campaigns</th><th>expected profit (model)</th><th>observed-mean profit</th><th>ROI</th></tr></thead><tbody></tbody></table></div>
+        <p class="muted" id="bg-agree"></p>
+      </div>
+      <div class="card">
+        <h2>Profit per campaign by budget level</h2>
+        <p class="muted">The served model on the typical campaign at each level, next to the observed mean.</p>
+        <canvas id="chart-bg-curve" height="220"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Build your own split</h2>
+      <p class="muted">Pick budget levels and campaign counts; the button unlocks only when the total is exactly ₪50,000.</p>
+      <div class="tablewrap"><table id="bg-builder" class="compact"><thead><tr><th>budget level</th><th>campaigns</th><th>spend</th><th></th></tr></thead><tbody></tbody></table></div>
+      <p><button class="ghost" id="bg-add" type="button">+ add a line</button>
+         <span id="bg-total" class="muted" style="margin-left:1rem">total ₪0 of ₪50,000</span></p>
+      <button class="primary" id="bg-run" type="button" style="max-width:16rem" disabled>Simulate</button>
+      <div class="error" id="bg-error" role="alert"></div>
+      <div id="bg-result" hidden>
+        <div class="result compact-result"><div class="big" id="bg-expected">…</div><div class="muted" id="bg-expected-sub"></div></div>
+        <div class="tablewrap"><table id="bg-lines" class="compact"><thead><tr><th>budget</th><th>campaigns</th><th>spend</th><th>model profit / campaign</th><th>observed mean</th><th>expected profit</th></tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
   </section>
   <section class="panel" id="panel-findings" hidden>
     <div class="card">
@@ -314,6 +340,75 @@
         `<tr><td>${v.calls}</td><td>${f.int(v.n)}</td><td>${f.pct(v.share_of_closed)}</td><td>${v.mean_ltv_months} mo</td><td>${f.money(v.mean_profit)}</td><td>${f.pct(v.upsell_rate)}</td></tr>`).join("");
     } catch (e) {
       document.getElementById("fu-verdict").textContent = "follow-up insights unavailable: " + e.message;
+    }
+
+    // ---------------- Budget simulator (P6) ----------------
+    try {
+      const pr = await FunnelIQ.api("/api/simulate/presets");
+      const f = FunnelIQ.fmt, wind = "#0f5c6e", tape = "#c9560c", gate = "#2f7d46";
+      const win = pr.strategies[0];
+      document.getElementById("bg-kpis").innerHTML = [
+        [win.name, "best strategy (model)"],
+        [f.money(win.expected_profit), `expected profit on ₪50,000 (${win.roi_model.toFixed(1)}×)`],
+        [f.money(pr.best_level_per_1000), "best budget level per ₪1,000 spent"],
+        [`<span class="badge ${pr.verdict === "spread" ? "ok" : "warn"}">${pr.verdict}</span>`, "concentrate or spread?"],
+      ].map(([v, l]) => `<div class="kpi"><div class="v">${v}</div><div class="l">${l}</div></div>`).join("");
+      document.getElementById("bg-verdict").textContent =
+        `${pr.verdict === "spread" ? "Spread" : "Concentrate"}: ${win.name} is expected to return ${f.money(win.expected_profit)}; the most concentrated split returns ${f.money(pr.strategies.find((s) => s.n_campaigns === Math.min(...pr.strategies.map((x) => x.n_campaigns))).expected_profit)}.`;
+      document.querySelector("#bg-presets tbody").innerHTML = pr.strategies.map((s) =>
+        `<tr${s.rank === 1 ? ' class="win"' : ""}><td>${s.rank}</td><td>${s.name}</td><td>${s.n_campaigns}</td><td>${f.money(s.expected_profit)}</td><td>${f.money(s.empirical_profit)}</td><td>${s.roi_model.toFixed(1)}×</td></tr>`).join("");
+      document.getElementById("bg-agree").textContent = pr.agree
+        ? `The model (${pr.served_model}) and the observed means agree on the winner.`
+        : `The model picks "${pr.winner_model}" while the observed means pick "${pr.winner_empirical}" — see REPORT.md §P6.`;
+      new Chart(document.getElementById("chart-bg-curve"), {
+        type: "bar",
+        data: {
+          labels: pr.curve.map((c) => c.budget),
+          datasets: [
+            { label: "model profit / campaign", data: pr.curve.map((c) => c.predicted_profit), backgroundColor: wind },
+            { label: "observed mean", data: pr.curve.map((c) => c.empirical_mean_profit), backgroundColor: tape },
+            { label: "campaigns in data", type: "line", data: pr.curve.map((c) => c.n), borderColor: gate, backgroundColor: gate, yAxisID: "y2", tension: 0.2 },
+          ],
+        },
+        options: { scales: { x: { title: { display: true, text: "ad budget (₪)" } }, y: { beginAtZero: true, title: { display: true, text: "profit (₪)" } }, y2: { position: "right", beginAtZero: true, title: { display: true, text: "campaigns" }, grid: { drawOnChartArea: false } } } },
+      });
+
+      // free builder
+      const levels = pr.levels, tbody = document.querySelector("#bg-builder tbody");
+      const runBtn = document.getElementById("bg-run"), totalEl = document.getElementById("bg-total");
+      function addLine(budget = 5000, count = 1) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td><select>${levels.map((l) => `<option value="${l}"${l === budget ? " selected" : ""}>₪${l.toLocaleString("en-US")}</option>`).join("")}</select></td>
+          <td><input type="number" min="1" step="1" value="${count}" style="max-width:6rem"></td><td class="spend">—</td>
+          <td><button class="ghost" type="button" title="remove">×</button></td>`;
+        tr.querySelector("button").addEventListener("click", () => { tr.remove(); recompute(); });
+        tr.querySelectorAll("select, input").forEach((el) => el.addEventListener("input", recompute));
+        tbody.appendChild(tr); recompute();
+      }
+      function lines() {
+        return [...tbody.querySelectorAll("tr")].map((tr) => ({ budget: Number(tr.querySelector("select").value), count: Number(tr.querySelector("input").value) || 0, tr }));
+      }
+      function recompute() {
+        let total = 0;
+        lines().forEach((l) => { const spend = l.budget * l.count; total += spend; l.tr.querySelector(".spend").textContent = f.money(spend); });
+        totalEl.textContent = `total ${f.money(total)} of ₪50,000` + (total === 50000 ? " ✓" : total > 50000 ? ` (₪${(total - 50000).toLocaleString("en-US")} over)` : ` (₪${(50000 - total).toLocaleString("en-US")} left)`);
+        runBtn.disabled = total !== 50000 || lines().length === 0;
+      }
+      document.getElementById("bg-add").addEventListener("click", () => addLine());
+      addLine(20000, 2); addLine(10000, 1);
+      runBtn.addEventListener("click", async () => {
+        const err = document.getElementById("bg-error"); err.textContent = "";
+        try {
+          const res = await FunnelIQ.api("/api/simulate/budget", { method: "POST", body: JSON.stringify({ allocation: lines().map(({ budget, count }) => ({ budget, count })), total: 50000 }) });
+          document.getElementById("bg-result").hidden = false;
+          document.getElementById("bg-expected").textContent = f.money(res.expected_profit);
+          document.getElementById("bg-expected-sub").textContent = `expected profit from ${res.n_campaigns} campaigns · ROI ${res.roi_model.toFixed(1)}× (model) vs ${res.roi_empirical == null ? "—" : res.roi_empirical.toFixed(1) + "×"} (observed means) · ${res.served_model}`;
+          document.querySelector("#bg-lines tbody").innerHTML = res.per_campaign.map((l) =>
+            `<tr><td>${f.money(l.budget)}</td><td>${l.count}</td><td>${f.money(l.spend)}</td><td>${f.money(l.predicted_profit_per_campaign)}</td><td>${f.money(l.empirical_profit_per_campaign)}</td><td>${f.money(l.expected_profit)}</td></tr>`).join("");
+        } catch (e) { err.textContent = e.message; }
+      });
+    } catch (e) {
+      document.getElementById("bg-verdict").textContent = "simulator unavailable: " + e.message;
     }
 
     // ---------------- Predict + Findings (P2) ----------------

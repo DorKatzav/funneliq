@@ -846,5 +846,259 @@
         "rest_share_closed_in_2_calls": 0.2126
       }
     }
+  },
+  "profit": {
+    "trained_at": "2026-09-06T19:20:42+00:00",
+    "target": "cumulative_profit",
+    "training_policy": "all rows with a recorded profit (non-purchasers at ₪0); 29 rows without profit dropped",
+    "n_train": 3471,
+    "features": [
+      "ad_budget",
+      "num_leads",
+      "leads_answered",
+      "leads_not_answered",
+      "followup_1",
+      "followup_2",
+      "followup_3",
+      "followup_4",
+      "followup_5",
+      "not_closed",
+      "closed",
+      "calls_to_closed",
+      "calls_to_not_closed",
+      "customer_acquisition_cost",
+      "answer_rate",
+      "conversion_rate",
+      "cost_per_lead",
+      "budget_tier"
+    ],
+    "served": "catboost",
+    "cv": {
+      "xgboost": {
+        "rmse_mean": 6660.8738,
+        "rmse_std": 1632.7872,
+        "r2_mean": 0.647,
+        "r2_std": 0.1001,
+        "n_splits": 5,
+        "n_rows": 3471
+      },
+      "lightgbm": {
+        "rmse_mean": 6593.9707,
+        "rmse_std": 1712.5035,
+        "r2_mean": 0.6536,
+        "r2_std": 0.1085,
+        "n_splits": 5,
+        "n_rows": 3471
+      },
+      "catboost": {
+        "rmse_mean": 6515.0866,
+        "rmse_std": 1680.3257,
+        "r2_mean": 0.6619,
+        "r2_std": 0.1044,
+        "n_splits": 5,
+        "n_rows": 3471
+      }
+    },
+    "importances": {
+      "xgboost": {
+        "budget_tier": 0.50839,
+        "calls_to_closed": 0.16827,
+        "closed": 0.15297,
+        "ad_budget": 0.06868,
+        "followup_2": 0.01229,
+        "conversion_rate": 0.00973,
+        "not_closed": 0.00957,
+        "num_leads": 0.00815,
+        "followup_3": 0.00794,
+        "followup_4": 0.00784,
+        "customer_acquisition_cost": 0.0077,
+        "followup_1": 0.00762,
+        "leads_answered": 0.00733,
+        "leads_not_answered": 0.00539,
+        "cost_per_lead": 0.00534,
+        "answer_rate": 0.0048,
+        "followup_5": 0.00436,
+        "calls_to_not_closed": 0.00365
+      },
+      "lightgbm": {
+        "calls_to_closed": 0.49937,
+        "closed": 0.14024,
+        "ad_budget": 0.10158,
+        "conversion_rate": 0.0831,
+        "answer_rate": 0.04033,
+        "cost_per_lead": 0.02322,
+        "num_leads": 0.01656,
+        "leads_answered": 0.01412,
+        "followup_1": 0.01248,
+        "leads_not_answered": 0.01203,
+        "followup_2": 0.00959,
+        "followup_3": 0.00903,
+        "customer_acquisition_cost": 0.00899,
+        "calls_to_not_closed": 0.00885,
+        "followup_4": 0.0076,
+        "followup_5": 0.00656,
+        "not_closed": 0.00612,
+        "budget_tier": 0.00023
+      },
+      "catboost": {
+        "calls_to_closed": 0.53014,
+        "answer_rate": 0.05903,
+        "budget_tier": 0.05808,
+        "closed": 0.04253,
+        "ad_budget": 0.03968,
+        "conversion_rate": 0.03859,
+        "followup_5": 0.03637,
+        "customer_acquisition_cost": 0.03525,
+        "num_leads": 0.02447,
+        "leads_not_answered": 0.02438,
+        "leads_answered": 0.02201,
+        "cost_per_lead": 0.02098,
+        "followup_2": 0.01845,
+        "followup_3": 0.01445,
+        "not_closed": 0.01342,
+        "followup_1": 0.01117,
+        "followup_4": 0.00705,
+        "calls_to_not_closed": 0.00396
+      }
+    },
+    "profile_levels": [
+      500,
+      800,
+      1000,
+      1500,
+      2000,
+      2500,
+      3000,
+      4000,
+      5000,
+      6000,
+      7000,
+      8000,
+      10000,
+      12000,
+      15000,
+      20000
+    ],
+    "profit_by_budget": [
+      {
+        "ad_budget": 500,
+        "n": 109,
+        "mean_profit": 1109.7,
+        "median_profit": 479.0,
+        "purchase_rate": 0.5046
+      },
+      {
+        "ad_budget": 800,
+        "n": 152,
+        "mean_profit": 1284.8,
+        "median_profit": 946.5,
+        "purchase_rate": 0.5461
+      },
+      {
+        "ad_budget": 1000,
+        "n": 217,
+        "mean_profit": 2240.2,
+        "median_profit": 1996.0,
+        "purchase_rate": 0.7143
+      },
+      {
+        "ad_budget": 1500,
+        "n": 297,
+        "mean_profit": 3275.4,
+        "median_profit": 2104.0,
+        "purchase_rate": 0.9259
+      },
+      {
+        "ad_budget": 2000,
+        "n": 407,
+        "mean_profit": 21748.8,
+        "median_profit": 21660.0,
+        "purchase_rate": 0.9705
+      },
+      {
+        "ad_budget": 2500,
+        "n": 342,
+        "mean_profit": 22013.3,
+        "median_profit": 22574.0,
+        "purchase_rate": 0.9561
+      },
+      {
+        "ad_budget": 3000,
+        "n": 327,
+        "mean_profit": 21980.0,
+        "median_profit": 22325.0,
+        "purchase_rate": 0.9388
+      },
+      {
+        "ad_budget": 4000,
+        "n": 314,
+        "mean_profit": 21477.2,
+        "median_profit": 22364.5,
+        "purchase_rate": 0.9618
+      },
+      {
+        "ad_budget": 5000,
+        "n": 312,
+        "mean_profit": 21725.1,
+        "median_profit": 22457.5,
+        "purchase_rate": 0.9423
+      },
+      {
+        "ad_budget": 6000,
+        "n": 195,
+        "mean_profit": 5170.9,
+        "median_profit": 4501.0,
+        "purchase_rate": 0.9692
+      },
+      {
+        "ad_budget": 7000,
+        "n": 183,
+        "mean_profit": 5308.6,
+        "median_profit": 4662.0,
+        "purchase_rate": 0.9508
+      },
+      {
+        "ad_budget": 8000,
+        "n": 124,
+        "mean_profit": 5491.7,
+        "median_profit": 5031.5,
+        "purchase_rate": 0.9355
+      },
+      {
+        "ad_budget": 10000,
+        "n": 194,
+        "mean_profit": 5107.1,
+        "median_profit": 4573.5,
+        "purchase_rate": 0.9588
+      },
+      {
+        "ad_budget": 12000,
+        "n": 114,
+        "mean_profit": 5017.6,
+        "median_profit": 4708.0,
+        "purchase_rate": 0.9123
+      },
+      {
+        "ad_budget": 15000,
+        "n": 113,
+        "mean_profit": 5247.5,
+        "median_profit": 4859.0,
+        "purchase_rate": 0.9558
+      },
+      {
+        "ad_budget": 20000,
+        "n": 71,
+        "mean_profit": 4762.2,
+        "median_profit": 4550.0,
+        "purchase_rate": 0.9296
+      }
+    ],
+    "target_stats": {
+      "mean": 12682.1,
+      "std": 11227.5,
+      "min": 0.0,
+      "max": 149959.0,
+      "share_zero": 0.0965
+    }
   }
 }

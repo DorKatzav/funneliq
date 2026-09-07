@@ -441,6 +441,72 @@ def check_live_followups() -> None:
     assert r["verdict"] in {"keep", "cut_after_3", "extend"} and r["reason"], r
 
 
+# ---------------------------------------------------------------- M7 checks
+def check_profit_artifacts() -> None:
+    m = _metrics().get("profit")
+    assert m, "metrics.json has no 'profit' section"
+    assert set(m["cv"]) == {"xgboost", "lightgbm", "catboost"} and m["served"] in m["cv"], m.get("served")
+    assert "cumulative_profit" not in m["features"] and "ltv_months" not in m["features"]
+    assert (ROOT / "models" / "profit.joblib").exists(), "profit.joblib missing"
+    import json as _json
+
+    profiles = _json.loads((ROOT / "models" / "profiles.json").read_text(encoding="utf-8"))
+    assert len(profiles["levels"]) == 16 == len(m["profile_levels"]), profiles["levels"]
+
+
+def check_presets_offline() -> None:
+    sys.path.insert(0, str(ROOT))
+    from ml.registry import MODELS_DIR, ModelRegistry
+    from ml.simulator import TOTAL_BUDGET, preset_strategies, rank_presets
+
+    for p in preset_strategies():
+        assert sum(a["budget"] * a["count"] for a in p["allocation"]) == TOTAL_BUDGET, p["name"]
+    r = rank_presets(ModelRegistry.load(MODELS_DIR))
+    assert len(r["strategies"]) == 5 and r["strategies"][0]["rank"] == 1
+    assert r["verdict"] in {"concentrate", "spread"}
+
+
+def check_winner_agreement_or_explained() -> None:
+    sys.path.insert(0, str(ROOT))
+    from ml.registry import MODELS_DIR, ModelRegistry
+    from ml.simulator import rank_presets
+
+    r = rank_presets(ModelRegistry.load(MODELS_DIR))
+    if not r["agree"]:
+        text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+        assert "disagree" in text, "model and data disagree on the winner but REPORT.md does not explain it"
+
+
+def check_report_p6() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    for needle in ("## P6", "Verdict: concentrate or spread", "Caveats", "next month"):
+        assert needle in text, f"REPORT.md §P6 lacks '{needle}'"
+
+
+def check_live_simulator() -> None:
+    import httpx
+
+    headers = {"Authorization": f"Bearer {_gate_user_token()}"}
+    res = httpx.get(f"{_live_url()}/api/simulate/presets", headers=headers, timeout=60)
+    assert res.status_code == 200, f"HTTP {res.status_code} {res.text[:200]}"
+    body = res.json()
+    assert len(body["strategies"]) == 5 and body["strategies"][0]["rank"] == 1, body.get("strategies")
+    bad = httpx.post(
+        f"{_live_url()}/api/simulate/budget",
+        json={"allocation": [{"budget": 5000, "count": 9}]},
+        headers=headers,
+        timeout=60,
+    )
+    assert bad.status_code == 422, f"wrong total accepted: HTTP {bad.status_code}"
+    ok = httpx.post(
+        f"{_live_url()}/api/simulate/budget",
+        json={"allocation": [{"budget": 5000, "count": 10}]},
+        headers=headers,
+        timeout=60,
+    )
+    assert ok.status_code == 200 and ok.json()["expected_profit"] > 0, ok.text[:200]
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -500,6 +566,15 @@ GATES: dict[int, list[Check]] = {
         ("followups on the CSV: 6 stages, verdict + reason + unexpected stage", check_followups_offline),
         ("REPORT.md §P5 answers the brief", check_report_p5),
         ("live GET /api/insights/followups -> 200 with 6 stages and a recommendation", check_live_followups),
+    ],
+    7: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("profit model: 3 regressors, served artifact, 16 profile levels", check_profit_artifacts),
+        ("presets: 5 strategies, each exactly 50,000, ranked", check_presets_offline),
+        ("model vs data agree on the winner (or REPORT says why)", check_winner_agreement_or_explained),
+        ("REPORT.md §P6 answers the brief", check_report_p6),
+        ("live simulate: presets ranked; /budget 422 on wrong total, 200 on valid", check_live_simulator),
     ],
 }
 

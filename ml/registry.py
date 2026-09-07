@@ -57,12 +57,16 @@ class ModelRegistry:
         ltv_models: dict[str, object],
         upsell_models: dict[str, object] | None = None,
         super_model: object | None = None,
+        profit_model: object | None = None,
+        profiles: dict | None = None,
     ):
         self.models_dir = models_dir
         self.metrics = metrics
         self.ltv_models = ltv_models
         self.upsell_models = upsell_models or {}  # key: "<variant>_<name>"
         self.super_model = super_model
+        self.profit_model = profit_model
+        self.profiles = profiles  # models/profiles.json: typical campaign per budget level (P6)
 
     @classmethod
     def load(cls, models_dir: Path = MODELS_DIR) -> ModelRegistry:
@@ -81,13 +85,19 @@ class ModelRegistry:
                     upsell_models[f"{variant}_{name}"] = joblib.load(path)
         super_path = models_dir / "super.joblib"
         super_model = joblib.load(super_path) if super_path.exists() else None
-        return cls(models_dir, metrics, ltv_models, upsell_models, super_model)
+        profit_path = models_dir / "profit.joblib"
+        profit_model = joblib.load(profit_path) if profit_path.exists() else None
+        profiles_path = models_dir / "profiles.json"
+        profiles = json.loads(profiles_path.read_text(encoding="utf-8")) if profiles_path.exists() else None
+        return cls(models_dir, metrics, ltv_models, upsell_models, super_model, profit_model, profiles)
 
     @property
     def loaded(self) -> list[str]:
         names = [f"ltv_{n}" for n in self.ltv_models] + [f"upsell_{k}" for k in self.upsell_models]
         if self.super_model is not None:
             names.append("super")
+        if self.profit_model is not None:
+            names.append("profit")
         return names
 
     # ------------------------------------------------------------------ P2
@@ -162,3 +172,11 @@ class ModelRegistry:
         ]
         band = next((b["band"] for b in bands if b["min"] <= score <= b["max"]), "High")
         return {"score": score, "probability": round(proba, 4), "band": band}
+
+    # ------------------------------------------------------------------ P6
+    def predict_profit(self, row: dict) -> float:
+        """Expected cumulative profit (₪, floored at 0) of one campaign described by its funnel features."""
+        if self.profit_model is None:
+            raise RuntimeError("profit model is not loaded")
+        X = build_features(customer_frame(row), "profit")
+        return max(float(self.profit_model.predict(X)[0]), 0.0)

@@ -201,3 +201,63 @@ Median **3 calls**, interquartile range 2–5, mean 3.70. **48% of closed deals 
 A sale closed in 1–2 calls stays 36.4 months on average (profit ₪24,777); one closed after 6+ calls stays 6.7 months (₪2,001). Late closes are real sales, but smaller ones. The lever is therefore not *whether* to keep calling but *whom*: the calls-to-close signal already drives the lifetime prediction (P2) and the super-customer score (P4), so late-closing leads should be worked with the expectation of a smaller account, not dropped.
 
 Rules used (in `ml/followups.py`): cut only if < 15% of closed deals needed > 3 calls; extend only if ≥ 25% needed > 5; the unexpected stage is the follow-up transition farthest from the median of the others.
+
+## P6 — Where should ₪50,000 go? (profit model + budget simulator)
+
+**Setup.** Profit model on every campaign with a recorded profit (n = 3,471, non-purchasers included at ₪0 — D-M2-1), FUNNEL features only. Three regressors, 5-fold CV:
+
+| model | RMSE (₪) | R² |
+| --- | ---: | ---: |
+| xgboost | 6,661 ± 1,633 | 0.647 |
+| lightgbm | 6,594 ± 1,713 | 0.654 |
+| catboost ★ served | 6,515 ± 1,680 | 0.662 |
+
+Target std ₪11,228. For each budget level the simulator uses the served model's expected profit per campaign — its predictions averaged over the real campaigns at that level, stored in `models/profiles.json` next to the median funnel profile — and multiplies by the number of campaigns; the empirical column is the observed mean profit at that level × campaigns.
+
+### The model's curve: profit per campaign by budget level
+
+| budget | campaigns in data | model profit / campaign | observed mean | model profit per ₪1,000 |
+| ---: | ---: | ---: | ---: | ---: |
+| ₪500 | 109 | ₪1,184 | ₪1,110 | ₪2,369 |
+| ₪800 | 152 | ₪1,437 | ₪1,285 | ₪1,797 |
+| ₪1,000 | 217 | ₪2,104 | ₪2,240 | ₪2,104 |
+| ₪1,500 | 297 | ₪3,300 | ₪3,275 | ₪2,200 |
+| ₪2,000 | 407 | ₪21,758 | ₪21,749 | ₪10,879 |
+| ₪2,500 | 342 | ₪22,095 | ₪22,013 | ₪8,838 |
+| ₪3,000 | 327 | ₪21,910 | ₪21,980 | ₪7,303 |
+| ₪4,000 | 314 | ₪21,552 | ₪21,477 | ₪5,388 |
+| ₪5,000 | 312 | ₪21,562 | ₪21,725 | ₪4,312 |
+| ₪6,000 | 195 | ₪5,334 | ₪5,171 | ₪889 |
+| ₪7,000 | 183 | ₪5,323 | ₪5,309 | ₪760 |
+| ₪8,000 | 124 | ₪5,369 | ₪5,492 | ₪671 |
+| ₪10,000 | 194 | ₪5,147 | ₪5,107 | ₪515 |
+| ₪12,000 | 114 | ₪5,091 | ₪5,018 | ₪424 |
+| ₪15,000 | 113 | ₪5,097 | ₪5,248 | ₪340 |
+| ₪20,000 | 71 | ₪4,892 | ₪4,762 | ₪245 |
+
+The curve is a staircase, not a slope: the Mid tier (₪2,000–5,000) returns ₪21,758 per campaign, while a ₪20,000 campaign returns about ₪4,892 and a ₪500 one about ₪1,184. Per ₪1,000 spent the best level is **₪2,000** (₪10,879). More budget buys more leads (P1) but not more profit per campaign.
+
+### The five strategies, ranked
+
+| rank | strategy | campaigns | expected profit (model) | observed-mean profit | ROI (model) |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| 1 | 25 × ₪2,000 | 25 | ₪543,950 | ₪543,720 | 10.9× |
+| 2 | 10 × ₪5,000 | 10 | ₪215,620 | ₪217,251 | 4.3× |
+| 3 | 100 × ₪500 | 100 | ₪118,430 | ₪110,970 | 2.4× |
+| 4 | 5 × ₪10,000 | 5 | ₪25,737 | ₪25,536 | 0.5× |
+| 5 | 2 × ₪20,000 + 1 × ₪10,000 | 3 | ₪14,932 | ₪14,632 | 0.3× |
+
+### Verdict: concentrate or spread?
+
+**Spread.** 25 × ₪2,000 is expected to return ₪543,950 on ₪50,000 (10.9×), against ₪14,932 for the most concentrated split (2 × ₪20,000 + 1 × ₪10,000). The model and the raw data agree on the winner. The gap is not a modelling artefact: it is the tier staircase in the data, where a Mid-tier campaign earns roughly four times a High-tier one at a fraction of the cost.
+
+### Caveats
+
+- **Capacity.** 25 campaigns a month is a different operation from three: each needs creative, a landing page and a sales team to work its leads (P5: a sale takes a median of 3 calls). If the team cannot run that many, the next-best Mid-tier split still beats concentration.
+- **Small levels are noisy.** The ₪500 level has 109 campaigns with median profit well below its mean; 100 × ₪500 leans on the least reliable part of the curve. Predicting on the *median* campaign alone would put a ₪500 campaign at ₪4,615 (the plan's failure signal), which is why the simulator uses the model averaged over the real campaigns at each level (D-M7-1).
+- **Extrapolation.** The simulator only knows the 16 budget levels in the data and assumes campaigns are independent (no audience saturation from 25 parallel campaigns). Mixed allocations are fine; new levels are not.
+- **This is the practice dataset's structure.** Profit here is almost a function of tier; in production the curve must be re-estimated from real campaigns before the split is trusted.
+
+### What to tell the founder next month
+
+Put the ₪50,000 into Mid-tier campaigns — 25 × ₪2,000 if the team can run them, otherwise 10 × ₪5,000 — and stop buying ₪10,000+ campaigns until the data shows they earn more than ₪5,000 each. Track profit per campaign by level as the months come in; the simulator re-ranks automatically when the model is retrained.
