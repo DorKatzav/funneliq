@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — React: כדאיות, שינויים בממשק, שעות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .verdict { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 1rem 1.25rem; margin-block: 1rem; font-size: 1.1rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  tr.sum td { background: var(--wind-soft); font-weight: 700; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · הערת החלטה · M9 · 2026-09-07</span>
+    <h1>React ל-FunnelIQ: האם כדאי, מה ישתנה, וכמה שעות</h1>
+    <p class="lede">התוכנית סימנה React כ-M9 אופציונלי, "רק אם נשאר זמן". הפרויקט הושלם והברייף מכוסה בממשק הוואנילי הנוכחי. המסמך הזה עונה על שלוש שאלות: מה React היה נותן למשתמש שאין לו היום, מה הוא לא היה משנה, ומה המחיר בשעות, בשלוש רמות היקף.</p>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">5</div><div class="l">מסכים היום, בקובץ HTML אחד של ~750 שורות עם JS משובץ</div></div>
+    <div class="kpi"><div class="v">0</div><div class="l">שינויים ב-API, במודלים או בתשובות אם עוברים ל-React</div></div>
+    <div class="kpi"><div class="v">35–45</div><div class="l">שעות עבודה ידנית לזהות מלאה (parity) ב-React</div></div>
+    <div class="kpi"><div class="v">12–18</div><div class="l">שעות סשן עם Claude Code, לפי הקצב של M2–M7 בפרויקט הזה</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה</h3>
+    <p>React הוא ספריית ממשק שמפרקת את המסך לרכיבים עם "מצב" משלהם, במקום קובץ אחד שמעדכן את הדף ידנית. בפרויקט הזה הוא לא ישנה אף מספר ואף תשובה למייסד: השרת, המודלים והאבטחה נשארים כמו שהם. מה שהוא כן ישנה: איך הממשק מרגיש (ניווט עם כתובות, ולידציה בזמן הקלדה, תוצאות שנשמרות בין מסכים, טפסים חכמים יותר) ועד כמה קל להוסיף מסך שישי ושביעי בלי לשבור את החמישה הקיימים. ההמלצה בתחתית: לא לעשות את זה כחלק מההגשה; לעשות אותו רק אם הכלי ממשיך לחיות אחרי הקורס או אם רוצים אותו כפריט תיק עבודות, ואז בהיקף "זהות מלאה" עם תיבת זמן.</p>
+  </div>
+
+  <h2>1. מה יש היום, ואיפה זה נחלש</h2>
+  <div class="card">
+    <p><b>הסטאק:</b> <code>static/dashboard.html</code> (~750 שורות, כולל ה-JS), <code>app.js</code> (session + fetch), <code>styles.css</code>, Chart.js ו-supabase-js מ-CDN. בלי שלב build: מה שב-git הוא מה שרץ. זה יתרון אמיתי: פריסה של שירות אחד, בלי node ב-Railway, ובלי "עובד אצלי".</p>
+    <p><b>איפה זה נחלש</b> (מה שראינו במהלך העבודה, לא ספקולציה):</p>
+    <ul>
+      <li><b>לשוניות בלי כתובת.</b> חמשת המסכים הם <code>section hidden</code>; אין URL ללשונית, כפתור "אחורה" לא עובד, ואי-אפשר לשלוח לינק ל-"Budget".</li>
+      <li><b>גרפים בלשוניות מוסתרות.</b> Chart.js על canvas שנוצר בלשונית נסתרת דרש תיקון ידני של resize + update (M6). ב-React הגרף נוצר כשהרכיב מוצג, והבעיה לא קיימת.</li>
+      <li><b>ולידציה רק בשרת.</b> משפך לא עקבי מוחזר כ-422 עם הודעה יפה, אבל רק אחרי לחיצה. אין סימון של השדה הבעייתי תוך כדי הקלדה.</li>
+      <li><b>אין מצב משותף.</b> הלקוח שחזיתם בלשונית Predict לא "קיים" ב-Findings או ב-Budget; כל מסך שולף לבד. הקוד מעדכן DOM ידנית ב-40+ נקודות (<code>getElementById</code>).</li>
+      <li><b>מטמון.</b> אחרי פריסה הדפדפן הגיש dashboard.html ישן (M7); תוקן ב-<code>Cache-Control: no-cache</code>. ב-build של Vite הקבצים מקבלים hash בשם, והבעיה נעלמת מבנית.</li>
+      <li><b>תחזוקה.</b> קובץ אחד גדול בלי טיפוסים ובלי בדיקות UI. הוספת מסך שישי פירושה עוד 150 שורות באותו קובץ.</li>
+    </ul>
+  </div>
+
+  <h2>2. מה React ישנה בממשק (למשתמש)</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>היום</th><th>עם React</th><th>למי זה משנה</th></tr></thead>
+    <tbody>
+      <tr><td>לשוניות ללא כתובת</td><td>ניתוב אמיתי: <code>/predict</code>, <code>/budget</code>, לינקים ישירים, "אחורה" עובד, לשונית פתוחה נשמרת ברענון</td><td>צוות שמשתף לינקים בסלאק</td></tr>
+      <tr><td>ולידציה אחרי לחיצה (422)</td><td>ולידציה חיה: השדה שמפר את זהות המשפך מסומן תוך כדי הקלדה, עם הסכום הנכון מוצע</td><td>מי שמזין לקוחות חדשים</td></tr>
+      <tr><td>כל מסך שולף לבד</td><td>מצב משותף: הלקוח מ-Predict זמין ב-Budget ("מה יקרה ל-25 לקוחות כאלה"), השוואת שני תרחישים זה לצד זה</td><td>המייסד, בסימולציות "מה-אם"</td></tr>
+      <tr><td>טעינה: "…" עד שהנתונים מגיעים</td><td>skeletons, טעינה מדורגת, שגיאת רשת עם "נסה שוב" ממוקד</td><td>כולם, במיוחד בחיבור איטי</td></tr>
+      <tr><td>גרפים עם תיקון ידני ללשוניות</td><td>גרפים כרכיבים (Chart.js דרך react-chartjs-2 או Recharts), נוצרים רק כשמוצגים</td><td>פחות באגים, לא נראה למשתמש</td></tr>
+      <tr><td>אנגלית בלבד</td><td>i18n: מתג עברית/אנגלית עם RTL מלא (המייסד קורא עברית; הדוחות שלנו כבר בעברית)</td><td>המייסד</td></tr>
+      <tr><td>בונה תקציב: טבלה ידנית</td><td>בונה עם drag של סכום, אחוזים, שמירת תרחישים בשם (ב-Supabase, עם RLS כמו prediction_log)</td><td>המייסד, לפגישת תקציב חודשית</td></tr>
+      <tr><td>מסך רחב בלבד</td><td>responsive אמיתי: הטלפון של המייסד</td><td>המייסד</td></tr>
+    </tbody>
+  </table></div>
+  <div class="notice">
+    <h3>מה React לא ישנה</h3>
+    <p>לא את התשובות (P1–P6), לא את המודלים, לא את ה-API (הוא נשאר בדיוק כפי שהוא: זה היתרון הגדול של ההפרדה שבחרנו ב-D3), לא את האבטחה (אותו JWT, אותו RLS; supabase-js עובד ב-React בדיוק כמו היום), ולא את הפריסה מבחינת המשתמש (עדיין URL אחד ב-Railway). כל פריט בטבלה למעלה אפשרי גם בוואנילה; React רק הופך אותו לזול פי 2–3 לכתוב ולתחזק.</p>
+  </div>
+
+  <h2>3. כדאיות: מתי כן ומתי לא</h2>
+  <div class="card">
+    <h3>לא כדאי, אם</h3>
+    <ul>
+      <li>הפרויקט נגמר בהגשה. הברייף מכוסה; React לא מוסיף אף תשובה ואף נקודת הערכה מובהקת מלבד "סטאק מודרני".</li>
+      <li>אין 12+ שעות פנויות. React חצי-גמור גרוע מוואנילה שלם: שני ממשקים לתחזק.</li>
+    </ul>
+    <h3>כדאי, אם</h3>
+    <ul>
+      <li>הכלי ימשיך לחיות ומישהו יבקש מסך שישי (למשל דוח חודשי אוטומטי או ניהול משתמשים). אז הקובץ הבודד הופך לצוואר בקבוק.</li>
+      <li>רוצים את הפרויקט כפריט תיק עבודות של full-stack: FastAPI + React + Supabase הוא סטאק שמראיינים מזהים.</li>
+      <li>המייסד באמת ישתמש בזה בטלפון או יצטרך עברית.</li>
+    </ul>
+    <h3>הסיכונים העיקריים</h3>
+    <ul>
+      <li><b>Build בפריסה.</b> צריך node. שתי דרכים: (א) GitHub Actions בונה את <code>frontend/</code> ומקמט את <code>static/</code> (פשוט, אבל קומיטים אוטומטיים); (ב) Railpack עם node + python באותו image (יותר "נכון", יותר שברירי; ראינו כבר שני תיקוני פריסה ב-M1 וב-M3).</li>
+      <li><b>שני ממשקים במהלך המעבר.</b> חייבים תיבת זמן וקו סיום ברור: הוואנילה נמחק רק כשה-React עובר את מבחן הזר.</li>
+      <li><b>גרפים.</b> Recharts יפה יותר אבל דורש כתיבה מחדש של כל גרף; react-chartjs-2 שומר את Chart.js הקיים ומקצר.</li>
+    </ul>
+  </div>
+
+  <h2>4. הערכת שעות</h2>
+  <p>שתי עמודות: עבודה ידנית של מפתח שמכיר React, ושעות סשן עם Claude Code לפי הקצב בפרויקט הזה (M2–M7 לקחו כ-1.5–3 שעות סשן כל אחת, כולל בדיקות, שער ודוח). ההנחה: Vite + React + TypeScript, react-router, react-chartjs-2, supabase-js, Vitest, ו-Playwright למבחן עשן.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>רכיב</th><th>מה כלול</th><th>ידני (שעות)</th><th>עם Claude Code (שעות)</th></tr></thead>
+    <tbody>
+      <tr><td>תשתית</td><td>Vite + TS + router, שלד עמוד, session guard עם supabase-js, לקוח API עם טיפוסים מ-OpenAPI (<code>/api/docs</code> כבר קיים)</td><td class="num">5–6</td><td class="num">1.5–2</td></tr>
+      <tr><td>Overview</td><td>KPI, שלושה גרפים, טבלת רשומות</td><td class="num">3</td><td class="num">1</td></tr>
+      <tr><td>Predict</td><td>טופס עם ולידציה חיה של זהויות המשפך, שלוש תוצאות, אזהרת חריגות, יומן חיזויים</td><td class="num">5</td><td class="num">1.5–2</td></tr>
+      <tr><td>Follow-ups</td><td>כרטיס הכרעה, שלושה גרפים, טבלת ערך</td><td class="num">3</td><td class="num">1</td></tr>
+      <tr><td>Budget</td><td>אסטרטגיות, עקומה, בונה חופשי עם נעילה, תוצאה</td><td class="num">4–5</td><td class="num">1.5</td></tr>
+      <tr><td>Findings</td><td>טבלאות P2–P4 וגרף חשיבות</td><td class="num">3</td><td class="num">1</td></tr>
+      <tr><td>Build ופריסה</td><td>Actions בונה ל-<code>static/</code> או Railpack דו-שפתי; <code>/health</code> מדווח גרסת frontend</td><td class="num">3–4</td><td class="num">1–1.5</td></tr>
+      <tr><td>בדיקות</td><td>Vitest לרכיבים (ולידציה, נעילת הבונה), Playwright למסלול הזר</td><td class="num">4–5</td><td class="num">1.5–2</td></tr>
+      <tr><td>ליטוש</td><td>RTL/עברית בסיסי, responsive, נגישות מקלדת, מחיקת הוואנילה</td><td class="num">3–4</td><td class="num">1–1.5</td></tr>
+      <tr><td>תיעוד</td><td>README, דוח M9 בעברית, PROJECT_LOG, אובסידיאן, שער M9</td><td class="num">2</td><td class="num">0.5–1</td></tr>
+      <tr class="sum"><td>סה"כ זהות מלאה (parity)</td><td>אותם חמישה מסכים, בלי פיצ'רים חדשים</td><td class="num">35–45</td><td class="num">12–18</td></tr>
+      <tr><td>תוספות (אופציונלי)</td><td>מצב משותף והשוואת תרחישים, שמירת תרחישי תקציב ב-Supabase (טבלה + RLS), i18n מלא</td><td class="num">+15–25</td><td class="num">+5–8</td></tr>
+    </tbody>
+  </table></div>
+  <p>ההערכה "עם Claude Code" היא שעות של דור ליד המסך (אישור, בדיקה, מיזוג), לא זמן מחשב. היא מניחה את אותו פרוטוקול: branch, שער, דוח, PR לכל שלב. הטווח התחתון מניח react-chartjs-2 ובנייה ב-Actions; העליון מניח Recharts ו-Railpack דו-שפתי.</p>
+
+  <h2>5. שלוש אפשרויות</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>אפשרות</th><th>מה עושים</th><th>שעות</th><th>מה מקבלים</th></tr></thead>
+    <tbody>
+      <tr class="win"><td>א. להשאיר</td><td>כלום. הפרויקט סגור עם 10/10 בשער M8.</td><td class="num">0</td><td>הברייף מכוסה. הזמן הולך להגשה או לפרויקט הבא.</td></tr>
+      <tr><td>ב. לפרק את הוואנילה</td><td>לפצל את dashboard.html ל-5 מודולי JS (<code>static/js/overview.js</code> …), ניתוב עם <code>#hash</code> ללשוניות, ולידציה חיה בטופס</td><td class="num">4–6 ידני · 1.5–2 עם Claude</td><td>80% מהתועלת התחזוקתית ו-2 מהשיפורים למשתמש (לינקים, ולידציה), בלי build ובלי סיכון פריסה.</td></tr>
+      <tr><td>ג. React בזהות מלאה</td><td>M9 לפי הטבלה למעלה, עם תיבת זמן; הוואנילה נמחקת רק אחרי מבחן זר ב-React</td><td class="num">35–45 ידני · 12–18 עם Claude</td><td>ממשק שקל להרחיב, ניתוב, ולידציה חיה, גרפים בלי hacks, ופריט תיק עבודות full-stack. אפס שינוי בתשובות.</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="verdict">
+    <b>ההמלצה:</b> להגשה, אפשרות א. אם יש ערב פנוי ורוצים שיפור מורגש בלי סיכון, אפשרות ב. React (ג) רק אם הכלי ממשיך אחרי הקורס או אם תיק העבודות הוא המטרה; ואז 12–18 שעות סשן, בשלושה PRs (תשתית + Overview/Findings, Predict + Follow-ups, Budget + פריסה + מחיקת הוואנילה), עם אותו שער ואותו דוח עברי לכל אחד.
+  </div>
+
+  <footer>FunnelIQ · הערת החלטה M9 · 2026-09-07 · קוד: <code>github.com/DorKatzav/funneliq</code></footer>
+</main>
+</body>
+</html>

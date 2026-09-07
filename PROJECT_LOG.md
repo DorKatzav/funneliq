@@ -118,3 +118,14 @@ Decision ids: `D-M<milestone>-<n>`. Design-level decisions D1–D10 live in `DES
 - Caveats written for the founder: capacity to run 25 campaigns, noisy small levels, no extrapolation beyond the 16 levels, and that profit ≈ tier is this practice dataset's structure.
 - Tests: 88 (10 new). PR #21. ruff: per-file E501 ignore for the §P6 prose renderer, as for eda.py.
 - Next: M8 — wrap-up (README, executive summary in REPORT, PROJECT_LOG + Obsidian closed, stranger test, polish list: "far from training data" warning).
+
+## 2026-09-07 — M8: wrap-up — GATE PASSED (10/10)
+- README rewritten for a stranger (what it answers with numbers, architecture, setup, data + retraining, screenshots, security model, map). `docs/REPORT.md` opens with an executive summary for the founder: six answers, every number generated.
+- Polish items closed: (1) "far from the training data" warning — `ml/stats.py` writes `models/input_stats.json` (mean/std/min/max of the 14 funnel features over the 3,163 training customers); `POST /api/predict/ltv` returns `novelty` (max |z|, the feature, values outside the observed range) and the Predict tab shows a warning beyond 3σ; the all-zero funnel and the ₪800-with-42-leads case from the post-M3 sweep now warn. (2) Browsers served the previous `dashboard.html` after the M7 deploy → `/static/*` now sends `Cache-Control: no-cache`.
+- `scripts/train_all.py` retrains every model and regenerates FINDINGS / REPORT §P5 §P6 / input stats in dependency order. `docs/STRANGER_TEST.md` records the end-to-end acceptance walk-through.
+- Gate M8 re-runs every M0–M7 offline check (all pass), then README / REPORT / log / reports M0–M8 / input stats / stranger test / live health.
+- Tests: 91. PR #23.
+- Lessons of the project (the short list): the plan's failure signals were worth writing down — two of them fired (M7's median-profile trap, M3's identity-violating form defaults) and were caught by the gate; a fair model-vs-rule comparison needs the rule tuned and scored on the same folds (M4); Chart.js needs resize + update after a hidden tab is shown (M6); Supabase's SQL editor runs only the highlighted selection (M1); Railway domains are global — copy from the Networking panel (M0).
+- Not done, by choice: M9 (React front-end) — the vanilla dashboard covers the brief; a 3–5 minute demo recording (`docs/demo.md`) is optional and left to Dor. React (M9): worth it only if the tool outlives the course or as a portfolio piece — analysis, UI changes and an hours estimate (12–18 session hours for full parity) in `docs/notes/REACT_HE.html`.
+
+**PROJECT CLOSED — 2026-09-07.** Nine milestones (M0–M8), 24 pull requests, six analytical packages live behind login at https://funneliq-production-4b63.up.railway.app. Stranger test: see `docs/STRANGER_TEST.md`.

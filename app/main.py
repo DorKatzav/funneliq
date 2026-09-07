@@ -17,7 +17,7 @@ from app.config import get_settings
 from app.routers import insights, predict, records, simulate
 from ml.registry import ModelRegistry
 
-APP_VERSION = "0.7.0"
+APP_VERSION = "0.8.0"
 STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 _started_at = time.time()
 
