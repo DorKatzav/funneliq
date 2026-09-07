@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FunnelIQ — דוח M8 (סיום)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Suez+One&family=Assistant:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #eef1ef; --card: #ffffff; --ink: #1b2733; --ink-soft: #46545f;
+    --wind: #0f5c6e; --wind-soft: #e3eef1; --tape: #c9560c; --tape-soft: #fbe9dc;
+    --gate: #2f7d46; --gate-soft: #e7f2ea; --line: #c9d2cd;
+    --mono: "IBM Plex Mono", ui-monospace, monospace;
+    --display: "Suez One", "Arial Hebrew", serif;
+    --body: "Assistant", "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { font-size: 106%; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 1.08rem; line-height: 1.7; text-align: start; }
+  main { max-width: 60rem; margin-inline: auto; padding: 2.5rem 1.25rem 5rem; }
+  code { font-family: var(--mono); font-size: 0.85em; direction: ltr; unicode-bidi: isolate; background: #f0ede6; border: 1px solid #ddd8cc; border-radius: 4px; padding: 0.05em 0.35em; white-space: nowrap; }
+  .eyebrow { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.12em; color: var(--wind); border-block-end: 2px solid var(--wind); display: inline-block; padding-block-end: 0.3rem; margin-block-end: 1rem; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; margin: 0 0 0.75rem; }
+  .lede { color: var(--ink-soft); max-width: 46rem; margin-block-end: 1.5rem; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: 1.7rem; margin: 2.5rem 0 1rem; }
+  h3 { font-family: var(--display); font-weight: 400; font-size: 1.25rem; margin: 1.5rem 0 0.5rem; }
+  p { margin: 0.5rem 0 0.9rem; }
+  ul, ol { margin: 0.4rem 0 1rem; padding-inline-start: 1.5rem; }
+  li { margin-block-end: 0.35rem; }
+  a { color: var(--wind); }
+  img { max-width: 100%; border: 1px solid var(--line); border-radius: 10px; }
+  .stamp { display: inline-block; background: var(--gate); color: #fff; font-family: var(--display); font-size: 1.1rem; padding: 0.25rem 1rem; border-radius: 6px; transform: rotate(-2deg); margin-block: 0.5rem 1rem; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.9rem; margin-block: 1rem 1.5rem; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.2rem; }
+  .kpi .v { font-family: var(--display); font-size: 1.9rem; color: var(--wind); line-height: 1.1; }
+  .kpi .l { color: var(--ink-soft); font-size: 0.92rem; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 1.25rem 1.5rem; margin-block: 1rem; }
+  .gate { border: 2px solid var(--gate); background: var(--gate-soft); border-radius: 10px; padding: 0.9rem 1.1rem; margin-block: 1.25rem; position: relative; }
+  .gate::before { content: "✓ שער בדיקה"; position: absolute; inset-block-start: -0.85rem; inset-inline-end: 1rem; background: var(--gate); color: #fff; font-family: var(--display); font-size: 0.85rem; padding: 0.1rem 0.7rem; border-radius: 4px; transform: rotate(2deg); }
+  .gate ol { margin: 0.25rem 0 0; }
+  .ok { color: var(--gate); font-weight: 700; }
+  .notice { border-inline-start: 5px solid var(--tape); background: var(--tape-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .notice h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .info { border-inline-start: 5px solid var(--wind); background: var(--wind-soft); border-radius: 8px; padding: 1rem 1.25rem; margin-block: 1.5rem; }
+  .info h3 { margin: 0 0 0.4rem; font-size: 1.1rem; }
+  .tablewrap { overflow-x: auto; margin-block: 0.75rem 1.25rem; }
+  table { border-collapse: collapse; width: 100%; background: var(--card); border: 1px solid var(--line); font-size: 0.97rem; }
+  th, td { border: 1px solid var(--line); padding: 0.55rem 0.8rem; text-align: start; vertical-align: top; }
+  th { background: var(--wind); color: #fff; font-weight: 600; }
+  td.num { font-family: var(--mono); direction: ltr; unicode-bidi: isolate; text-align: end; white-space: nowrap; }
+  tr.win td { background: var(--gate-soft); font-weight: 600; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 0.9rem; }
+  .grid figure { margin: 0; }
+  .grid figcaption { color: var(--ink-soft); font-size: 0.9rem; margin-block-start: 0.3rem; }
+  .artifacts { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-block-start: 0.6rem; }
+  .artifacts span { font-family: var(--mono); font-size: 0.78rem; direction: ltr; unicode-bidi: isolate; border: 1.5px dashed var(--ink-soft); border-radius: 6px; padding: 0.2rem 0.55rem; background: #fbfaf7; }
+  footer { margin-block-start: 3rem; color: var(--ink-soft); font-size: 0.85rem; border-block-start: 1px solid var(--line); padding-block-start: 1rem; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="eyebrow">FUNNELIQ · דוח סיום · M8 · 2026-09-07</span>
+    <h1>M8: הפרויקט סגור ומסור</h1>
+    <p class="lede">שמונה תחנות, שש חבילות אנליטיות, אתר חי מאחורי לוגין. הדוח הזה מסכם מה נבנה, מה הנתונים אמרו למייסד של Northbound, מה תוקן בסיבוב הליטוש האחרון, ומה נשאר במכוון בחוץ. הוא נכתב לצד README באנגלית לזר, ותקציר מנהלים בראש <code>docs/REPORT.md</code>.</p>
+    <span class="stamp">שער M8: עבר 10/10</span>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="v">6 / 6</div><div class="l">חבילות הברייף חיות באתר</div></div>
+    <div class="kpi"><div class="v">24</div><div class="l">pull requests ממוזגים, CI ירוק בכולם</div></div>
+    <div class="kpi"><div class="v">91</div><div class="l">בדיקות אוטומטיות, כולל מגן דליפה</div></div>
+    <div class="kpi"><div class="v">9</div><div class="l">שערי תחנה שעברו (M0–M8), כל אחד עם דוח עברי</div></div>
+  </div>
+
+  <div class="info">
+    <h3>בשפה פשוטה: מה הנתונים אמרו למייסד</h3>
+    <ol>
+      <li><b>הדאטה נקי ועקבי.</b> 33 שורות בלי תוצאה, ולא ממציאים להן ערך. תקציב גדול קונה פחות לידים לשקל (גמישות 0.61), והקמפיינים הבינוניים (<span dir="ltr">₪2,000–5,000</span>) ממירים הכי טוב ומרוויחים פי 4 מהגדולים.</li>
+      <li><b>כמה זמן לקוח יישאר אפשר לדעת ביום החתימה</b> (R² 0.95, ±2.8 חודשים). המנוף: כמה שיחות לקח לסגור אותו.</li>
+      <li><b>מי יקנה עוד:</b> המודל מגיע ל-AUC 0.80, אבל ללקוחות קיימים כלל פשוט ("ותק מעל 12, עלות רכישה מתחת ל-2,000") טוב באותה מידה. כלל לקיימים, מודל לחדשים.</li>
+      <li><b>לקוחות-העל</b> הם 17% מהלקוחות ו-34% מהרווח, וזולים יותר להשגה. כמעט כולם Mid ונסגרו בשתי שיחות: לזהות ביום החתימה.</li>
+      <li><b>לא להפסיק אחרי השיחה השלישית:</b> 48% מהמכירות דרשו יותר. מי שעדיין מדבר אחרי שלוש הוא ליד רציני, אבל סגירה מאוחרת היא חשבון קטן.</li>
+      <li><b>לפזר את <span dir="ltr">₪50,000</span> על קמפיינים בינוניים:</b> 25 × <span dir="ltr">₪2,000</span> צפוי להחזיר <span dir="ltr">₪544k</span> מול <span dir="ltr">₪15k</span> לשני קמפיינים גדולים. בתנאי שהצוות יכול להריץ 25.</li>
+    </ol>
+  </div>
+
+  <h2>מה נעשה בתחנה הזו</h2>
+  <div class="card">
+    <ul>
+      <li><b>README לזר:</b> מה הכלי עונה (עם המספרים), ארכיטקטורה, התקנה, נתונים ואימון מחדש, צילומים, מודל האבטחה, מפת הריפו, קרדיטים.</li>
+      <li><b>תקציר מנהלים</b> בראש <code>docs/REPORT.md</code>: שש תשובות, כל מספר נוצר מקוד.</li>
+      <li><b>אזהרת "רחוק מנתוני האימון"</b> (הערה מסבב הבדיקות אחרי M3): <code>ml/stats.py</code> שומר ממוצע/סטיית תקן/טווח של 14 פיצ'רי המשפך על 3,163 לקוחות האימון; כל תחזית ותק מחזירה <code>novelty</code> (ה-z הגדול ביותר, הפיצ'ר, ערכים מחוץ לטווח), ולשונית Predict מציגה אזהרה כתומה מעל 3 סטיות תקן. משפך של אפסים ו-"<span dir="ltr">₪800</span> עם 42 לידים" מזהירים עכשיו.</li>
+      <li><b>מטמון static:</b> אחרי הפריסה של M7 הדפדפן המשיך להגיש את dashboard.html הישן. <code>/static/*</code> שולח עכשיו <code>Cache-Control: no-cache</code>.</li>
+      <li><code>scripts/train_all.py</code> מאמן הכול מחדש ומייצר את FINDINGS, REPORT §P5/§P6 וסטטיסטיקות הקלט בסדר התלויות. <code>docs/STRANGER_TEST.md</code> מתעד את מבחן הזר.</li>
+      <li><b>שער M8</b> מריץ מחדש את כל בדיקות ה-offline של M0–M7 (כולן עוברות), ואז README, REPORT, לוג סגור, דוחות M0–M8, סטטיסטיקות קלט, מבחן הזר, ו-/health חי.</li>
+    </ul>
+  </div>
+
+  <h2>מבחן הזר</h2>
+  <div class="card">
+    <p>פרופיל דפדפן נקי ← לוגין ← Overview ← תחזית (כולל אזהרת חריגות והודעת ולידציה) ← Follow-ups ← Budget (הבונה נעול על סכום שגוי, מדמה על 50,000) ← Findings ← יציאה. התוצאה המלאה, שלב-שלב, ב-<code>docs/STRANGER_TEST.md</code>: <b>PASS</b>.</p>
+  </div>
+
+  <h2>המסע בצילומים</h2>
+  <div class="grid">
+    <figure><img src="img/m1_dashboard_signed_in.jpg" alt="M1: הדשבורד אחרי לוגין, טבלת רשומות מ-Supabase"><figcaption>M1 · לוגין ו-RLS: הרשומות נקראות עם הטוקן של המשתמש</figcaption></figure>
+    <figure><img src="img/m2_overview_live.jpg" alt="M2: לשונית Overview עם KPI וגרפים"><figcaption>M2 · Overview: תשואה פוחתת, המרה לפי tier</figcaption></figure>
+    <figure><img src="img/m3_predict_live.jpg" alt="M3: תחזית ותק"><figcaption>M3 · תחזית ותק, שלושה רגרסורים</figcaption></figure>
+    <figure><img src="img/m5_predict_super_live.jpg" alt="M5: ותק, upsell וציון super customer"><figcaption>M4–M5 · upsell וציון 0–100</figcaption></figure>
+    <figure><img src="img/m6_followups_live.jpg" alt="M6: לשונית Follow-ups"><figcaption>M6 · פרדוקס המעקבים: keep</figcaption></figure>
+    <figure><img src="img/m7_budget_live.jpg" alt="M7: לשונית Budget"><figcaption>M7 · סימולטור התקציב: לפזר</figcaption></figure>
+  </div>
+
+  <h2>לקחים שנשמרו (ב-<code>CLAUDE.md</code> וב-PROJECT_LOG)</h2>
+  <div class="card">
+    <ul>
+      <li><b>אותות הכשל שנכתבו בתוכנית שווים את הזמן:</b> שניים מהם התממשו (מלכודת "הקמפיין החציוני" ב-M7, ברירות מחדל שמפרות את זהות המשפך ב-M3) והשער תפס אותם.</li>
+      <li><b>השוואה הוגנת מודל-מול-כלל</b> דורשת לכוונן ולמדוד את הכלל על אותם folds (M4). התוצאה הייתה לא מחמיאה למודל, ודווחה כמו שהיא.</li>
+      <li><b>Chart.js</b> על canvas שנוצר בלשונית מוסתרת דורש resize + update כשהלשונית נפתחת (M6).</li>
+      <li><b>Supabase</b>: עורך ה-SQL מריץ רק את הקטע המסומן (M1). <b>Railway</b>: דומיינים גלובליים, להעתיק מפאנל Networking (M0); Railpack צריך start command מפורש ו-libgomp1 (M1, M3).</li>
+      <li><b>תהליך:</b> branch + שער + דוח עברי + Obsidian + PR לכל תחנה. הכללים חיים ב-<code>CLAUDE.md</code> כדי שכל סשן מתחיל מאותו מקום.</li>
+    </ul>
+  </div>
+
+  <h2>מה נשאר בחוץ, במכוון</h2>
+  <div class="card">
+    <ul>
+      <li><b>M9 (React):</b> אופציונלי בתוכנית; הדשבורד הוואנילי מכסה את הברייף וה-API לא היה משתנה. ניתוח כדאיות, מה ישתנה בממשק והערכת שעות: <code>docs/notes/REACT_HE.html</code>.</li>
+      <li><b>הקלטת דמו</b> של 3–5 דקות: אופציונלי, נשאר לדור.</li>
+      <li><b>הדאטה תרגולי:</b> ה-R² של 0.95 ומדרגת הרווח לפי tier הם תכונות של הסט הזה. בייצור מאמנים מחדש מקמפיינים אמיתיים לפני שסומכים על החלוקה. הכל כתוב ב-REPORT.</li>
+    </ul>
+  </div>
+
+  <h2>תוצאת השער</h2>
+  <div class="gate">
+    <ol>
+      <li><span class="ok">עבר</span> · pytest ירוק (91 בדיקות).</li>
+      <li><span class="ok">עבר</span> · ruff נקי.</li>
+      <li><span class="ok">עבר</span> · אין סודות ב-git.</li>
+      <li><span class="ok">עבר</span> · כל בדיקות ה-offline של M0–M7 עדיין עוברות.</li>
+      <li><span class="ok">עבר</span> · README שלם (תשובות, ארכיטקטורה, התקנה, אימון מחדש, צילומים, אבטחה).</li>
+      <li><span class="ok">עבר</span> · REPORT.md: תקציר מנהלים + P2–P6.</li>
+      <li><span class="ok">עבר</span> · PROJECT_LOG סגור; דוחות עבריים M0–M8 קיימים.</li>
+      <li><span class="ok">עבר</span> · input_stats.json לאזהרת החריגות (14 פיצ'רים, 3,163 לקוחות).</li>
+      <li><span class="ok">עבר</span> · מבחן הזר מתועד כ-PASS.</li>
+      <li><span class="ok">עבר</span> · <code>/health</code> חי מחזיר 200.</li>
+    </ol>
+  </div>
+
+  <div class="notice">
+    <h3>Definition of Done (PLAN §8)</h3>
+    <p>ריפו ציבורי עם README, schema.sql, תג CI ירוק ו-23 PRs ממוזגים ✓ · URL חי שמחזיר 200, שורד restart ונפרס ב-push ✓ · לוגין: אורח רואה רק את דף הכניסה, יציאה מנקה את ה-session ✓ · RLS מוכח: anon 0 שורות, JWT 3,500 ✓ · מפתח ה-service לא ב-Railway ולא בהיסטוריה ✓ · loader אידמפוטנטי, 3,500 שורות ✓ · P1–P6 לפי הדרישות, כולן חיות ✓ · REPORT, PROJECT_LOG ואובסידיאן שלמים ✓ · מבחן הזר עבר ✓</p>
+  </div>
+
+  <footer>FunnelIQ · דוח M8 (סיום) · 2026-09-07 · קוד: <code>github.com/DorKatzav/funneliq</code> · חי: <code>funneliq-production-4b63.up.railway.app</code></footer>
+</main>
+</body>
+</html>
