@@ -507,6 +507,67 @@ def check_live_simulator() -> None:
     assert ok.status_code == 200 and ok.json()["expected_profit"] > 0, ok.text[:200]
 
 
+# ---------------------------------------------------------------- M8 checks
+def check_previous_gates_offline() -> None:
+    """Re-run every M0–M7 check that does not need the live URL; a failure anywhere fails M8."""
+    failures = []
+    for m in range(0, 8):
+        for name, fn in GATES[m]:
+            if name.startswith("live "):
+                continue
+            try:
+                fn()
+            except Skip:
+                continue
+            except Exception as e:  # noqa: BLE001
+                failures.append(f"M{m}: {name} — {e}")
+    assert not failures, "; ".join(failures)
+
+
+def check_readme_complete() -> None:
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    for needle in (
+        "## What it answers",
+        "## Architecture",
+        "## Local setup",
+        "## Data and retraining",
+        "## Screenshots",
+        "## Security model",
+        "## Credits",
+        "actions/workflows/ci.yml/badge.svg",
+        "db/schema.sql",
+    ):
+        assert needle in text, f"README lacks '{needle}'"
+
+
+def check_report_executive_summary() -> None:
+    text = (ROOT / "docs" / "REPORT.md").read_text(encoding="utf-8")
+    assert "## Executive summary" in text, "REPORT.md has no executive summary"
+    for section in ("## P2", "## P3", "## P4", "## P5", "## P6"):
+        assert section in text, f"REPORT.md lacks {section}"
+
+
+def check_docs_closed() -> None:
+    log = (ROOT / "PROJECT_LOG.md").read_text(encoding="utf-8")
+    assert "M8: wrap-up" in log and "PROJECT CLOSED" in log, "PROJECT_LOG.md is not closed"
+    for n in range(0, 9):
+        assert (ROOT / "docs" / "reports" / f"M{n}_HE.html").exists(), f"docs/reports/M{n}_HE.html missing"
+
+
+def check_stranger_test_recorded() -> None:
+    text = (ROOT / "docs" / "STRANGER_TEST.md").read_text(encoding="utf-8")
+    assert "Outcome: PASS" in text, "docs/STRANGER_TEST.md does not record a PASS"
+
+
+def check_input_stats_artifact() -> None:
+    import json as _json
+
+    path = ROOT / "models" / "input_stats.json"
+    assert path.exists(), "models/input_stats.json missing (python -m ml.stats)"
+    stats = _json.loads(path.read_text(encoding="utf-8"))
+    assert len(stats["features"]) == 14 and stats["n"] == 3163, (len(stats["features"]), stats.get("n"))
+
+
 GATES: dict[int, list[Check]] = {
     0: [
         ("pytest green", check_pytest),
@@ -575,6 +636,18 @@ GATES: dict[int, list[Check]] = {
         ("model vs data agree on the winner (or REPORT says why)", check_winner_agreement_or_explained),
         ("REPORT.md §P6 answers the brief", check_report_p6),
         ("live simulate: presets ranked; /budget 422 on wrong total, 200 on valid", check_live_simulator),
+    ],
+    8: [
+        ("pytest green", check_pytest),
+        ("ruff clean", check_ruff),
+        ("no secrets in git", check_no_secrets_in_git),
+        ("every M0-M7 offline check still passes", check_previous_gates_offline),
+        ("README complete (answers, architecture, setup, retraining, screenshots)", check_readme_complete),
+        ("REPORT.md: executive summary + P2-P6", check_report_executive_summary),
+        ("PROJECT_LOG closed; Hebrew reports M0-M8 present", check_docs_closed),
+        ("input_stats.json for the novelty warning (14 features, 3,163 rows)", check_input_stats_artifact),
+        ("stranger test recorded as PASS", check_stranger_test_recorded),
+        ("live /health returns 200 + status ok", check_live_health),
     ],
 }
 

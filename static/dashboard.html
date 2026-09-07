@@ -87,6 +87,7 @@
         </div>
         <table id="ltv-by-model" class="compact"><thead><tr><th>model</th><th>months</th></tr></thead><tbody></tbody></table>
         <p class="muted" id="ltv-note"></p>
+        <p class="warn" id="ltv-novelty" hidden></p>
         <h2 style="margin-top:1.25rem">Will they buy more?</h2>
         <div class="result compact-result">
           <div class="big" id="up-prob">—</div>
@@ -468,6 +469,9 @@
           Object.entries(r.by_model).map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join("");
         document.getElementById("ltv-note").textContent =
           "Reads as: a customer acquired like this — same budget, same calls to close, same cost — stays this long on average.";
+        const nov = document.getElementById("ltv-novelty");
+        nov.hidden = !(r.novelty && r.novelty.flag);
+        nov.textContent = r.novelty && r.novelty.flag ? "⚠ Far from the training data: " + r.novelty.note : "";
         loadLog();
       } catch (e) { err.textContent = e.message; }
     });

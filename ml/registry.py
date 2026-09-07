@@ -59,6 +59,7 @@ class ModelRegistry:
         super_model: object | None = None,
         profit_model: object | None = None,
         profiles: dict | None = None,
+        input_stats: dict | None = None,
     ):
         self.models_dir = models_dir
         self.metrics = metrics
@@ -67,6 +68,7 @@ class ModelRegistry:
         self.super_model = super_model
         self.profit_model = profit_model
         self.profiles = profiles  # models/profiles.json: typical campaign per budget level (P6)
+        self.input_stats = input_stats  # models/input_stats.json: training distribution (novelty warning)
 
     @classmethod
     def load(cls, models_dir: Path = MODELS_DIR) -> ModelRegistry:
@@ -89,7 +91,11 @@ class ModelRegistry:
         profit_model = joblib.load(profit_path) if profit_path.exists() else None
         profiles_path = models_dir / "profiles.json"
         profiles = json.loads(profiles_path.read_text(encoding="utf-8")) if profiles_path.exists() else None
-        return cls(models_dir, metrics, ltv_models, upsell_models, super_model, profit_model, profiles)
+        stats_path = models_dir / "input_stats.json"
+        input_stats = json.loads(stats_path.read_text(encoding="utf-8")) if stats_path.exists() else None
+        return cls(
+            models_dir, metrics, ltv_models, upsell_models, super_model, profit_model, profiles, input_stats
+        )
 
     @property
     def loaded(self) -> list[str]:
@@ -180,3 +186,12 @@ class ModelRegistry:
             raise RuntimeError("profit model is not loaded")
         X = build_features(customer_frame(row), "profit")
         return max(float(self.profit_model.predict(X)[0]), 0.0)
+
+    # ------------------------------------------------------------------ novelty (M8)
+    def novelty(self, customer: dict) -> dict | None:
+        """How far the input is from the training customers (None when input_stats.json is absent)."""
+        if self.input_stats is None:
+            return None
+        from ml.stats import novelty  # local import: ml.stats imports MODELS_DIR from this module
+
+        return novelty(customer, self.input_stats)

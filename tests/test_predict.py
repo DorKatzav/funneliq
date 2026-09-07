@@ -192,3 +192,27 @@ def test_super_score_endpoint_and_profile_endpoint(api):
     assert res.status_code == 200, res.text
     body = res.json()
     assert 0 <= body["score"] <= 100 and body["band"] and any(r["model"] == "super" for r in fake.inserted)
+
+
+def test_novelty_flags_inputs_far_from_training(registry):
+    assert registry.input_stats, "run `python -m ml.stats` first"
+    typical = registry.novelty(EASY_CLOSE)
+    assert typical["flag"] is False and typical["max_z"] < 3
+    weird = {**EASY_CLOSE, "ad_budget": 800, "num_leads": 400, "leads_answered": 386}
+    far = registry.novelty(weird)
+    assert far["flag"] is True and far["note"]
+    assert "num_leads" in far["outside_training_range"] or far["feature"] in ("num_leads", "leads_answered")
+
+
+def test_predict_ltv_endpoint_returns_novelty():
+    app = create_app()
+    app.dependency_overrides[get_current_user] = lambda: TEST_USER
+    app.dependency_overrides[get_user_client] = lambda: FakeSupabase({"prediction_log": []})
+    res = TestClient(app).post("/api/predict/ltv", json=EASY_CLOSE)
+    assert res.status_code == 200, res.text
+    assert res.json()["novelty"]["flag"] is False
+
+
+def test_static_files_are_not_cached_stale(client):
+    res = client.get("/static/dashboard.html")
+    assert res.status_code == 200 and res.headers["cache-control"] == "no-cache"

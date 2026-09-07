@@ -41,6 +41,7 @@ def predict_ltv(
     result = registry.predict_ltv(customer.funnel_dict())
     served_cv = registry.metrics.get("ltv", {}).get("cv", {}).get(result["served"], {})
     result["rmse_months"] = served_cv.get("rmse_mean")
+    result["novelty"] = registry.novelty(customer.funnel_dict())
     log_prediction(client, "ltv", customer.model_dump(), result)
     return LtvPrediction(**result)
 
