@@ -8,7 +8,7 @@ simulates how to split a ₪50,000 monthly ad budget. Login-gated internal tool 
 with gradient boosting (XGBoost, LightGBM, CatBoost), FastAPI, Supabase (Postgres + Auth
 + Row Level Security) and Railway.
 
-> Status: **M6 — predictions, super-customer score and the follow-up paradox live (verdict: keep calling; 48% of sales need > 3 calls).** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
+> Status: **M7 — all six packages live: predictions, super-customer score, follow-up paradox, and the ₪50,000 budget simulator (verdict: spread across Mid-tier campaigns).** Live: https://funneliq-production-4b63.up.railway.app (health: `/health`)
 
 ## Architecture (short version)
 
@@ -39,7 +39,9 @@ python -m ml.train_ltv                # P2: train the LTV regressors -> models/
 python -m ml.train_upsell             # P3: train the upsell classifiers -> models/
 python -m ml.train_super              # P4: tune + train the super-customer scorer -> models/
 python -m ml.followups --write-report  # P5: regenerate REPORT.md §P5 from the data
-python scripts/gate.py --m 6          # milestone gate (offline + live checks)
+python -m ml.train_profit             # P6: train the profit model -> models/profit.joblib + profiles.json
+python -m ml.simulator --write-report  # P6: rank the ₪50,000 presets, write REPORT.md §P6
+python scripts/gate.py --m 7          # milestone gate (offline + live checks)
 python scripts/smoke_live.py          # live end-to-end sanity sweep
 ```
 
